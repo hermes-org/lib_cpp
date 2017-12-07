@@ -1,0 +1,37 @@
+DBGFLAGS = -O2 -g0 -DNDEBUG
+ifeq ($(DEBUG),1)
+DBGFLAGS = -O0 -g3 -D_DEBUG
+endif
+
+VERSION= 1:0
+CFLAGS = -std=c++17
+LFLAGS = -lpugixml
+
+CCOMPILER=libtool --mode=compile g++ -Wall -Wno-unused -fPIC -shared -fvisibility=hidden $(DBGFLAGS) -D_REENTRANT -DENV_LINUX -I.  -I../include $(CFLAGS)
+
+SYSLIBRARIES=
+
+LIBS =
+
+EXECUTABLE=libhermes.la
+
+LINK=libtool --mode=link g++ -fvisibility=hidden -shared -export-symbols-regex 'Hermes' -rpath /usr/lib64 -version-info $(VERSION)
+
+OBJECTS = ConfigurationClient.lo ConfigurationService.lo ConfigurationServiceSerializer.lo ConfigurationServiceSession.lo \
+	Downstream.lo DownstreamSerializer.lo DownstreamSession.lo DownstreamStateMachine.lo Serialization.lo Serializer.lo Upstream.lo \
+	UpstreamSerializer.lo UpstreamSession.lo UpstreamStateMachine.lo AsioServer.lo AsioClient.lo
+
+
+default: $(EXECUTABLE)
+
+$(EXECUTABLE): $(OBJECTS)
+	$(LINK) $(SYSLDFLAGS) $(LDFLAGS) -o $(EXECUTABLE) $(OBJECTS) -Wl,-whole-archive $(LIBS) -Wl,-no-whole-archive
+
+%.lo: %.cpp
+	$(CCOMPILER) -c $< -o $@
+
+clean:
+	rm -f $(OBJECTS) $(EXECUTABLE)
+
+
+
