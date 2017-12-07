@@ -1,0 +1,184 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="PrecompiledHeaders">
+      <UniqueIdentifier>{1206491f-c7dc-4ff7-9428-24ec0363de3a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="NetworkCommunication">
+      <UniqueIdentifier>{27ccef39-5c10-4813-b489-372b6957ed1b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Public">
+      <UniqueIdentifier>{1e1ec4f4-39f0-4631-a633-9113d04d378e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Infra">
+      <UniqueIdentifier>{33074580-b1ec-4da0-8a9f-348707f45aaa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Downstream">
+      <UniqueIdentifier>{98e706fa-0d5f-45c9-9941-d290afc0453f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Service">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Serialization">
+      <UniqueIdentifier>{a1b6f957-3633-4457-8869-555143b5cdba}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Serialization\pugixml">
+      <UniqueIdentifier>{2bb8285b-5879-4db8-bea3-899d4ff1438c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Upstream">
+      <UniqueIdentifier>{217b355f-4db9-4366-8f3e-2fc173b41223}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Configuration">
+      <UniqueIdentifier>{4035d6a8-f053-4d09-92f9-856f89ef72d0}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="stdafx.h">
+      <Filter>PrecompiledHeaders</Filter>
+    </ClInclude>
+    <ClInclude Include="Serializer.h">
+      <Filter>Serialization</Filter>
+    </ClInclude>
+    <ClInclude Include="IService.h">
+      <Filter>Service</Filter>
+    </ClInclude>
+    <ClInclude Include="Network.h">
+      <Filter>NetworkCommunication</Filter>
+    </ClInclude>
+    <ClInclude Include="ApiCallback.h">
+      <Filter>Infra</Filter>
+    </ClInclude>
+    <ClInclude Include="AsioSocket.h">
+      <Filter>NetworkCommunication</Filter>
+    </ClInclude>
+    <ClInclude Include="DownstreamSession.h">
+      <Filter>Downstream</Filter>
+    </ClInclude>
+    <ClInclude Include="DownstreamSerializer.h">
+      <Filter>Downstream</Filter>
+    </ClInclude>
+    <ClInclude Include="DownstreamStateMachine.h">
+      <Filter>Downstream</Filter>
+    </ClInclude>
+    <ClInclude Include="UpstreamConnection.h">
+      <Filter>Upstream</Filter>
+    </ClInclude>
+    <ClInclude Include="UpstreamSerializer.h">
+      <Filter>Upstream</Filter>
+    </ClInclude>
+    <ClInclude Include="UpstreamStateMachine.h">
+      <Filter>Upstream</Filter>
+    </ClInclude>
+    <ClInclude Include="UpstreamSession.h">
+      <Filter>Upstream</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\References\pugixml\pugiconfig.hpp">
+      <Filter>Serialization\pugixml</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\References\pugixml\pugixml.hpp">
+      <Filter>Serialization\pugixml</Filter>
+    </ClInclude>
+    <ClInclude Include="ConfigurationServiceSerializer.h">
+      <Filter>Configuration</Filter>
+    </ClInclude>
+    <ClInclude Include="ConfigurationServiceSession.h">
+      <Filter>Configuration</Filter>
+    </ClInclude>
+    <ClInclude Include="Service.h">
+      <Filter>Service</Filter>
+    </ClInclude>
+    <ClInclude Include="StringBuilder.h">
+      <Filter>Infra</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Hermes.hpp">
+      <Filter>Public</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Hermes.h">
+      <Filter>Public</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\HermesStringView.hpp">
+      <Filter>Public</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\HermesSerialization.h">
+      <Filter>Public</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\HermesSerialization.hpp">
+      <Filter>Public</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\HermesData.hpp">
+      <Filter>Public</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\HermesDataConversion.hpp">
+      <Filter>Public</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\HermesOptional.hpp">
+      <Filter>Public</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="stdafx.cpp">
+      <Filter>PrecompiledHeaders</Filter>
+    </ClCompile>
+    <ClCompile Include="Serializer.cpp">
+      <Filter>Serialization</Filter>
+    </ClCompile>
+    <ClCompile Include="AsioServer.cpp">
+      <Filter>NetworkCommunication</Filter>
+    </ClCompile>
+    <ClCompile Include="AsioClient.cpp">
+      <Filter>NetworkCommunication</Filter>
+    </ClCompile>
+    <ClCompile Include="Downstream.cpp">
+      <Filter>Downstream</Filter>
+    </ClCompile>
+    <ClCompile Include="DownstreamSession.cpp">
+      <Filter>Downstream</Filter>
+    </ClCompile>
+    <ClCompile Include="DownstreamSerializer.cpp">
+      <Filter>Downstream</Filter>
+    </ClCompile>
+    <ClCompile Include="DownstreamStateMachine.cpp">
+      <Filter>Downstream</Filter>
+    </ClCompile>
+    <ClCompile Include="Upstream.cpp">
+      <Filter>Upstream</Filter>
+    </ClCompile>
+    <ClCompile Include="UpstreamSerializer.cpp">
+      <Filter>Upstream</Filter>
+    </ClCompile>
+    <ClCompile Include="UpstreamStateMachine.cpp">
+      <Filter>Upstream</Filter>
+    </ClCompile>
+    <ClCompile Include="UpstreamSession.cpp">
+      <Filter>Upstream</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\References\pugixml\pugixml.cpp">
+      <Filter>Serialization\pugixml</Filter>
+    </ClCompile>
+    <ClCompile Include="ConfigurationService.cpp">
+      <Filter>Configuration</Filter>
+    </ClCompile>
+    <ClCompile Include="ConfigurationServiceSerializer.cpp">
+      <Filter>Configuration</Filter>
+    </ClCompile>
+    <ClCompile Include="ConfigurationServiceSession.cpp">
+      <Filter>Configuration</Filter>
+    </ClCompile>
+    <ClCompile Include="ConfigurationClient.cpp">
+      <Filter>Configuration</Filter>
+    </ClCompile>
+    <ClCompile Include="Serialization.cpp">
+      <Filter>Serialization</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="..\..\version\Version.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+</Project>

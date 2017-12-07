@@ -1,0 +1,1 @@
+Insert pugixml.hpp / pugixml.cpp / pugiconfig.hpp

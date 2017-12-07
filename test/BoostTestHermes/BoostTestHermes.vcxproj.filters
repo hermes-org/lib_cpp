@@ -1,0 +1,67 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Infra">
+      <UniqueIdentifier>{f3e299e3-5b61-40e9-8b53-45b745538de7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Tests">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Helpers">
+      <UniqueIdentifier>{443d0a64-f4e7-4dfa-b9af-95a822957bbe}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="stdafx.h">
+      <Filter>Infra</Filter>
+    </ClInclude>
+    <ClInclude Include="HermesDataGenerators.h">
+      <Filter>Helpers</Filter>
+    </ClInclude>
+    <ClInclude Include="HermesDataReflection.h">
+      <Filter>Helpers</Filter>
+    </ClInclude>
+    <ClInclude Include="StateMachineSpec.h">
+      <Filter>Helpers</Filter>
+    </ClInclude>
+    <ClInclude Include="Sinks.h">
+      <Filter>Infra</Filter>
+    </ClInclude>
+    <ClInclude Include="Runner.h">
+      <Filter>Helpers</Filter>
+    </ClInclude>
+    <ClInclude Include="Trace.h">
+      <Filter>Infra</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="stdafx.cpp">
+      <Filter>Infra</Filter>
+    </ClCompile>
+    <ClCompile Include="TestMain.cpp">
+      <Filter>Infra</Filter>
+    </ClCompile>
+    <ClCompile Include="ConfigurationTest.cpp">
+      <Filter>Tests</Filter>
+    </ClCompile>
+    <ClCompile Include="HermesDataTest.cpp">
+      <Filter>Tests</Filter>
+    </ClCompile>
+    <ClCompile Include="SerializerTest.cpp">
+      <Filter>Tests</Filter>
+    </ClCompile>
+    <ClCompile Include="DownstreamTest.cpp">
+      <Filter>Tests</Filter>
+    </ClCompile>
+    <ClCompile Include="UpstreamTest.cpp">
+      <Filter>Tests</Filter>
+    </ClCompile>
+    <ClCompile Include="Trace.cpp">
+      <Filter>Infra</Filter>
+    </ClCompile>
+    <ClCompile Include="CApiTest.cpp">
+      <Filter>Tests</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>
