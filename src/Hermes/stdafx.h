@@ -1,6 +1,8 @@
 #pragma once
 
-#include <SDKDDKVer.h>
+#ifdef _WINDOWS
+ #include <SDKDDKVer.h>
+#endif
 
 #include <string>
 #include <sstream>

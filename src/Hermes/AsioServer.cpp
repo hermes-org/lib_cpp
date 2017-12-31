@@ -95,7 +95,7 @@ namespace Hermes
             m_callback(callback)
         {}
 
-        AsioAcceptor::~AsioAcceptor()
+        ~AsioAcceptor()
         {
             Close_();
         }

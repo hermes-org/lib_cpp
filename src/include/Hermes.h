@@ -5,11 +5,15 @@
 #ifndef HERMES_H
 #define HERMES_H
 
-#ifdef HERMES_EXPORTS
-# define  HERMESPROTOCOL_API  __declspec(dllexport) 
+#ifdef _WINDOWS
+# ifdef HERMES_EXPORTS
+#  define  HERMESPROTOCOL_API  __declspec(dllexport) 
+# else
+#  define  HERMESPROTOCOL_API  __declspec(dllimport)
+# endif // HERMES_EXPORTS
 #else
-# define  HERMESPROTOCOL_API  __declspec(dllimport)
-#endif
+# define HERMESPROTOCOL_API
+#endif //_WINDOWS
 
 #define HERMES_VERSION "1.0"
 

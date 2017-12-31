@@ -37,7 +37,7 @@ namespace Hermes
     {
         if (!view.m_pData)
             return{};
-        return ToCpp(view);
+        return ToCpp(view).cpp_str();
     }
 
     // enums

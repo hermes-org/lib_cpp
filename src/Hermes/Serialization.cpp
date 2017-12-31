@@ -89,8 +89,13 @@ namespace Hermes
         struct DataHolder
         { 
             DataHolder(const T& cppData) : m_cppData(cppData) {}
+#ifdef _WINDOWS
             DataHolder(const DataHolder&) = delete;
             DataHolder& operator=(const DataHolder&) = delete;
+#else
+            DataHolder(const DataHolder&);
+            DataHolder& operator=(const DataHolder&);
+#endif
             DataHolder(DataHolder&& rhs) : m_cppData(std::move(rhs.m_cppData)), m_convertedData(ToC(m_cppData)) {}
             DataHolder& operator=(DataHolder&& rhs)
             {

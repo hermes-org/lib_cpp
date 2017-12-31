@@ -673,7 +673,7 @@ namespace Hermes
         return{configuration, error};
     }
 
-    inline Error Hermes::SetConfiguration(StringView hostName, const SetConfigurationData& configuration,
+    inline Error SetConfiguration(StringView hostName, const SetConfigurationData& configuration,
         unsigned timeoutInSeconds,
         Hermes::CurrentConfigurationData* out_pConfiguration, // resulting configuration
         std::vector<NotificationData>* out_pNotifications, // out: notification data

@@ -1,7 +1,7 @@
 // Copyright (c) ASM Assembly Systems GmbH & Co. KG
 #pragma once
 
-#include <string>
+#include <cstring>
 // while we have not got std::string_view at our disposal, we make our own:
 
 namespace Hermes
@@ -28,6 +28,7 @@ namespace Hermes
 
         operator std::string() const { return std::string(m_pData, m_size); }
 
+        const std::string cpp_str() const { return std::string(m_pData); }
         const char* data() const { return m_pData; }
         std::size_t size() const { return m_size; }
         std::size_t length() const { return m_size; }

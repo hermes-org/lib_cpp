@@ -7,7 +7,8 @@ VERSION= 1:0
 CFLAGS = -std=c++17
 LFLAGS = -lpugixml
 
-CCOMPILER=libtool --mode=compile g++ -Wall -Wno-unused -fPIC -shared -fvisibility=hidden $(DBGFLAGS) -D_REENTRANT -DENV_LINUX -I.  -I../include $(CFLAGS)
+CCOMPILER=libtool --mode=compile g++ -Wall -Wno-unused -fPIC -shared $(DBGFLAGS) -D_REENTRANT -DENV_LINUX -I.  -I../include $(CFLAGS)
+# -fvisibility=hidden
 
 SYSLIBRARIES=
 
@@ -15,7 +16,8 @@ LIBS =
 
 EXECUTABLE=libhermes.la
 
-LINK=libtool --mode=link g++ -fvisibility=hidden -shared -export-symbols-regex 'Hermes' -rpath /usr/lib64 -version-info $(VERSION)
+LINK=libtool --mode=link g++ -shared -rpath /usr/lib64 -version-info $(VERSION)
+#-fvisibility=hidden-export-symbols-regex 'Hermes'
 
 OBJECTS = ConfigurationClient.lo ConfigurationService.lo ConfigurationServiceSerializer.lo ConfigurationServiceSession.lo \
 	Downstream.lo DownstreamSerializer.lo DownstreamSession.lo DownstreamStateMachine.lo Serialization.lo Serializer.lo Upstream.lo \

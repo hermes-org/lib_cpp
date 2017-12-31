@@ -2,14 +2,20 @@
 
 #include <HermesDataConversion.hpp>
 
-#include "pugixml/pugixml.hpp"
+#ifdef _WINDOWS
+ #include "pugixml/pugixml.hpp"
+#else
+ #include "pugixml.hpp"
+#endif
 
 #include <boost/variant.hpp>
 
 #include <memory>
 
-#pragma warning( push )  
-#pragma warning( disable : 4251 )  
+#ifdef _WINDOWS
+# pragma warning( push )  
+# pragma warning( disable : 4251 )  
+#endif
 
 namespace Hermes
 {
@@ -48,4 +54,6 @@ namespace Hermes
 
 }
 
-#pragma warning( pop )  
+#ifdef _WINDOWS
+# pragma warning( pop )  
+#endif

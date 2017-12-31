@@ -66,7 +66,7 @@ struct HermesConfigurationService : IAcceptorCallback, IConfigurationServiceSess
         m_service.Inform(0U, "Created");
     }
 
-    ~HermesConfigurationService()
+    virtual ~HermesConfigurationService()
     {
         m_service.Inform(0U, "Deleted");
     }
@@ -126,7 +126,11 @@ struct HermesConfigurationService : IAcceptorCallback, IConfigurationServiceSess
     {
         auto sessionId = upSocket->SessionId();
         m_service.Inform(sessionId, "OnAccepted: ", upSocket->GetConnectionInfo());
+#ifdef _WINDOWS
         auto result = m_sessionMap.try_emplace(sessionId, std::move(upSocket), m_service, m_settings);
+#else
+        auto result = m_sessionMap.emplace(sessionId, ConfigurationServiceSession(std::move(upSocket), m_service, m_settings));
+#endif
         if (!result.second)
         {
             // should not really happen, unless someone launches a Denial of Service attack
