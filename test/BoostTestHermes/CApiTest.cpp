@@ -2,7 +2,11 @@
 #include "stdafx.h"
 
 #include <Hermes.h>
-#include <Windows.h>
+#ifdef _WINDOWS
+# include <Windows.h>
+#else
+# include <pthread.h>
+#endif
 
 #include <cassert>
 #include <iostream>
@@ -16,12 +20,30 @@ namespace
     {
     public:
 
-        Mutex() { ::InitializeCriticalSection(&m_criticalSection); }
-        ~Mutex() { ::DeleteCriticalSection(&m_criticalSection); }
+        Mutex() 
+        { 
+#ifdef _WINDOWS
+           ::InitializeCriticalSection(&m_criticalSection); 
+#else
+           pthread_mutex_init(&m_criticalSection,NULL);
+#endif
+        }
+        ~Mutex() 
+        { 
+#ifdef _WINDOWS
+           ::DeleteCriticalSection(&m_criticalSection); 
+#else
+           pthread_mutex_destroy(&m_criticalSection);
+#endif
+        }
 
     private:
         friend class Lock;
+#ifdef _WINDOWS
         CRITICAL_SECTION m_criticalSection;
+#else
+        pthread_mutex_t  m_criticalSection;
+#endif
         Mutex(const Mutex&);
         Mutex& operator=(const Mutex&);
     };
@@ -29,8 +51,22 @@ namespace
     class Lock
     {
     public:
-        Lock(Mutex& mutex) : m_mutex(mutex) { ::EnterCriticalSection(&m_mutex.m_criticalSection); }
-        ~Lock() { ::LeaveCriticalSection(&m_mutex.m_criticalSection); }
+        Lock(Mutex& mutex) : m_mutex(mutex) 
+        { 
+#ifdef _WINDOWS
+            ::EnterCriticalSection(&m_mutex.m_criticalSection); 
+#else
+            pthread_mutex_lock(&m_mutex.m_criticalSection);
+#endif
+        }
+        ~Lock() 
+        { 
+#ifdef _WINDOWS
+           ::LeaveCriticalSection(&m_mutex.m_criticalSection); 
+#else
+            pthread_mutex_lock(&m_mutex.m_criticalSection);
+#endif
+        }
 
     private:
         Lock(const Lock&);
@@ -101,8 +137,14 @@ public:
         };
 
         m_pHermes = ::CreateHermesDownstream(1U, &callbacks);
+#ifdef _WINDOWS
         m_completedEventHandle = ::CreateEvent(NULL, TRUE, FALSE, 0);
         m_threadHandle = ::CreateThread(0, 0, &DownstreamProxy::Run_, this, 0, 0);
+#else
+        pthread_mutex_init(&m_completedEventHandleMutex,NULL);
+        pthread_cond_init(&m_completedEventHandle,NULL);
+        pthread_create(&m_threadHandle, NULL, &DownstreamProxy::Run_, this);
+#endif
     }
 
     void SetConfiguration(const std::string& optionalClientAddress, unsigned short port,
@@ -148,7 +190,13 @@ public:
 
     void WaitForCompletion()
     {
+#ifdef _WINDOWS
         ::WaitForSingleObject(m_completedEventHandle, INFINITE);
+#else
+        pthread_mutex_lock(&m_completedEventHandleMutex);
+        pthread_cond_wait(&m_completedEventHandle,&m_completedEventHandleMutex);
+        pthread_mutex_unlock(&m_completedEventHandleMutex);
+#endif
     }
 
     void JoinThread()
@@ -156,7 +204,13 @@ public:
         if (!m_threadHandle)
             return;
         ::StopHermesDownstream(m_pHermes);
+#ifdef _WINDOWS
         ::WaitForSingleObject(m_threadHandle, INFINITE);
+#else
+        int i;
+
+        pthread_join(m_threadHandle,(void**)&i);
+#endif
         m_threadHandle = 0;
     }
 
@@ -177,13 +231,23 @@ private:
     HermesDownstream* m_pHermes;
     std::string m_optionalClientAddress; // this is the actual storage behind m_configuration.m_optionalClientAddress!
 
+#ifdef _WINDOWS
     HANDLE m_threadHandle;
+    HANDLE m_completedEventHandle;
+#else
+    pthread_t m_threadHandle;
+    pthread_mutex_t m_completedEventHandleMutex;
+    pthread_cond_t m_completedEventHandle;
+#endif
     unsigned m_sessionId;
     EHermesState m_state;
 
-    HANDLE m_completedEventHandle;
 
+#ifdef _WINDOWS
     static DWORD WINAPI Run_(void* pVoid)
+#else
+    static void *Run_(void* pVoid)
+#endif
     {
         DownstreamProxy* pThis = static_cast<DownstreamProxy*>(pVoid);
         ::RunHermesDownstream(pThis->m_pHermes);
@@ -318,7 +382,11 @@ public:
         m_pHermes = ::CreateHermesUpstream(1U, &callbacks);
 
         m_completedEventHandle = ::CreateEvent(NULL, TRUE, FALSE, 0);
+#ifdef _WINDOWS
         m_threadHandle = ::CreateThread(0, 0, &UpstreamProxy::Run_, this, 0, 0);
+#else
+        pthread_create(m_threadHandle, NULL, &UpstreamProxy::Run_, this);
+#endif
     }
 
     void SetConfiguration(const std::string& serverAddress, unsigned short port,
@@ -393,7 +461,11 @@ private:
     unsigned m_laneId;
     HermesUpstream* m_pHermes;
     std::string m_serverAddress; // this is the actual storage behind m_configuration.m_hostAddress!
+#ifdef _WINDOWS
     HANDLE m_threadHandle;
+#else
+    pthread_t m_threadHandle;
+#endif
     unsigned m_sessionId;
     EHermesState m_state;
     HANDLE m_completedEventHandle;
@@ -497,7 +569,12 @@ public:
         };
 
         m_pHermes = ::CreateHermesConfigurationService(&callbacks);
+
+#ifdef _WINDOWS
         m_threadHandle = ::CreateThread(0, 0, &ConfigurationProxy::Run_, this, 0, 0);
+#else
+        pthread_create(m_threadHandle, NULL, &ConfigurationProxy::Run_, this);
+#endif
 
         HermesConfigurationServiceSettings settings = {0, 10U};
         ::EnableHermesConfigurationService(m_pHermes, &settings);
@@ -546,7 +623,11 @@ private:
     DownstreamProxy m_downstream2;
 
     HermesConfigurationService* m_pHermes;
+#ifdef _WINDOWS
     HANDLE m_threadHandle;
+#else
+    pthread_t m_threadHandle;
+#endif
 
     std::string m_machineId;
 
