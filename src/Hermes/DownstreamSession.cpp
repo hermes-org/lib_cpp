@@ -42,11 +42,11 @@ namespace Hermes
             std::unique_ptr<IServerSocket> m_upSocket;
             std::unique_ptr<ISerializer> m_upSerializer;
             std::unique_ptr<IStateMachine> m_upStateMachine;
-            Optional<ServiceDescription> m_optionalPeerServiceDescription;
+            Optional<ServiceDescriptionData> m_optionalPeerServiceDescriptionData;
             ConnectionInfo m_peerConnectionInfo;
 
             ISessionCallback* m_pCallback{nullptr};
-            bool m_hasServiceDescription{false};
+            bool m_hasServiceDescriptionData{false};
 
             Impl(std::unique_ptr<IServerSocket>&& upSocket, IAsioService& service, const DownstreamSettings& configuration) :
                 m_id(upSocket->SessionId()),
@@ -72,9 +72,9 @@ namespace Hermes
                 m_pCallback->OnSocketConnected(m_id, state, connectionInfo);
             }
 
-            template<class DataT> void Signal_(const DataT& data)
+            template<class DataT> void Signal_(const DataT& data, StringView rawXml)
             {
-                m_upStateMachine->Signal(data);
+                m_upStateMachine->Signal(data, rawXml);
             }
 
             template<class DataT> void On_(EState state, const DataT& data)
@@ -85,9 +85,9 @@ namespace Hermes
                 m_pCallback->On(m_id, state, data);
             }
 
-            void On(EState state, const ServiceDescription& data)
+            void On(EState state, const ServiceDescriptionData& data)
             { 
-                m_optionalPeerServiceDescription = data;
+                m_optionalPeerServiceDescriptionData = data;
                 On_(state, data);
             }
 
@@ -95,6 +95,7 @@ namespace Hermes
             void On(EState state, const RevokeMachineReadyData& data) override { On_(state, data); }
             void On(EState state, const StartTransportData& data) override { On_(state, data); }
             void On(EState state, const StopTransportData& data) override { On_(state, data); }
+            void On(EState state, const QueryBoardInfoData& data) override { On_(state, data); }
             void On(EState state, const NotificationData& data) override { On_(state, data); }
             void On(EState state, const CheckAliveData& data) override { On_(state, data); }
             void OnState(EState state) override
@@ -135,9 +136,9 @@ namespace Hermes
         }
 
         unsigned Session::Id() const { return m_spImpl->m_id; }
-        const Optional<ServiceDescription>& Session::OptionalPeerServiceDescription() const 
+        const Optional<ServiceDescriptionData>& Session::OptionalPeerServiceDescriptionData() const 
         { 
-            return m_spImpl->m_optionalPeerServiceDescription; 
+            return m_spImpl->m_optionalPeerServiceDescriptionData; 
         }
         
         const ConnectionInfo& Session::PeerConnectionInfo() const { return m_spImpl->m_peerConnectionInfo; }
@@ -148,17 +149,19 @@ namespace Hermes
             m_spImpl->m_upStateMachine->Connect(m_spImpl, *m_spImpl);
         }
 
-        void Session::Signal(const ServiceDescription& data) { m_spImpl->Signal_(data); }
-        void Session::Signal(const BoardAvailableData& data) { m_spImpl->Signal_(data); }
-        void Session::Signal(const RevokeBoardAvailableData& data) { m_spImpl->Signal_(data); }
-        void Session::Signal(const TransportFinishedData& data) { m_spImpl->Signal_(data); }
-        void Session::Signal(const NotificationData&  data) { m_spImpl->Signal_(data); }
-        void Session::Signal(const CheckAliveData&  data) { m_spImpl->Signal_(data); }
+        void Session::Signal(const ServiceDescriptionData& data, StringView rawXml) { m_spImpl->Signal_(data, rawXml); }
+        void Session::Signal(const BoardAvailableData& data, StringView rawXml) { m_spImpl->Signal_(data, rawXml); }
+        void Session::Signal(const RevokeBoardAvailableData& data, StringView rawXml) { m_spImpl->Signal_(data, rawXml); }
+        void Session::Signal(const TransportFinishedData& data, StringView rawXml) { m_spImpl->Signal_(data, rawXml); }
+        void Session::Signal(const BoardForecastData& data, StringView rawXml) { m_spImpl->Signal_(data, rawXml); }
+        void Session::Signal(const SendBoardInfoData& data, StringView rawXml) { m_spImpl->Signal_(data, rawXml); }
+        void Session::Signal(const NotificationData&  data, StringView rawXml) { m_spImpl->Signal_(data, rawXml); }
+        void Session::Signal(const CheckAliveData&  data, StringView rawXml) { m_spImpl->Signal_(data, rawXml); }
 
-        void Session::Disconnect(const NotificationData& data) 
+        void Session::Disconnect()
         {
             m_spImpl->m_pCallback = nullptr;
-            m_spImpl->m_upStateMachine->Disconnect(data); 
+            m_spImpl->m_upStateMachine->Disconnect(); 
         }
     }
 }

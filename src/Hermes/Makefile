@@ -3,7 +3,7 @@ ifeq ($(DEBUG),1)
 DBGFLAGS = -O0 -g3 -D_DEBUG
 endif
 
-VERSION= 1:0
+VERSION= 1:1
 CFLAGS = -std=c++17
 LFLAGS = -lpugixml
 
@@ -19,9 +19,10 @@ EXECUTABLE=libhermes.la
 LINK=libtool --mode=link g++ -shared -rpath /usr/lib64 -version-info $(VERSION)
 #-fvisibility=hidden-export-symbols-regex 'Hermes'
 
-OBJECTS = ConfigurationClient.lo ConfigurationService.lo ConfigurationServiceSerializer.lo ConfigurationServiceSession.lo \
-	Downstream.lo DownstreamSerializer.lo DownstreamSession.lo DownstreamStateMachine.lo Serialization.lo Serializer.lo Upstream.lo \
-	UpstreamSerializer.lo UpstreamSession.lo UpstreamStateMachine.lo AsioServer.lo AsioClient.lo
+OBJECTS = AsioClient.lo AsioServer.lo ConfigurationClient.lo ConfigurationService.lo ConfigurationServiceSerializer.lo \
+	ConfigurationServiceSession.lo DeserializationHelper.lo Downstream.lo DownstreamSerializer.lo DownstreamSession.lo DownstreamStateMachine.lo \
+	GeneratedHermesGuid.lo MessageDispatcher.lo MessageSerialization.lo SenderEnvelope.lo Serialization.lo Upstream.lo \
+	UpstreamSerializer.lo UpstreamSession.lo UpstreamStateMachine.lo
 
 
 default: $(EXECUTABLE)

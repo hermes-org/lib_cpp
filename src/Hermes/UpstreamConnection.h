@@ -25,7 +25,7 @@ namespace Hermes
     public:
         UpstreamConnection(IAsioServiceSp, const UpstreamSettings&, const UpstreamConfiguration&);
 
-        SignalResult Connect(const ServiceDescription&);
+        SignalResult Connect(const ServiceDescriptionData&);
         SignalResult Signal(const MachineReadyData&);
         SignalResult Signal(const RevokeMachineReadyData&);
         SignalResult Signal(const StartTransportData&);
@@ -37,7 +37,7 @@ namespace Hermes
 
     struct IUpstreamConnectionCallback
     {
-        virtual void OnConnected(UpstreamConnection&, EHermesState, const ServiceDescription&) = 0;
+        virtual void OnConnected(UpstreamConnection&, EHermesState, const ServiceDescriptionData&) = 0;
         virtual void OnBoardAvailable(UpstreamConnection&, EHermesState, const BoardAvailableData&) = 0;
         virtual void OnRevokeBoardAvailable(UpstreamConnection&, EHermesState, const RevokeBoardAvailableData&) = 0;
         virtual void OnTransportFinished(UpstreamConnection&, EHermesState, const TransportFinishedData&) = 0;

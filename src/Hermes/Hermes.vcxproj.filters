@@ -41,9 +41,6 @@
     <ClInclude Include="stdafx.h">
       <Filter>PrecompiledHeaders</Filter>
     </ClInclude>
-    <ClInclude Include="Serializer.h">
-      <Filter>Serialization</Filter>
-    </ClInclude>
     <ClInclude Include="IService.h">
       <Filter>Service</Filter>
     </ClInclude>
@@ -119,13 +116,34 @@
     <ClInclude Include="..\include\HermesOptional.hpp">
       <Filter>Public</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\HermesData.h">
+      <Filter>Public</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\HermesStringView.h">
+      <Filter>Public</Filter>
+    </ClInclude>
+    <ClInclude Include="StringSpan.h">
+      <Filter>Infra</Filter>
+    </ClInclude>
+    <ClInclude Include="DeserializationHelpers.h">
+      <Filter>Serialization</Filter>
+    </ClInclude>
+    <ClInclude Include="MessageSerialization.h">
+      <Filter>Serialization</Filter>
+    </ClInclude>
+    <ClInclude Include="SenderEnvelope.h">
+      <Filter>Serialization</Filter>
+    </ClInclude>
+    <ClInclude Include="BasicPugiSerialization.h">
+      <Filter>Serialization</Filter>
+    </ClInclude>
+    <ClInclude Include="MessageDispatcher.h">
+      <Filter>Serialization</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
       <Filter>PrecompiledHeaders</Filter>
-    </ClCompile>
-    <ClCompile Include="Serializer.cpp">
-      <Filter>Serialization</Filter>
     </ClCompile>
     <ClCompile Include="AsioServer.cpp">
       <Filter>NetworkCommunication</Filter>
@@ -173,6 +191,21 @@
       <Filter>Configuration</Filter>
     </ClCompile>
     <ClCompile Include="Serialization.cpp">
+      <Filter>Serialization</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedHermesGuid.cpp">
+      <Filter>Infra</Filter>
+    </ClCompile>
+    <ClCompile Include="MessageSerialization.cpp">
+      <Filter>Serialization</Filter>
+    </ClCompile>
+    <ClCompile Include="SenderEnvelope.cpp">
+      <Filter>Serialization</Filter>
+    </ClCompile>
+    <ClCompile Include="DeserializationHelper.cpp">
+      <Filter>Serialization</Filter>
+    </ClCompile>
+    <ClCompile Include="MessageDispatcher.cpp">
       <Filter>Serialization</Filter>
     </ClCompile>
   </ItemGroup>

@@ -18,6 +18,7 @@ limitations under the License.
 #pragma once
 
 #include <HermesStringView.hpp>
+#include "StringSpan.h"
 
 #include <memory>
 #include <string>
@@ -28,7 +29,7 @@ limitations under the License.
 namespace Hermes
 {
     struct ConnectionInfo;
-    class Error;
+    struct Error;
     struct IAsioService; using IAsioServiceSp = std::shared_ptr<IAsioService>;
     struct IDataForward;
     struct NetworkConfiguration;
@@ -50,7 +51,7 @@ namespace Hermes
     struct ISocketCallback
     {
         virtual void OnConnected(const ConnectionInfo&) = 0;
-        virtual void OnReceived(StringView dataView) = 0;
+        virtual void OnReceived(StringSpan data) = 0;
         virtual void OnDisconnected(const Error&) = 0;
 
     protected:
@@ -83,8 +84,8 @@ namespace Hermes
     {
         std::string m_hostName;
         uint16_t m_port = 0U;
-        unsigned m_retryDelayInSeconds = 10U;
-        unsigned m_checkAlivePeriodInSeconds = 0U;
+        double m_retryDelayInSeconds = 10.0;
+        double m_checkAlivePeriodInSeconds = 60.0;
 
         friend bool operator==(const NetworkConfiguration& lhs, const NetworkConfiguration& rhs)
         {

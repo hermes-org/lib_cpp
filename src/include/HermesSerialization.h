@@ -27,44 +27,137 @@ limitations under the License.
 extern "C" {
 #endif
 
-    struct HermesStringHandle;
-    HERMESPROTOCOL_API HermesStringView HermesStringViewFromHandle(HermesStringHandle*);
+    // Serialize (just for unit testing)
+    struct HermesSerializationCallback
+    {
+        void(*m_pCall)(void* /*m_pData*/, HermesStringView);
+        void* m_pData;
+    };
+    HERMESPROTOCOL_API void HermesSerializeServiceDescription(const HermesServiceDescriptionData*, HermesSerializationCallback);
+    HERMESPROTOCOL_API void HermesSerializeBoardAvailable(const HermesBoardAvailableData*, HermesSerializationCallback);
+    HERMESPROTOCOL_API void HermesSerializeRevokeBoardAvailable(const HermesRevokeBoardAvailableData*, HermesSerializationCallback);
+    HERMESPROTOCOL_API void HermesSerializeMachineReady(const HermesMachineReadyData*, HermesSerializationCallback);
+    HERMESPROTOCOL_API void HermesSerializeRevokeMachineReady(const HermesRevokeMachineReadyData*, HermesSerializationCallback);
+    HERMESPROTOCOL_API void HermesSerializeStartTransport(const HermesStartTransportData*, HermesSerializationCallback);
+    HERMESPROTOCOL_API void HermesSerializeStopTransport(const HermesStopTransportData*, HermesSerializationCallback);
+    HERMESPROTOCOL_API void HermesSerializeTransportFinished(const HermesTransportFinishedData*, HermesSerializationCallback);
+    HERMESPROTOCOL_API void HermesSerializeBoardForecast(const HermesBoardForecastData*, HermesSerializationCallback);
+    HERMESPROTOCOL_API void HermesSerializeQueryBoardInfo(const HermesQueryBoardInfoData*, HermesSerializationCallback);
+    HERMESPROTOCOL_API void HermesSerializeSendBoardInfo(const HermesSendBoardInfoData*, HermesSerializationCallback);
+    HERMESPROTOCOL_API void HermesSerializeNotification(const HermesNotificationData*, HermesSerializationCallback);
+    HERMESPROTOCOL_API void HermesSerializeCheckAlive(const HermesCheckAliveData*, HermesSerializationCallback);
+    HERMESPROTOCOL_API void HermesSerializeGetConfiguration(const HermesGetConfigurationData*, HermesSerializationCallback);
+    HERMESPROTOCOL_API void HermesSerializeSetConfiguration(const HermesSetConfigurationData*, HermesSerializationCallback);
+    HERMESPROTOCOL_API void HermesSerializeCurrentConfiguration(const HermesCurrentConfigurationData*, HermesSerializationCallback);
 
-    HERMESPROTOCOL_API HermesStringHandle* HermesXmlFromServiceDescription(const HermesServiceDescription*);
-    HERMESPROTOCOL_API HermesStringHandle* HermesXmlFromBoardAvailableData(const HermesBoardAvailableData*);
-    HERMESPROTOCOL_API HermesStringHandle* HermesXmlFromRevokeBoardAvailableData(const HermesRevokeBoardAvailableData*);
-    HERMESPROTOCOL_API HermesStringHandle* HermesXmlFromMachineReadyData(const HermesMachineReadyData*);
-    HERMESPROTOCOL_API HermesStringHandle* HermesXmlFromRevokeMachineReadyData(const HermesRevokeMachineReadyData*);
-    HERMESPROTOCOL_API HermesStringHandle* HermesXmlFromStartTransportData(const HermesStartTransportData*);
-    HERMESPROTOCOL_API HermesStringHandle* HermesXmlFromStopTransportData(const HermesStopTransportData*);
-    HERMESPROTOCOL_API HermesStringHandle* HermesXmlFromTransportFinishedData(const HermesTransportFinishedData*);
-    HERMESPROTOCOL_API HermesStringHandle* HermesXmlFromNotificationData(const HermesNotificationData*);
-    HERMESPROTOCOL_API HermesStringHandle* HermesXmlFromCheckAliveData(const HermesCheckAliveData*);
-    HERMESPROTOCOL_API HermesStringHandle* HermesXmlFromGetConfigurationData(const HermesGetConfigurationData*);
-    HERMESPROTOCOL_API HermesStringHandle* HermesXmlFromSetConfigurationData(const HermesSetConfigurationData*);
-    HERMESPROTOCOL_API HermesStringHandle* HermesXmlFromCurrentConfigurationData(const HermesCurrentConfigurationData*);
+    // Deserialize (just for unit testing)
+    struct HermesDeserializationErrorCallback
+    {
+        void(*m_pCall)(void*, const HermesError*);
+        void* m_pData;
+    };
+    struct HermesDeserializedServiceDescriptionCallback
+    {
+        void(*m_pCall)(void*, const HermesServiceDescriptionData*);
+        void* m_pData;
+    };
+    struct HermesDeserializedBoardAvailableCallback
+    {
+        void(*m_pCall)(void*, const HermesBoardAvailableData*);
+        void* m_pData;
+    };
+    struct HermesDeserializedRevokeBoardAvailableCallback
+    {
+        void(*m_pCall)(void*, const HermesRevokeBoardAvailableData*);
+        void* m_pData;
+    };
+    struct HermesDeserializedMachineReadyCallback
+    {
+        void(*m_pCall)(void*, const HermesMachineReadyData*);
+        void* m_pData;
+    };
+    struct HermesDeserializedRevokeMachineReadyCallback
+    {
+        void(*m_pCall)(void*, const HermesRevokeMachineReadyData*);
+        void* m_pData;
+    };
+    struct HermesDeserializedStartTransportCallback
+    {
+        void(*m_pCall)(void*, const HermesStartTransportData*);
+        void* m_pData;
+    };
+    struct HermesDeserializedStopTransportCallback
+    {
+        void(*m_pCall)(void*, const HermesStopTransportData*);
+        void* m_pData;
+    };
+    struct HermesDeserializedTransportFinishedCallback
+    {
+        void(*m_pCall)(void*, const HermesTransportFinishedData*);
+        void* m_pData;
+    };
+    struct HermesDeserializedBoardForecastCallback
+    {
+        void(*m_pCall)(void*, const HermesBoardForecastData*);
+        void* m_pData;
+    };
+    struct HermesDeserializedQueryBoardInfoCallback
+    {
+        void(*m_pCall)(void*, const HermesQueryBoardInfoData*);
+        void* m_pData;
+    };
+    struct HermesDeserializedSendBoardInfoCallback
+    {
+        void(*m_pCall)(void*, const HermesSendBoardInfoData*);
+        void* m_pData;
+    };
+    struct HermesDeserializedNotificationCallback
+    {
+        void(*m_pCall)(void*, const HermesNotificationData*);
+        void* m_pData;
+    };
+    struct HermesDeserializedCheckAliveCallback
+    {
+        void(*m_pCall)(void*, const HermesCheckAliveData*);
+        void* m_pData;
+    };
+    struct HermesDeserializedGetConfigurationCallback
+    {
+        void(*m_pCall)(void*, const HermesGetConfigurationData*);
+        void* m_pData;
+    };
+    struct HermesDeserializedSetConfigurationCallback
+    {
+        void(*m_pCall)(void*, const HermesSetConfigurationData*);
+        void* m_pData;
+    };
+    struct HermesDeserializedCurrentConfigurationCallback
+    {
+        void(*m_pCall)(void*, const HermesCurrentConfigurationData*);
+        void* m_pData;
+    };
 
-    HERMESPROTOCOL_API void FreeHermesString(HermesStringHandle*);
-
-    struct HermesDataHandle;
-    HERMESPROTOCOL_API HermesDataHandle* HermesDataFromXml(HermesStringView);
-
-    HERMESPROTOCOL_API const HermesError* HermesErrorFromHandle(HermesDataHandle*);
-    HERMESPROTOCOL_API const HermesServiceDescription* HermesServiceDescriptionFromHandle(HermesDataHandle*);
-    HERMESPROTOCOL_API const HermesBoardAvailableData* HermesBoardAvailableDataFromHandle(HermesDataHandle*);
-    HERMESPROTOCOL_API const HermesRevokeBoardAvailableData* HermesRevokeBoardAvailableDataFromHandle(HermesDataHandle*);
-    HERMESPROTOCOL_API const HermesMachineReadyData* HermesMachineReadyDataFromHandle(HermesDataHandle*);
-    HERMESPROTOCOL_API const HermesRevokeMachineReadyData* HermesRevokeMachineReadyDataFromHandle(HermesDataHandle*);
-    HERMESPROTOCOL_API const HermesStartTransportData* HermesStartTransportDataFromHandle(HermesDataHandle*);
-    HERMESPROTOCOL_API const HermesStopTransportData* HermesStopTransportDataFromHandle(HermesDataHandle*);
-    HERMESPROTOCOL_API const HermesTransportFinishedData* HermesTransportFinishedDataFromHandle(HermesDataHandle*);
-    HERMESPROTOCOL_API const HermesNotificationData* HermesNotificationDataFromHandle(HermesDataHandle*);
-    HERMESPROTOCOL_API const HermesCheckAliveData* HermesCheckAliveDataFromHandle(HermesDataHandle*);
-    HERMESPROTOCOL_API const HermesGetConfigurationData* HermesGetConfigurationDataFromHandle(HermesDataHandle*);
-    HERMESPROTOCOL_API const HermesSetConfigurationData* HermesSetConfigurationDataFromHandle(HermesDataHandle*);
-    HERMESPROTOCOL_API const HermesCurrentConfigurationData* HermesCurrentConfigurationDataFromHandle(HermesDataHandle*);
-
-    HERMESPROTOCOL_API void FreeHermesData(HermesDataHandle*);
+    struct HermesDeserializationCallbacks
+    {
+        HermesDeserializationErrorCallback m_deserializationErrorCallback;
+        HermesDeserializedServiceDescriptionCallback m_serviceDescriptionCallback;
+        HermesDeserializedBoardAvailableCallback m_boardAvailableCallback;
+        HermesDeserializedRevokeBoardAvailableCallback m_revokeBoardAvailableCallback;
+        HermesDeserializedMachineReadyCallback m_machineReadyCallback;
+        HermesDeserializedRevokeMachineReadyCallback m_revokeMachineReadyCallback;
+        HermesDeserializedStartTransportCallback m_startTransportCallback;
+        HermesDeserializedStopTransportCallback m_stopTransportCallback;
+        HermesDeserializedTransportFinishedCallback m_transportFinishedCallback;
+        HermesDeserializedBoardForecastCallback m_boardForecastCallback;
+        HermesDeserializedQueryBoardInfoCallback m_queryBoardInfoCallback;
+        HermesDeserializedSendBoardInfoCallback m_sendBoardInfoCallback;
+        HermesDeserializedNotificationCallback m_notificationCallback;
+        HermesDeserializedCheckAliveCallback m_checkAliveCallback;
+        HermesDeserializedGetConfigurationCallback m_getConfigurationCallback;
+        HermesDeserializedSetConfigurationCallback m_setConfigurationCallback;
+        HermesDeserializedCurrentConfigurationCallback m_currentConfigurationCallback;
+    };
+    HERMESPROTOCOL_API void HermesDeserialize(HermesStringView, const HermesDeserializationCallbacks*);
 
 #ifdef __cplusplus
 }

@@ -18,6 +18,7 @@ limitations under the License.
 #pragma once
 
 #include "HermesDataConversion.hpp"
+#include "HermesData.hpp"
 
 #include <functional>
 #include <memory>
@@ -26,6 +27,8 @@ limitations under the License.
 // These are lightweight C++ wrappers around the Hermes C Api:
 namespace Hermes
 {
+    enum class EState;
+
     //======================= Downstream interface =====================================
     struct IDownstreamCallback;
     class Downstream
@@ -40,14 +43,19 @@ namespace Hermes
         template<class F> void Post(F&&);
         void Enable(const DownstreamSettings&);
 
-        void Signal(unsigned sessionId, const ServiceDescription&);
+        void Signal(unsigned sessionId, const ServiceDescriptionData&);
         void Signal(unsigned sessionId, const BoardAvailableData&);
         void Signal(unsigned sessionId, const RevokeBoardAvailableData&);
         void Signal(unsigned sessionId, const TransportFinishedData&);
+        void Signal(unsigned sessionId, const BoardForecastData&);
+        void Signal(unsigned sessionId, const SendBoardInfoData&);
         void Signal(unsigned sessionId, const NotificationData&);
         void Signal(unsigned sessionId, const CheckAliveData&);
-
         void Reset(const NotificationData&);
+
+        void Signal(unsigned sessionId, StringView);
+        void Reset(StringView);
+
         void Disable(const NotificationData&);
         void Stop();
 
@@ -69,11 +77,12 @@ namespace Hermes
         virtual void OnState(unsigned sessionId, EState) = 0;
         virtual void OnDisconnected(unsigned sessionId, EState, const Error&) = 0;
 
-        virtual void On(unsigned sessionId, EState, const ServiceDescription&) = 0;
+        virtual void On(unsigned sessionId, EState, const ServiceDescriptionData&) = 0;
         virtual void On(unsigned sessionId, EState, const MachineReadyData&) = 0;
         virtual void On(unsigned sessionId, EState, const RevokeMachineReadyData&) = 0;
         virtual void On(unsigned sessionId, EState, const StartTransportData&) = 0;
         virtual void On(unsigned sessionId, EState, const StopTransportData&) = 0;
+        virtual void On(unsigned /*sessionId*/, const QueryBoardInfoData&) {} // not necessarily interesting, hence not abstract
 
         virtual void OnTrace(unsigned sessionId, ETraceType, StringView trace) = 0;
 
@@ -95,15 +104,19 @@ namespace Hermes
         template<class F> void Post(F&&);
         void Enable(const UpstreamSettings&);
 
-        void Signal(unsigned sessionId, const ServiceDescription&);
+        void Signal(unsigned sessionId, const ServiceDescriptionData&);
         void Signal(unsigned sessionId, const MachineReadyData&);
         void Signal(unsigned sessionId, const RevokeMachineReadyData&);
         void Signal(unsigned sessionId, const StartTransportData&);
         void Signal(unsigned sessionId, const StopTransportData&);
+        void Signal(unsigned sessionId, const QueryBoardInfoData&);
         void Signal(unsigned sessionId, const NotificationData&);
         void Signal(unsigned sessionId, const CheckAliveData&);
-
         void Reset(const NotificationData&);
+
+        void Signal(unsigned sessionId, StringView);
+        void Reset(StringView);
+
         void Disable(const NotificationData&);
         void Stop();
 
@@ -125,10 +138,12 @@ namespace Hermes
         virtual void OnState(unsigned sessionId, EState) = 0;
         virtual void OnDisconnected(unsigned sessionId, EState, const Error&) = 0;
 
-        virtual void On(unsigned sessionId, EState, const ServiceDescription&) = 0;
+        virtual void On(unsigned sessionId, EState, const ServiceDescriptionData&) = 0;
         virtual void On(unsigned sessionId, EState, const BoardAvailableData&) = 0;
         virtual void On(unsigned sessionId, EState, const RevokeBoardAvailableData&) = 0;
         virtual void On(unsigned sessionId, EState, const TransportFinishedData&) = 0;
+        virtual void On(unsigned /*sessionId*/, EState, const BoardForecastData&) {} // not necessarily interesting, hence not abstract
+        virtual void On(unsigned /*sessionId*/, const SendBoardInfoData&) {} // not necessarily interesting, hence not abstract
 
         virtual void OnTrace(unsigned sessionId, ETraceType, StringView trace) = 0;
 
@@ -198,20 +213,23 @@ namespace Hermes
         ITraceCallback* // optional
     );
 
+    // stand-alone helper function to create a GUID
+    std::string GenerateGuid();
+
     // Convenience interface for situations in which the same class implements IUpstreamCallback and IDownstreamCallback.
     // Because some function names clash, this adds a level of indirection to different function names, eg.
-    // On(unsigned, const ServiceDescription&)
+    // On(unsigned, const ServiceDescriptionData&)
     // becomes:
-    // OnUpstream(unsigned, const ServiceDescription&)
+    // OnUpstream(unsigned, const ServiceDescriptionData&)
     // and
-    // OnDownstream(unsigned, const ServiceDescription&)
+    // OnDownstream(unsigned, const ServiceDescriptionData&)
     //
     // Deriving from UpstreamCallbackHelper and DownstreamCallbackHelper gives unique names for all callback methods.
     // Unambiguous methods, eg. On(unsigned, EState, const BoardAvailableData&) remain unchanged!
     struct UpstreamCallbackHelper : IUpstreamCallback
     {
         virtual void OnUpstreamConnected(unsigned sessionId, EState, const ConnectionInfo&) = 0;
-        virtual void OnUpstream(unsigned sessionId, EState, const ServiceDescription&) = 0;
+        virtual void OnUpstream(unsigned sessionId, EState, const ServiceDescriptionData&) = 0;
         virtual void OnUpstream(unsigned sessionId, const NotificationData& data) = 0;
         virtual void OnUpstream(unsigned sessionId, const CheckAliveData& data) = 0;
         virtual void OnUpstreamState(unsigned sessionId, EState) = 0;
@@ -219,7 +237,7 @@ namespace Hermes
         virtual void OnUpstreamTrace(unsigned sessionId, ETraceType, StringView trace) = 0;
 
         void OnConnected(unsigned sessionId, EState state, const ConnectionInfo& data) override { OnUpstreamConnected(sessionId, state, data); }
-        void On(unsigned sessionId, EState state, const ServiceDescription& data) override { OnUpstream(sessionId, state, data); }
+        void On(unsigned sessionId, EState state, const ServiceDescriptionData& data) override { OnUpstream(sessionId, state, data); }
         void On(unsigned sessionId, const NotificationData& data) override { OnUpstream(sessionId, data); }
         void On(unsigned sessionId, const CheckAliveData& data) override { OnUpstream(sessionId, data); }
         void OnState(unsigned sessionId, EState state) override { OnUpstreamState(sessionId, state); }
@@ -230,7 +248,7 @@ namespace Hermes
     struct DownstreamCallbackHelper : IDownstreamCallback
     {
         virtual void OnDownstreamConnected(unsigned sessionId, EState, const ConnectionInfo&) = 0;
-        virtual void OnDownstream(unsigned sessionId, EState, const ServiceDescription&) = 0;
+        virtual void OnDownstream(unsigned sessionId, EState, const ServiceDescriptionData&) = 0;
         virtual void OnDownstream(unsigned sessionId, const NotificationData& data) = 0;
         virtual void OnDownstream(unsigned sessionId, const CheckAliveData& data) = 0;
         virtual void OnDownstreamState(unsigned sessionId, EState) = 0;
@@ -238,14 +256,13 @@ namespace Hermes
         virtual void OnDownstreamTrace(unsigned sessionId, ETraceType, StringView trace) = 0;
 
         void OnConnected(unsigned sessionId, EState state, const ConnectionInfo& data) override { OnDownstreamConnected(sessionId, state, data); }
-        void On(unsigned sessionId, EState state, const ServiceDescription& data) override { OnDownstream(sessionId, state, data); }
+        void On(unsigned sessionId, EState state, const ServiceDescriptionData& data) override { OnDownstream(sessionId, state, data); }
         void On(unsigned sessionId, const NotificationData& data) override { OnDownstream(sessionId, data); }
         void On(unsigned sessionId, const CheckAliveData& data) override { OnDownstream(sessionId, data); }
         void OnState(unsigned sessionId, EState state) override { OnDownstreamState(sessionId, state); }
         void OnDisconnected(unsigned sessionId, EState state, const Error& data) override { OnDownstreamDisconnected(sessionId, state, data); }
         void OnTrace(unsigned sessionId, ETraceType type, StringView data) override { OnDownstreamTrace(sessionId, type, data); }
     };
-
 
     //======================== Downstream implementation =================================
     inline Downstream::Downstream(unsigned laneId, IDownstreamCallback& callback)
@@ -262,9 +279,9 @@ namespace Hermes
 
         callbacks.m_serviceDescriptionCallback.m_pData = &callback;
         callbacks.m_serviceDescriptionCallback.m_pCall = [](void* pCallback, uint32_t sessionId, EHermesState state,
-            const HermesServiceDescription* pServiceDescription)
+            const HermesServiceDescriptionData* pServiceDescriptionData)
         {
-            static_cast<IDownstreamCallback*>(pCallback)->On(sessionId, ToCpp(state), ToCpp(*pServiceDescription));
+            static_cast<IDownstreamCallback*>(pCallback)->On(sessionId, ToCpp(state), ToCpp(*pServiceDescriptionData));
         };
 
         callbacks.m_machineReadyCallback.m_pData = &callback;
@@ -293,6 +310,13 @@ namespace Hermes
             const HermesStopTransportData* pData)
         {
             static_cast<IDownstreamCallback*>(pCallback)->On(sessionId, ToCpp(state), ToCpp(*pData));
+        };
+
+        callbacks.m_queryBoardInfoCallback.m_pData = &callback;
+        callbacks.m_queryBoardInfoCallback.m_pCall = [](void* pCallback, uint32_t sessionId,
+            const HermesQueryBoardInfoData* pData)
+        {
+            static_cast<IDownstreamCallback*>(pCallback)->On(sessionId, ToCpp(*pData));
         };
 
         callbacks.m_notificationCallback.m_pData = &callback;
@@ -355,7 +379,7 @@ namespace Hermes
         ::EnableHermesDownstream(m_pImpl, &apiData);
     }
 
-    inline void Downstream::Signal(unsigned sessionId, const ServiceDescription& data)
+    inline void Downstream::Signal(unsigned sessionId, const ServiceDescriptionData& data)
     {
         auto apiData = ToC(data);
         ::SignalHermesDownstreamServiceDescription(m_pImpl, sessionId, &apiData);
@@ -379,6 +403,18 @@ namespace Hermes
         ::SignalHermesTransportFinished(m_pImpl, sessionId, &apiData);
     }
 
+    inline void Downstream::Signal(unsigned sessionId, const BoardForecastData& data)
+    {
+        auto apiData = ToC(data);
+        ::SignalHermesBoardForecast(m_pImpl, sessionId, &apiData);
+    }
+
+    inline void Downstream::Signal(unsigned sessionId, const SendBoardInfoData& data)
+    {
+        auto apiData = ToC(data);
+        ::SignalHermesSendBoardInfo(m_pImpl, sessionId, &apiData);
+    }
+
     inline void Downstream::Signal(unsigned sessionId, const NotificationData& data)
     {
         auto apiData = ToC(data);
@@ -395,6 +431,16 @@ namespace Hermes
     {
         auto apiData = ToC(data);
         ::ResetHermesDownstream(m_pImpl, &apiData);
+    }
+
+    inline void Downstream::Signal(unsigned sessionId, StringView rawXml)
+    {
+        ::SignalHermesDownstreamRawXml(m_pImpl, sessionId, ToC(rawXml));
+    }
+
+    inline void Downstream::Reset(StringView rawXml)
+    {
+        ::ResetHermesDownstreamRawXml(m_pImpl, ToC(rawXml));
     }
 
     inline void Downstream::Disable(const NotificationData& data)
@@ -423,9 +469,9 @@ namespace Hermes
 
         callbacks.m_serviceDescriptionCallback.m_pData = &callback;
         callbacks.m_serviceDescriptionCallback.m_pCall = [](void* pCallback, uint32_t sessionId, EHermesState state,
-            const HermesServiceDescription* pServiceDescription)
+            const HermesServiceDescriptionData* pServiceDescriptionData)
         {
-            static_cast<IUpstreamCallback*>(pCallback)->On(sessionId, ToCpp(state), ToCpp(*pServiceDescription));
+            static_cast<IUpstreamCallback*>(pCallback)->On(sessionId, ToCpp(state), ToCpp(*pServiceDescriptionData));
         };
 
         callbacks.m_boardAvailableCallback.m_pData = &callback;
@@ -447,6 +493,20 @@ namespace Hermes
             const HermesTransportFinishedData* pData)
         {
             static_cast<IUpstreamCallback*>(pCallback)->On(sessionId, ToCpp(state), ToCpp(*pData));
+        };
+
+        callbacks.m_boardForecastCallback.m_pData = &callback;
+        callbacks.m_boardForecastCallback.m_pCall = [](void* pCallback, uint32_t sessionId, EHermesState state,
+            const HermesBoardForecastData* pData)
+        {
+            static_cast<IUpstreamCallback*>(pCallback)->On(sessionId, ToCpp(state), ToCpp(*pData));
+        };
+
+        callbacks.m_sendBoardInfoCallback.m_pData = &callback;
+        callbacks.m_sendBoardInfoCallback.m_pCall = [](void* pCallback, uint32_t sessionId,
+            const HermesSendBoardInfoData* pData)
+        {
+            static_cast<IUpstreamCallback*>(pCallback)->On(sessionId, ToCpp(*pData));
         };
 
         callbacks.m_notificationCallback.m_pData = &callback;
@@ -509,7 +569,7 @@ namespace Hermes
         ::PostHermesUpstream(m_pImpl, callback);
     }
 
-    inline void Upstream::Signal(unsigned sessionId, const ServiceDescription& data)
+    inline void Upstream::Signal(unsigned sessionId, const ServiceDescriptionData& data)
     {
         auto apiData = ToC(data);
         ::SignalHermesUpstreamServiceDescription(m_pImpl, sessionId, &apiData);
@@ -539,6 +599,12 @@ namespace Hermes
         ::SignalHermesStopTransport(m_pImpl, sessionId, &apiData);
     }
 
+    inline void Upstream::Signal(unsigned sessionId, const QueryBoardInfoData& data)
+    {
+        auto apiData = ToC(data);
+        ::SignalHermesQueryBoardInfo(m_pImpl, sessionId, &apiData);
+    }
+
     inline void Upstream::Signal(unsigned sessionId, const NotificationData& data)
     {
         auto apiData = ToC(data);
@@ -555,6 +621,16 @@ namespace Hermes
     {
         auto apiData = ToC(data);
         ::SignalHermesUpstreamCheckAlive(m_pImpl, sessionId, &apiData);
+    }
+
+    inline void Upstream::Signal(unsigned sessionId, StringView rawXml)
+    {
+        ::SignalHermesUpstreamRawXml(m_pImpl, sessionId, ToC(rawXml));
+    }
+
+    inline void Upstream::Reset(StringView rawXml)
+    {
+        ::ResetHermesUpstreamRawXml(m_pImpl, ToC(rawXml));
     }
 
     inline void Upstream::Disable(const NotificationData& data)
@@ -653,6 +729,15 @@ namespace Hermes
         ::StopHermesConfigurationService(m_pImpl);
     }
 
+    //======================== GenerateGuid implementation =================================
+    inline std::string GenerateGuid()
+    {
+        std::string guid;
+        guid.resize(cHERMES_GUID_LENGTH);
+        ::GenerateHermesGuid(const_cast<char*>(guid.data()));
+        return guid;
+    }
+
     //================= Configuration client implementation =======================
     inline std::pair<CurrentConfigurationData, Error> GetConfiguration(StringView hostName, unsigned timeoutInSeconds,
         ITraceCallback* pTraceCallback)
@@ -691,7 +776,7 @@ namespace Hermes
 
     inline Error SetConfiguration(StringView hostName, const SetConfigurationData& configuration,
         unsigned timeoutInSeconds,
-        Hermes::CurrentConfigurationData* out_pConfiguration, // resulting configuration
+        CurrentConfigurationData* out_pConfiguration, // resulting configuration
         std::vector<NotificationData>* out_pNotifications, // out: notification data
         ITraceCallback* pTraceCallback)
     {

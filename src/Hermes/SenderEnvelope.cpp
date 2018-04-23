@@ -18,7 +18,11 @@ namespace Hermes
             auto fraction = now - seconds;
             time_t cnow = std::chrono::system_clock::to_time_t(now);
             tm local_tm;
+#ifdef _WINDOWS
             localtime_s(&local_tm, &cnow);
+#else
+            localtime_r(&cnow, &local_tm);
+#endif
             std::ostringstream oss;
             oss << std::put_time(&local_tm, "%Y-%m-%dT%H:%M:%S.");
             auto milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(fraction);

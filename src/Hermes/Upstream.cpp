@@ -18,6 +18,7 @@ limitations under the License.
 
 #include <HermesDataConversion.hpp>
 #include "ApiCallback.h"
+#include "MessageDispatcher.h"
 #include "Service.h"
 #include "UpstreamSession.h"
 
@@ -32,7 +33,7 @@ struct HermesUpstream : ISessionCallback
     unsigned m_laneId = 0U;
     Service m_service;
     asio::deadline_timer m_timer{m_service.GetUnderlyingService()};
-    UpstreamSettings m_configuration;
+    UpstreamSettings m_settings;
 
     unsigned m_sessionId{0U};
     unsigned m_connectedSessionId{0U};
@@ -42,6 +43,8 @@ struct HermesUpstream : ISessionCallback
     ApiCallback<HermesBoardAvailableCallback> m_boardAvailableCallback;
     ApiCallback<HermesRevokeBoardAvailableCallback> m_revokeBoardAvailableCallback;
     ApiCallback<HermesTransportFinishedCallback> m_transportFinishedCallback;
+    ApiCallback<HermesBoardForecastCallback> m_boardForecastCallback;
+    ApiCallback<HermesSendBoardInfoCallback> m_sendBoardInfoCallback;
     ApiCallback<HermesNotificationCallback> m_notificationCallback;
     ApiCallback<HermesCheckAliveCallback> m_checkAliveCallback;
     ApiCallback<HermesStateCallback> m_stateCallback;
@@ -59,6 +62,8 @@ struct HermesUpstream : ISessionCallback
         m_boardAvailableCallback(callbacks.m_boardAvailableCallback),
         m_revokeBoardAvailableCallback(callbacks.m_revokeBoardAvailableCallback),
         m_transportFinishedCallback(callbacks.m_transportFinishedCallback),
+        m_boardForecastCallback(callbacks.m_boardForecastCallback),
+        m_sendBoardInfoCallback(callbacks.m_sendBoardInfoCallback),
         m_notificationCallback(callbacks.m_notificationCallback),
         m_checkAliveCallback(callbacks.m_checkAliveCallback),
         m_stateCallback(callbacks.m_stateCallback),
@@ -67,23 +72,23 @@ struct HermesUpstream : ISessionCallback
         m_service.Inform(0U, "Created");
     }
 
-    virtual ~HermesUpstream()
+    ~HermesUpstream()
     {
         m_service.Inform(0U, "Deleted");
     }
 
-    void Enable(const UpstreamSettings& configuration)
+    void Enable(const UpstreamSettings& settings)
     {
-        m_service.Log(0U, "Enable(", configuration, "); m_enabled=", m_enabled, ", m_configuration=", m_configuration);
+        m_service.Log(0U, "Enable(", settings, "); m_enabled=", m_enabled, ", m_settings=", m_settings);
 
-        if (m_enabled && configuration == m_configuration)
+        if (m_enabled && settings == m_settings)
             return;
 
         m_enabled = true;
         RemoveSession_(NotificationData(ENotificationCode::eCONNECTION_RESET_BECAUSE_OF_CHANGED_CONFIGURATION,
             ESeverity::eINFO, "ConfigurationChanged"));
 
-        m_configuration = configuration;
+        m_settings = settings;
         CreateNewSession_();
     }
 
@@ -99,23 +104,15 @@ struct HermesUpstream : ISessionCallback
     }
 
     template<class DataT>
-    void Signal(unsigned sessionId, const DataT& data)
+    void Signal(unsigned sessionId, const DataT& data, StringView rawXml)
     {
-        m_service.Log(sessionId, "Signal(", data, ')');
+        m_service.Log(sessionId, "Signal(", data, ',', rawXml, ')');
 
         auto pSession = Session_(sessionId);
         if (!pSession)
             return;
 
-        pSession->Signal(data);
-    }
-
-    void Reset(const NotificationData& notificationData)
-    {
-        m_service.Log(0U, "Reset(", notificationData, ')');
-
-        RemoveSession_(notificationData);
-        CreateNewSession_();
+        pSession->Signal(data, rawXml);
     }
 
     void Stop()
@@ -139,14 +136,14 @@ struct HermesUpstream : ISessionCallback
         m_connectedCallback(pSession->Id(), ToC(state), &apiConnectionInfo);
     }
 
-    void On(unsigned sessionId, EState state, const ServiceDescription& serviceDescription) override
+    void On(unsigned sessionId, EState state, const ServiceDescriptionData& serviceDescription) override
     {
         auto* pSession = Session_(sessionId);
         if (!pSession)
             return;
 
-        auto apiServiceDescription = ToC(serviceDescription);
-        m_serviceDescriptionCallback(pSession->Id(), ToC(state), &apiServiceDescription);
+        auto apiServiceDescriptionData = ToC(serviceDescription);
+        m_serviceDescriptionCallback(pSession->Id(), ToC(state), &apiServiceDescriptionData);
     }
 
     void On(unsigned sessionId, EState state, const BoardAvailableData& in_data) override
@@ -179,6 +176,26 @@ struct HermesUpstream : ISessionCallback
         m_transportFinishedCallback(sessionId, ToC(state), &apiData);
     }
 
+    void On(unsigned sessionId, EState state, const BoardForecastData& data) override
+    {
+        auto* pSession = Session_(sessionId);
+        if (!pSession)
+            return;
+
+        auto apiData = ToC(data);
+        m_boardForecastCallback(sessionId, ToC(state), &apiData);
+    }
+
+    void On(unsigned sessionId, EState, const SendBoardInfoData& data) override
+    {
+        auto* pSession = Session_(sessionId);
+        if (!pSession)
+            return;
+
+        auto apiData = ToC(data);
+        m_sendBoardInfoCallback(sessionId, &apiData);
+    }
+
     void On(unsigned sessionId, EState, const NotificationData& data) override
     {
         auto* pSession = Session_(sessionId);
@@ -189,13 +206,21 @@ struct HermesUpstream : ISessionCallback
         m_notificationCallback(sessionId, &apiData);
     }
 
-    void On(unsigned sessionId, EState, const CheckAliveData& data) override
+    void On(unsigned sessionId, EState, const CheckAliveData& in_data) override
     {
-        auto* pSession = Session_(sessionId);
+        auto pSession = Session_(sessionId);
         if (!pSession)
             return;
 
-        auto apiData = ToC(data);
+        if (in_data.m_optionalType
+            && *in_data.m_optionalType == ECheckAliveType::ePING
+            && m_settings.m_checkAliveResponseMode == ECheckAliveResponseMode::eAUTO)
+        {
+            CheckAliveData data{in_data};
+            data.m_optionalType = ECheckAliveType::ePONG;
+            m_service.Post([this, sessionId, data = std::move(data)]() { Signal(sessionId, data, Serialize(data)); });
+        }
+        auto apiData = ToC(in_data);
         m_checkAliveCallback(sessionId, &apiData);
     }
 
@@ -214,13 +239,13 @@ struct HermesUpstream : ISessionCallback
         if (!pSession)
             return;
 
-        if (pSession->OptionalPeerServiceDescription())
+        if (pSession->OptionalPeerServiceDescriptionData())
         {
-            m_service.Post([this]() { CreateNewSession_(); });
+            DelayCreateNewSession_(1.0);
         }
         else
         {
-            DelayCreateNewSession_();
+            DelayCreateNewSession_(m_settings.m_reconnectWaitTimeInSeconds);
         }
 
         m_upSession.reset();
@@ -238,15 +263,15 @@ struct HermesUpstream : ISessionCallback
         return nullptr;
     }
 
-    void RemoveSession_(const NotificationData& notification)
+    void RemoveSession_()
     {
         if (!m_upSession)
             return;
 
         auto sessionId = m_upSession->Id();
-        m_service.Log(sessionId, "Disconnect_(", notification, ')');
+        m_service.Log(sessionId, "RemoveSession_()");
 
-        m_upSession->Disconnect(notification);
+        m_upSession->Disconnect();
         m_upSession.reset();
 
         if (sessionId != m_connectedSessionId)
@@ -255,8 +280,16 @@ struct HermesUpstream : ISessionCallback
         m_connectedSessionId = 0U;
         Error error;
         auto apiError = ToC(error);
-        m_disconnectedCallback(sessionId, eHERMES_DISCONNECTED, &apiError);
+        m_disconnectedCallback(sessionId, eHERMES_STATE_DISCONNECTED, &apiError);
+    }
 
+    void RemoveSession_(const NotificationData& data)
+    {
+        if (!m_upSession)
+            return;
+
+        m_upSession->Signal(data, Serialize(data));
+        RemoveSession_();
     }
 
     void CreateNewSession_()
@@ -272,15 +305,15 @@ struct HermesUpstream : ISessionCallback
 
         if (!++m_sessionId) { ++m_sessionId; } // avoid zero sessionId
 
-        m_upSession = std::make_unique<Session>(m_sessionId, m_service, m_configuration);
+        m_upSession = std::make_unique<Session>(m_sessionId, m_service, m_settings);
         m_upSession->Connect(*this);
     }
 
-    void DelayCreateNewSession_()
+    void DelayCreateNewSession_(double delay)
     {
         m_service.Log(0U, "DelayCreateNewSession_");
 
-        m_timer.expires_from_now(boost::posix_time::seconds(m_configuration.m_reconnectWaitTimeInSeconds));
+        m_timer.expires_from_now(boost::posix_time::millisec(static_cast<int>(1000.0 * delay)));
         m_timer.async_wait([this](const boost::system::error_code& ec)
         {
             if (ec) // timer cancelled or whatever
@@ -329,12 +362,12 @@ void EnableHermesUpstream(HermesUpstream* pUpstream, const HermesUpstreamSetting
     });
 }
 
-void SignalHermesUpstreamServiceDescription(HermesUpstream* pUpstream, uint32_t sessionId, const HermesServiceDescription* pData)
+void SignalHermesUpstreamServiceDescription(HermesUpstream* pUpstream, uint32_t sessionId, const HermesServiceDescriptionData* pData)
 {
     pUpstream->m_service.Log(sessionId, "SignalHermesUpstreamServiceDescription");
     pUpstream->m_service.Post([pUpstream, sessionId, data = ToCpp(*pData)]()
     {
-        pUpstream->Signal(sessionId, data);
+        pUpstream->Signal(sessionId, data, Serialize(data));
     });
 }
 
@@ -343,7 +376,7 @@ void SignalHermesMachineReady(HermesUpstream* pUpstream, uint32_t sessionId, con
     pUpstream->m_service.Log(sessionId, "SignalHermesMachineReady");
     pUpstream->m_service.Post([pUpstream, sessionId, data = ToCpp(*pData)]()
     {
-        pUpstream->Signal(sessionId, data);
+        pUpstream->Signal(sessionId, data, Serialize(data));
     });
 }
 
@@ -352,7 +385,7 @@ void SignalHermesRevokeMachineReady(HermesUpstream* pUpstream, uint32_t sessionI
     pUpstream->m_service.Log(sessionId, "SignalHermesRevokeMachineReady");
     pUpstream->m_service.Post([pUpstream, sessionId, data = ToCpp(*pData)]()
     {
-        pUpstream->Signal(sessionId, data);
+        pUpstream->Signal(sessionId, data, Serialize(data));
     });
 }
 
@@ -362,7 +395,17 @@ void SignalHermesStartTransport(HermesUpstream* pUpstream, uint32_t sessionId, c
 
     pUpstream->m_service.Post([pUpstream, sessionId, data = ToCpp(*pData)]()
     {
-        pUpstream->Signal(sessionId, data);
+        pUpstream->Signal(sessionId, data, Serialize(data));
+    });
+}
+
+void SignalHermesQueryBoardInfo(HermesUpstream* pUpstream, uint32_t sessionId, const HermesQueryBoardInfoData* pData)
+{
+    pUpstream->m_service.Log(sessionId, "SignalHermesQueryBoardInfo");
+
+    pUpstream->m_service.Post([pUpstream, sessionId, data = ToCpp(*pData)]()
+    {
+        pUpstream->Signal(sessionId, data, Serialize(data));
     });
 }
 
@@ -372,7 +415,7 @@ void SignalHermesStopTransport(HermesUpstream* pUpstream, uint32_t sessionId, co
 
     pUpstream->m_service.Post([pUpstream, sessionId, data = ToCpp(*pData)]()
     {
-        pUpstream->Signal(sessionId, data);
+        pUpstream->Signal(sessionId, data, Serialize(data));
     });
 }
 
@@ -382,7 +425,7 @@ void SignalHermesUpstreamNotification(HermesUpstream* pUpstream, uint32_t sessio
 
     pUpstream->m_service.Post([pUpstream, sessionId, data = ToCpp(*pData)]()
     {
-        pUpstream->Signal(sessionId, data);
+        pUpstream->Signal(sessionId, data, Serialize(data));
     });
 }
 
@@ -392,7 +435,7 @@ void SignalHermesUpstreamCheckAlive(HermesUpstream* pUpstream, uint32_t sessionI
 
     pUpstream->m_service.Post([pUpstream, sessionId, data = ToCpp(*pData)]()
     {
-        pUpstream->Signal(sessionId, data);
+        pUpstream->Signal(sessionId, data, Serialize(data));
     });
 }
 
@@ -402,14 +445,53 @@ void ResetHermesUpstream(HermesUpstream* pUpstream, const HermesNotificationData
 
     pUpstream->m_service.Post([pUpstream, data = ToCpp(*pData)]()
     {
-        pUpstream->Reset(data);
+        pUpstream->RemoveSession_(data);
+        pUpstream->DelayCreateNewSession_(1.0);
+    });
+}
+
+void SignalHermesUpstreamRawXml(HermesUpstream* pUpstream, uint32_t sessionId, HermesStringView rawXml)
+{
+    pUpstream->m_service.Log(sessionId, "SignalHermesUpstreamRawXml");
+    pUpstream->m_service.Post([pUpstream, sessionId, xmlData = std::string(rawXml.m_pData, rawXml.m_size)]() mutable
+    {
+        MessageDispatcher dispatcher{sessionId, pUpstream->m_service};
+        auto parseData = xmlData;
+
+        bool wasDispatched = false;
+        dispatcher.Add<ServiceDescriptionData>([&](const auto& data) { wasDispatched = true; pUpstream->Signal(sessionId, data, xmlData); });
+        dispatcher.Add<MachineReadyData>([&](const auto& data) { wasDispatched = true; pUpstream->Signal(sessionId, data, xmlData); });
+        dispatcher.Add<RevokeMachineReadyData>([&](const auto& data) { wasDispatched = true; pUpstream->Signal(sessionId, data, xmlData); });
+        dispatcher.Add<StartTransportData>([&](const auto& data) { wasDispatched = true; pUpstream->Signal(sessionId, data, xmlData); });
+        dispatcher.Add<StopTransportData>([&](const auto& data) { wasDispatched = true; pUpstream->Signal(sessionId, data, xmlData); });
+        dispatcher.Add<NotificationData>([&](const auto& data) { wasDispatched = true; pUpstream->Signal(sessionId, data, xmlData); });
+        dispatcher.Add<CheckAliveData>([&](const auto& data) { wasDispatched = true; pUpstream->Signal(sessionId, data, xmlData); });
+
+        dispatcher.Dispatch(parseData);
+        if (wasDispatched)
+            return;
+
+        pUpstream->Signal(sessionId, NotificationData{}, xmlData);
+    });
+}
+
+void ResetHermesUpstreamRawXml(HermesUpstream* pUpstream, HermesStringView rawXml)
+{
+    pUpstream->m_service.Log(0U, "ResetHermesUpstreamRawXml");
+    pUpstream->m_service.Post([pUpstream, data = std::string(rawXml.m_pData, rawXml.m_size)]()
+    {
+        if (!data.empty() && pUpstream->m_upSession)
+        {
+            pUpstream->m_upSession->Signal(NotificationData(), data);
+        }
+        pUpstream->RemoveSession_();
+        pUpstream->DelayCreateNewSession_(1.0);
     });
 }
 
 void DisableHermesUpstream(HermesUpstream* pUpstream, const HermesNotificationData* pData)
 {
     pUpstream->m_service.Log(0U, "DisableHermesUpstream");
-
     pUpstream->m_service.Post([pUpstream, data = ToCpp(*pData)]()
     {
         pUpstream->Disable(data);

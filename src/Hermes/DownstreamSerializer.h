@@ -33,12 +33,7 @@ namespace Hermes
         struct ISerializer
         {
             virtual void Connect(std::weak_ptr<void> wpOwner, ISerializerCallback&) = 0;
-            virtual void Signal(const ServiceDescription&) = 0;
-            virtual void Signal(const BoardAvailableData&) = 0;
-            virtual void Signal(const RevokeBoardAvailableData&) = 0;
-            virtual void Signal(const TransportFinishedData&) = 0;
-            virtual void Signal(const NotificationData&) = 0;
-            virtual void Signal(const CheckAliveData&) = 0;
+            virtual void Signal(StringView rawXml) = 0;
             virtual void Disconnect() = 0;
 
             virtual ~ISerializer() = default;
@@ -47,11 +42,12 @@ namespace Hermes
         struct ISerializerCallback
         {
             virtual void OnSocketConnected(const ConnectionInfo&) = 0;
-            virtual void On(const ServiceDescription&) = 0;
+            virtual void On(const ServiceDescriptionData&) = 0;
             virtual void On(const MachineReadyData&) = 0;
             virtual void On(const RevokeMachineReadyData&) = 0;
             virtual void On(const StartTransportData&) = 0;
             virtual void On(const StopTransportData&) = 0;
+            virtual void On(const QueryBoardInfoData&) = 0;
             virtual void On(const NotificationData&) = 0;
             virtual void On(const CheckAliveData&) = 0;
             virtual void OnDisconnected(const Error&) = 0;

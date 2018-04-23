@@ -19,7 +19,8 @@ limitations under the License.
 
 #include <HermesDataConversion.hpp>
 #include "ApiCallback.h"
-#include "Serializer.h"
+#include "MessageDispatcher.h"
+#include "Service.h"
 #include "StringBuilder.h"
 
 #include <boost/asio.hpp>
@@ -44,19 +45,19 @@ namespace
     {
         std::string m_traceName;
         std::string m_hostName;
-        asio::io_service m_asioService;
+        Service m_service;
+        asio::io_service& m_asioService{m_service.GetUnderlyingService()};
         asio::ip::tcp::socket m_socket{m_asioService};
+        MessageDispatcher m_dispatcher{0U, m_service};
 
         unsigned m_timeoutInSeconds = 10U;
 
         CurrentConfigurationCallback m_configurationCallback;
         NotificationCallback m_notificationCallback;
         ErrorCallback m_errorCallback;
-        TraceCallback m_traceCallback;
 
         static const std::size_t cCHUNK_SIZE = 4096;
         std::array<char, cCHUNK_SIZE> m_receivedData;
-        std::string m_receiveBuffer;
 
         bool m_receiving = false;
 
@@ -65,31 +66,37 @@ namespace
             const CurrentConfigurationCallback& configurationCallback,
             const NotificationCallback& notificationCallback,
             const ErrorCallback& errorCallback,
-            const TraceCallback& traceCallback) :
+            const HermesTraceCallback& traceCallback) :
             m_traceName(traceName),
             m_hostName(hostName),
+            m_service(traceCallback),
             m_timeoutInSeconds(timeoutInSeconds),
             m_configurationCallback(configurationCallback),
             m_notificationCallback(notificationCallback),
-            m_errorCallback(errorCallback),
-            m_traceCallback(traceCallback)
-        {}
+            m_errorCallback(errorCallback)
+        {
+            m_dispatcher.Add<CurrentConfigurationData>([this](const auto& data) -> Error
+            {
+                m_receiving = false;
+                auto apiData = ToC(data);
+                m_configurationCallback(0U, &apiData);
+                return{};
+
+            });
+            m_dispatcher.Add<NotificationData>([this](const auto& data) -> Error
+            {
+                auto apiData = ToC(data);
+                m_notificationCallback(0U, &apiData);
+                return{};
+            });
+        }
 
         template<class... Ts>
         void GenerateError(EErrorCode errorCode, const Ts&... params)
         {
-            std::string errorString = BuildString(params...);
-            m_traceCallback(0U, eHERMES_TRACE_ERROR, ToC(errorString));
-            Error error(errorCode, errorString);
+            auto error = m_service.Alarm(0U, errorCode, params...);
             auto apiError = ToC(error);
             m_errorCallback(&apiError);
-        }
-
-        template<class... Ts>
-        void Trace(ETraceType type, const Ts&...params)
-        {
-            std::string trace = BuildString(params...);
-            m_traceCallback(0U, ToC(type), ToC(trace));
         }
 
         bool Connect()
@@ -149,7 +156,7 @@ namespace
                 GenerateError(EErrorCode::eNETWORK_ERROR, "asio::write: ", ec.message());
                 return;
             }
-            m_traceCallback(0U, eHERMES_TRACE_SENT, ToC(msgString));
+            m_service.Trace(ETraceType::eSENT, 0U, msgString);
 
             m_receiving = true;
 
@@ -187,44 +194,13 @@ namespace
                 return GenerateError(EErrorCode::eNETWORK_ERROR, "asio::async_receive", ecReceive.message());
             }
 
-            Trace(ETraceType::eRECEIVED, StringView{&m_receivedData[0], size});
-            m_receiveBuffer.append(&m_receivedData[0], size);
-            Trace(ETraceType::eDEBUG, "m_receiveBuffer=", m_receiveBuffer);
+            m_service.Trace(ETraceType::eRECEIVED, 0U, StringView{&m_receivedData[0], size});
 
-            std::string messageXml;
-            while (TakeMessage(messageXml, m_receiveBuffer))
+            if (auto error = m_dispatcher.Dispatch(StringSpan{&m_receivedData[0], size}))
             {
-                Trace(ETraceType::eDEBUG, "messageXml=", messageXml, "\nm_receiveBuffer=", m_receiveBuffer);
-
-                const auto& variant = Deserialize(messageXml);
-                if (const auto* pData = boost::get<Error>(&variant))
-                {
-                    m_receiving = false;
-                    GenerateError(EErrorCode::ePEER_ERROR, m_traceName, pData->m_text);
-                    return;
-                }
-                if (const auto* pData = boost::get<CurrentConfigurationData>(&variant))
-                {
-                    m_receiving = false;
-                    auto apiData = ToC(*pData);
-                    return m_configurationCallback(0U, &apiData);
-                    return;
-                }
-                if (const auto* pData = boost::get<NotificationData>(&variant))
-                {
-                    auto apiData = ToC(*pData);
-                    m_notificationCallback(0U, &apiData);
-                    continue;
-                }
-
-                Trace(ETraceType::eWARNING, "Unexpected message");
+                m_receiving = false;
+                GenerateError(EErrorCode::ePEER_ERROR, m_traceName, "Maximum message size exceeded");
             }
-
-            if (m_receiveBuffer.size() <= cMAX_MESSAGE_SIZE)
-                return;
-
-            m_receiving = false;
-            GenerateError(EErrorCode::ePEER_ERROR, m_traceName, "Maximum message size exceeded");
         }
     };
 }
@@ -246,7 +222,7 @@ void SetHermesConfiguration(HermesStringView hostName, const HermesSetConfigurat
     asio::write(helper.m_socket, asio::buffer(xmlString.data(), xmlString.size()), ec);
     if (ec)
         return helper.GenerateError(EErrorCode::eNETWORK_ERROR, "asio::write", ec.message());
-    helper.m_traceCallback(0U, eHERMES_TRACE_SENT, ToC(xmlString));
+    helper.m_service.Log(eHERMES_TRACE_TYPE_SENT, 0U, xmlString);
     helper.GetConfiguration();
 }
 

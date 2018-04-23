@@ -167,6 +167,7 @@
   <ItemGroup>
     <ClInclude Include="..\..\References\pugixml\pugiconfig.hpp" />
     <ClInclude Include="..\..\References\pugixml\pugixml.hpp" />
+    <ClInclude Include="..\include\HermesData.h" />
     <ClInclude Include="..\include\HermesSerialization.h" />
     <ClInclude Include="..\include\HermesDataConversion.hpp" />
     <ClInclude Include="..\include\Hermes.hpp" />
@@ -174,20 +175,26 @@
     <ClInclude Include="..\include\HermesData.hpp" />
     <ClInclude Include="..\include\HermesOptional.hpp" />
     <ClInclude Include="..\include\HermesSerialization.hpp" />
+    <ClInclude Include="..\include\HermesStringView.h" />
     <ClInclude Include="..\include\HermesStringView.hpp" />
     <ClInclude Include="ApiCallback.h" />
+    <ClInclude Include="BasicPugiSerialization.h" />
     <ClInclude Include="ConfigurationServiceSerializer.h" />
     <ClInclude Include="ConfigurationServiceSession.h" />
+    <ClInclude Include="DeserializationHelpers.h" />
     <ClInclude Include="DownstreamSession.h" />
     <ClInclude Include="DownstreamSerializer.h" />
     <ClInclude Include="DownstreamStateMachine.h" />
     <ClInclude Include="IService.h" />
+    <ClInclude Include="MessageSerialization.h" />
     <ClInclude Include="Network.h" />
-    <ClInclude Include="Serializer.h" />
+    <ClInclude Include="MessageDispatcher.h" />
+    <ClInclude Include="SenderEnvelope.h" />
     <ClInclude Include="AsioSocket.h" />
     <ClInclude Include="Service.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="StringBuilder.h" />
+    <ClInclude Include="StringSpan.h" />
     <ClInclude Include="UpstreamConnection.h" />
     <ClInclude Include="UpstreamSerializer.h" />
     <ClInclude Include="UpstreamSession.h" />
@@ -206,16 +213,20 @@
     <ClCompile Include="ConfigurationService.cpp" />
     <ClCompile Include="ConfigurationServiceSerializer.cpp" />
     <ClCompile Include="ConfigurationServiceSession.cpp" />
+    <ClCompile Include="DeserializationHelper.cpp" />
     <ClCompile Include="Downstream.cpp" />
     <ClCompile Include="DownstreamSession.cpp" />
     <ClCompile Include="DownstreamSerializer.cpp" />
     <ClCompile Include="DownstreamStateMachine.cpp" />
+    <ClCompile Include="GeneratedHermesGuid.cpp" />
+    <ClCompile Include="MessageDispatcher.cpp" />
+    <ClCompile Include="MessageSerialization.cpp" />
+    <ClCompile Include="SenderEnvelope.cpp" />
     <ClCompile Include="Serialization.cpp" />
     <ClCompile Include="UpstreamSerializer.cpp" />
     <ClCompile Include="Upstream.cpp" />
     <ClCompile Include="UpstreamSession.cpp" />
     <ClCompile Include="UpstreamStateMachine.cpp" />
-    <ClCompile Include="Serializer.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>

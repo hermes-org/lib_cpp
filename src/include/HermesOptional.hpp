@@ -30,6 +30,8 @@ namespace Hermes
         Optional() : m_hasValue(false) {}
 
         Optional(const T& value) : m_hasValue(true), m_value(value) {}
+        template<class U1, class U2>
+        Optional(const U1& u1, const U2& u2) : m_hasValue(true), m_value(u1, u2) {}
 
         // for the time being, avoid C++11 and its variadic templates for better compatibility. Up to two params should do for Hermes ...
         Optional& emplace() { m_value = T(); m_hasValue = true; return *this; }

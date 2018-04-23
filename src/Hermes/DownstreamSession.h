@@ -41,17 +41,19 @@ namespace Hermes
 
             explicit operator bool() const { return bool(m_spImpl); }
             unsigned Id() const;
-            const Optional<ServiceDescription>& OptionalPeerServiceDescription() const;
+            const Optional<ServiceDescriptionData>& OptionalPeerServiceDescriptionData() const;
             const ConnectionInfo& PeerConnectionInfo() const;
 
             void Connect(ISessionCallback&);
-            void Signal(const ServiceDescription&);
-            void Signal(const BoardAvailableData&);
-            void Signal(const RevokeBoardAvailableData&);
-            void Signal(const TransportFinishedData&);
-            void Signal(const NotificationData&);
-            void Signal(const CheckAliveData&);
-            void Disconnect(const NotificationData&);
+            void Signal(const ServiceDescriptionData&, StringView rawXml);
+            void Signal(const BoardAvailableData&, StringView rawXml);
+            void Signal(const RevokeBoardAvailableData&, StringView rawXml);
+            void Signal(const TransportFinishedData&, StringView rawXml);
+            void Signal(const BoardForecastData&, StringView rawXml);
+            void Signal(const SendBoardInfoData&, StringView rawXml);
+            void Signal(const NotificationData&, StringView rawXml);
+            void Signal(const CheckAliveData&, StringView rawXml);
+            void Disconnect();
 
         private:
             struct Impl;
@@ -62,11 +64,12 @@ namespace Hermes
         struct ISessionCallback
         {
             virtual void OnSocketConnected(unsigned id, EState, const ConnectionInfo&) = 0;
-            virtual void On(unsigned id, EState, const ServiceDescription&) = 0;
+            virtual void On(unsigned id, EState, const ServiceDescriptionData&) = 0;
             virtual void On(unsigned id, EState, const MachineReadyData&) = 0;
             virtual void On(unsigned id, EState, const RevokeMachineReadyData&) = 0;
             virtual void On(unsigned id, EState, const StartTransportData&) = 0;
             virtual void On(unsigned id, EState, const StopTransportData&) = 0;
+            virtual void On(unsigned id, EState, const QueryBoardInfoData&) = 0;
             virtual void On(unsigned id, EState, const NotificationData&) = 0;
             virtual void On(unsigned id, EState, const CheckAliveData&) = 0;
             virtual void OnState(unsigned id, EState) = 0;

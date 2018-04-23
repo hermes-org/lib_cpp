@@ -19,8 +19,7 @@ limitations under the License.
 
 #include "Network.h"
 #include "IService.h"
-#include "Serializer.h"
-#include "StringBuilder.h"
+#include "MessageDispatcher.h"
 
 namespace Hermes
 {
@@ -32,14 +31,22 @@ namespace Hermes
             IAsioService& m_service;
             IServerSocket& m_socket;
             ISerializerCallback* m_pCallback = nullptr;
-            std::string m_receiveBuffer;
+            MessageDispatcher m_dispatcher{m_sessionId, m_service};
 
             Serializer(unsigned sessionId, IAsioService& service, IServerSocket& socket) :
                 m_sessionId(sessionId),
-  
                 m_service(service),
                 m_socket(socket)
-            {}
+            {
+                m_dispatcher.Add<ServiceDescriptionData>([this](const auto& data) { m_pCallback->On(data); });
+                m_dispatcher.Add<CheckAliveData>([this](const auto& data) { m_pCallback->On(data); });
+                m_dispatcher.Add<NotificationData>([this](const auto& data) { m_pCallback->On(data); });
+                m_dispatcher.Add<MachineReadyData>([this](const auto& data) { m_pCallback->On(data); });
+                m_dispatcher.Add<RevokeMachineReadyData>([this](const auto& data) { m_pCallback->On(data); });
+                m_dispatcher.Add<StartTransportData>([this](const auto& data) { m_pCallback->On(data); });
+                m_dispatcher.Add<StopTransportData>([this](const auto& data) { m_pCallback->On(data); });
+                m_dispatcher.Add<QueryBoardInfoData>([this](const auto& data) { m_pCallback->On(data); });
+            }
 
             // ISocketCallback
             void OnConnected(const ConnectionInfo& connectionInfo) override
@@ -47,79 +54,14 @@ namespace Hermes
                 m_pCallback->OnSocketConnected(connectionInfo);
             }
 
-            void OnReceived(StringView dataView) override
+            void OnReceived(StringSpan xmlData) override
             {
-                m_receiveBuffer.append(dataView.data(), dataView.size());
-                m_service.Log(m_sessionId, "m_receiveBuffer[", dataView.size(), "]=", m_receiveBuffer);
-
-                std::string messageXml;
-                while (TakeMessage(messageXml, m_receiveBuffer))
-                {
-                    m_service.Log(m_sessionId, "messageXml[", messageXml.size(), "]=", messageXml,
-                        "\nm_receiveBuffer[", m_receiveBuffer.size(), "]=", m_receiveBuffer);
-
-                    const auto& variant = Deserialize(messageXml);
-
-                    if (const auto* pData = boost::get<Error>(&variant))
-                    {
-                        auto error = m_service.Alarm(m_sessionId, EErrorCode::ePEER_ERROR, pData->m_text);
-                        Signal(NotificationData(ENotificationCode::ePROTOCOL_ERROR, ESeverity::eFATAL, error.m_text));
-                        m_socket.Close();
-                        m_pCallback->OnDisconnected(error);
-                        return;
-                    }
-
-                    if (const auto* pData = boost::get<CheckAliveData>(&variant))
-                    {
-                        m_service.Log(m_sessionId, "CheckAliveData=", *pData);
-                        m_pCallback->On(*pData);
-                        continue;
-                    }
-                    if (const auto* pData = boost::get<ServiceDescription>(&variant))
-                    {
-                        m_service.Log(m_sessionId, "ServiceDescription=", *pData);
-                        m_pCallback->On(*pData);
-                        continue;
-                    }
-                    if (const auto* pData = boost::get<NotificationData>(&variant))
-                    {
-                        m_service.Log(m_sessionId, "NotificationData=", *pData);
-                        m_pCallback->On(*pData);
-                        continue;
-                    }
-                    if (const auto* pData = boost::get<MachineReadyData>(&variant))
-                    {
-                        m_service.Log(m_sessionId, "MachineReadyData=", *pData);
-                        m_pCallback->On(*pData);
-                        continue;
-                    }
-                    if (const auto* pData = boost::get<RevokeMachineReadyData>(&variant))
-                    {
-                        m_service.Log(m_sessionId, "RevokeMachineReadyData=", *pData);
-                        m_pCallback->On(*pData);
-                        continue;
-                    }
-                    if (const auto* pData = boost::get<StartTransportData>(&variant))
-                    {
-                        m_service.Log(m_sessionId, "StartTransportData=", *pData);
-                        m_pCallback->On(*pData);
-                        continue;
-                    }
-                    if (const auto* pData = boost::get<StopTransportData>(&variant))
-                    {
-                        m_service.Log(m_sessionId, "StopTransportData=", *pData);
-                        m_pCallback->On(*pData);
-                        continue;
-                    }
-
-                    m_service.Warn(m_sessionId, "Unexpected message");
-                }
-
-                if (m_receiveBuffer.size() <= cMAX_MESSAGE_SIZE)
+                auto error = m_dispatcher.Dispatch(xmlData);
+                if (!error)
                     return;
 
-                auto error = m_service.Alarm(m_sessionId, EErrorCode::ePEER_ERROR, "Maximum message size exceeded");
-                Signal(NotificationData(ENotificationCode::ePROTOCOL_ERROR, ESeverity::eFATAL, error.m_text));
+                error = m_service.Alarm(m_sessionId, EErrorCode::ePEER_ERROR, error.m_text);
+                Signal(Serialize(NotificationData(ENotificationCode::ePROTOCOL_ERROR, ESeverity::eFATAL, error.m_text)));
                 m_socket.Close();
                 m_pCallback->OnDisconnected(error);
             }
@@ -138,40 +80,9 @@ namespace Hermes
                 m_socket.Connect(wpOwner, *this);
             }
 
-            void Signal(const ServiceDescription& data) override
+            void Signal(StringView rawXml)
             {
-                const auto& xmlString = Serialize(data);
-                Send_(xmlString);
-            }
-
-            void Signal(const BoardAvailableData& data) override
-            {
-                const auto& xmlString = Serialize(data);
-                Send_(xmlString);
-            }
-
-            void Signal(const RevokeBoardAvailableData& data) override
-            {
-                const auto& xmlString = Serialize(data);
-                Send_(xmlString);
-            }
-
-            void Signal(const TransportFinishedData& data) override
-            {
-                const auto& xmlString = Serialize(data);
-                Send_(xmlString);
-            }
-
-            void Signal(const NotificationData& data) override
-            {
-                const auto& xmlString = Serialize(data);
-                Send_(xmlString);
-            }
-
-            void Signal(const CheckAliveData& data) override
-            {
-                const auto& xmlString = Serialize(data);
-                Send_(xmlString);
+                m_socket.Send(rawXml);
             }
 
             void Disconnect() override

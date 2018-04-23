@@ -20,7 +20,7 @@ limitations under the License.
 #include "Network.h"
 #include "IService.h"
 #include "Network.h"
-#include "Serializer.h"
+#include "MessageSerialization.h"
 #include "StringBuilder.h"
 
 #include <HermesData.hpp>
@@ -158,7 +158,7 @@ namespace Hermes
 
         void OnReceive_(const boost::system::error_code& ec, std::size_t size)
         {
-            StringView data(&m_receivedData.front(), size);
+            StringSpan data(&m_receivedData.front(), size);
 
             if (size)
             {
@@ -193,7 +193,7 @@ namespace Hermes
             if (!m_configuration.m_checkAlivePeriodInSeconds)
                 return;
 
-            m_timer.expires_from_now(boost::posix_time::seconds(m_configuration.m_checkAlivePeriodInSeconds));
+            m_timer.expires_from_now(boost::posix_time::milliseconds(static_cast<int>(1000.0 * m_configuration.m_checkAlivePeriodInSeconds)));
             m_timer.async_wait([spThis = shared_from_this()](const boost::system::error_code& ec)
             {
                 spThis->OnCheckAliveTrigger_(ec);

@@ -32,13 +32,15 @@ namespace Hermes
         struct IStateMachine
         {
             virtual void Connect(std::weak_ptr<void> wpOwner, IStateMachineCallback&) = 0;
-            virtual void Signal(const ServiceDescription&) = 0;
-            virtual void Signal(const BoardAvailableData&) = 0;
-            virtual void Signal(const RevokeBoardAvailableData&) = 0;
-            virtual void Signal(const TransportFinishedData&) = 0;
-            virtual void Signal(const NotificationData&) = 0;
-            virtual void Signal(const CheckAliveData&) = 0;
-            virtual void Disconnect(const NotificationData&) = 0;
+            virtual void Signal(const ServiceDescriptionData&, StringView rawXml) = 0;
+            virtual void Signal(const BoardAvailableData&, StringView rawXml) = 0;
+            virtual void Signal(const RevokeBoardAvailableData&, StringView rawXml) = 0;
+            virtual void Signal(const TransportFinishedData&, StringView rawXml) = 0;
+            virtual void Signal(const BoardForecastData&, StringView rawXml) = 0;
+            virtual void Signal(const SendBoardInfoData&, StringView rawXml) = 0;
+            virtual void Signal(const NotificationData&, StringView rawXml) = 0;
+            virtual void Signal(const CheckAliveData&, StringView rawXml) = 0;
+            virtual void Disconnect() = 0;
 
             virtual ~IStateMachine() = default;
         };
@@ -46,11 +48,12 @@ namespace Hermes
         struct IStateMachineCallback
         {
             virtual void OnSocketConnected(EState, const ConnectionInfo&) = 0;
-            virtual void On(EState, const ServiceDescription&) = 0;
+            virtual void On(EState, const ServiceDescriptionData&) = 0;
             virtual void On(EState, const MachineReadyData&) = 0;
             virtual void On(EState, const RevokeMachineReadyData&) = 0;
             virtual void On(EState, const StartTransportData&) = 0;
             virtual void On(EState, const StopTransportData&) = 0;
+            virtual void On(EState, const QueryBoardInfoData&) = 0;
             virtual void On(EState, const NotificationData&) = 0;
             virtual void On(EState, const CheckAliveData&) = 0;
             virtual void OnState(EState) = 0;

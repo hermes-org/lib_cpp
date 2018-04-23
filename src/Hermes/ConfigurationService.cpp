@@ -82,7 +82,7 @@ struct HermesConfigurationService : IAcceptorCallback, IConfigurationServiceSess
         m_service.Inform(0U, "Created");
     }
 
-    virtual ~HermesConfigurationService()
+    ~HermesConfigurationService()
     {
         m_service.Inform(0U, "Deleted");
     }
@@ -130,11 +130,13 @@ struct HermesConfigurationService : IAcceptorCallback, IConfigurationServiceSess
 
     void RemoveSessions_(const NotificationData& data)
     {
-        for (auto& entry : m_sessionMap)
+        auto sessionMap = std::move(m_sessionMap);
+        m_sessionMap.clear();
+
+        for (auto& entry : sessionMap)
         {
             entry.second.Disconnect(data);
         }
-        m_sessionMap.clear();
     }
 
     //================= IAcceptorCallback =========================
@@ -160,7 +162,7 @@ struct HermesConfigurationService : IAcceptorCallback, IConfigurationServiceSess
     void OnSocketConnected(unsigned sessionId, const ConnectionInfo& connectionInfo) override
     {
         auto apiConnectionInfo = ToC(connectionInfo);
-        m_connectedCallback(sessionId, eHERMES_SOCKET_CONNECTED, &apiConnectionInfo);
+        m_connectedCallback(sessionId, eHERMES_STATE_SOCKET_CONNECTED, &apiConnectionInfo);
     }
 
     virtual void OnGet(unsigned sessionId, const ConnectionInfo& connectionInfo,
@@ -190,7 +192,7 @@ struct HermesConfigurationService : IAcceptorCallback, IConfigurationServiceSess
             return;
 
         auto apiError = ToC(error);
-        m_disconnectedCallback(sessionId, eHERMES_DISCONNECTED, &apiError);
+        m_disconnectedCallback(sessionId, eHERMES_STATE_DISCONNECTED, &apiError);
     }
 };
 

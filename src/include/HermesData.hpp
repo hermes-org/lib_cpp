@@ -15,20 +15,161 @@ limitations under the License.
 ************************************************************************/
 
 // Copyright (c) ASM Assembly Systems GmbH & Co. KG
+//
+// C++ interface for an implementation of The Hermes Standard
+//
 #pragma once
 
 #include "HermesOptional.hpp"
 #include "HermesStringView.hpp"
 
 #include <string>
+#include <type_traits>
 #include <vector>
 
 namespace Hermes
 {
+
     static const uint16_t cCONFIG_PORT = 1248U;
     static const uint16_t cBASE_PORT = 50100U;
     static const std::size_t cMAX_MESSAGE_SIZE = 65536U;
 
+
+    //========== The Hermes Standard 3.3 ==========
+    enum class ECheckAliveType
+    {
+        eUNKNOWN,
+        ePING,
+        ePONG
+    };
+    template<class S>
+    S& operator<<(S& s, ECheckAliveType e)
+    {
+        switch (e)
+        {
+        case ECheckAliveType::eUNKNOWN: s << "eUNKNOWN"; return s;
+        case ECheckAliveType::ePING: s << "ePING"; return s;
+        case ECheckAliveType::ePONG: s << "ePONG"; return s;
+        default: s << "INVALID_CHECK_ALIVE_TYPE: " << static_cast<int>(e); return s;
+        }
+    }
+    inline constexpr std::size_t size(ECheckAliveType) { return 3; }
+
+    //========== The Hermes Standard 3.5 ==========
+    enum class ENotificationCode
+    {
+        eUNSPECIFIC,
+        ePROTOCOL_ERROR,
+        eCONNECTION_REFUSED_BECAUSE_OF_ESTABLISHED_CONNECTION,
+        eCONNECTION_RESET_BECAUSE_OF_CHANGED_CONFIGURATION,
+        eCONFIGURATION_ERROR,
+        eMACHINE_SHUTDOWN,
+        eBOARD_FORECAST_ERROR
+    };
+    template<class S>
+    S& operator<<(S& s, ENotificationCode e)
+    {
+        switch (e)
+        {
+        case ENotificationCode::eUNSPECIFIC: s << "eUNSPECIFIC"; return s;
+        case ENotificationCode::ePROTOCOL_ERROR: s << "ePROTOCOL_ERROR"; return s;
+        case ENotificationCode::eCONNECTION_REFUSED_BECAUSE_OF_ESTABLISHED_CONNECTION: s << "eCONNECTION_REFUSED_BECAUSE_OF_ESTABLISHED_CONNECTION"; return s;
+        case ENotificationCode::eCONNECTION_RESET_BECAUSE_OF_CHANGED_CONFIGURATION: s << "eCONNECTION_RESET_BECAUSE_OF_CHANGED_CONFIGURATION"; return s;
+        case ENotificationCode::eCONFIGURATION_ERROR: s << "eCONFIGURATION_ERROR"; return s;
+        case ENotificationCode::eMACHINE_SHUTDOWN: s << "eMACHINE_SHUTDOWN"; return s;
+        case ENotificationCode::eBOARD_FORECAST_ERROR: s << "eBOARD_FORECAST_ERROR"; return s;
+        default: s << "INVALID_NOTIFICATION_CODE: " << static_cast<int>(e); return s;
+        }
+    }
+    inline constexpr std::size_t size(ENotificationCode) { return 7; }
+
+    //========== The Hermes Standard 3.5 ==========
+    enum class ESeverity
+    {
+        eUNKNOWN,
+        eFATAL,
+        eERROR,
+        eWARNING,
+        eINFO
+    };
+    template<class S>
+    S& operator<<(S& s, ESeverity e)
+    {
+        switch (e)
+        {
+        case ESeverity::eUNKNOWN: s << "eUNKNOWN"; return s;
+        case ESeverity::eFATAL: s << "eFATAL"; return s;
+        case ESeverity::eERROR: s << "eERROR"; return s;
+        case ESeverity::eWARNING: s << "eWARNING"; return s;
+        case ESeverity::eINFO: s << "eINFO"; return s;
+        default: s << "INVALID_SEVERITY: " << static_cast<int>(e); return s;
+        }
+    }
+    inline constexpr std::size_t size(ESeverity) { return 5; }
+
+    //========== The Hermes Standard 3.6 ==========
+    enum class EBoardQuality
+    {
+        eANY,
+        eGOOD,
+        eBAD
+    };
+    template<class S>
+    S& operator<<(S& s, EBoardQuality e)
+    {
+        switch (e)
+        {
+        case EBoardQuality::eANY: s << "eANY"; return s;
+        case EBoardQuality::eGOOD: s << "eGOOD"; return s;
+        case EBoardQuality::eBAD: s << "eBAD"; return s;
+        default: s << "INVALID_BOARD_QUALITY: " << static_cast<int>(e); return s;
+        }
+    }
+    inline constexpr std::size_t size(EBoardQuality) { return 3; }
+
+    //========== The Hermes Standard 3.6 ==========
+    enum class EFlippedBoard
+    {
+        eSIDE_UP_IS_UNKNOWN,
+        eTOP_SIDE_IS_UP,
+        eBOTTOM_SIDE_IS_UP
+    };
+    template<class S>
+    S& operator<<(S& s, EFlippedBoard e)
+    {
+        switch (e)
+        {
+        case EFlippedBoard::eSIDE_UP_IS_UNKNOWN: s << "eSIDE_UP_IS_UNKNOWN"; return s;
+        case EFlippedBoard::eTOP_SIDE_IS_UP: s << "eTOP_SIDE_IS_UP"; return s;
+        case EFlippedBoard::eBOTTOM_SIDE_IS_UP: s << "eBOTTOM_SIDE_IS_UP"; return s;
+        default: s << "INVALID_FLIPPED_BOARD: " << static_cast<int>(e); return s;
+        }
+    }
+    inline constexpr std::size_t size(EFlippedBoard) { return 3; }
+
+    //========== The Hermes Standard 3.11 ==========
+    enum class ETransferState
+    {
+        eUNKNOWN,
+        eNOT_STARTED,
+        eINCOMPLETE,
+        eCOMPLETE
+    };
+    template<class S>
+    S& operator<<(S& s, ETransferState e)
+    {
+        switch (e)
+        {
+        case ETransferState::eUNKNOWN: s << "eUNKNOWN"; return s;
+        case ETransferState::eNOT_STARTED: s << "eNOT_STARTED"; return s;
+        case ETransferState::eINCOMPLETE: s << "eINCOMPLETE"; return s;
+        case ETransferState::eCOMPLETE: s << "eCOMPLETE"; return s;
+        default: s << "INVALID_TRANSFER_STATE: " << static_cast<int>(e); return s;
+        }
+    }
+    inline constexpr std::size_t size(ETransferState) { return 4; }
+
+    //========== The Hermes Standard chapter 2.6 ==========
     enum class EState
     {
         eNOT_CONNECTED,
@@ -50,7 +191,7 @@ namespace Hermes
         {
         case EState::eNOT_CONNECTED: s << "eNOT_CONNECTED"; return s;
         case EState::eSOCKET_CONNECTED: s << "eSOCKET_CONNECTED"; return s;
-        case EState::eSERVICE_DESCRIPTION_DOWNSTREAM: s << "eUPSTREAM_SERVICE_DESCRIPTION"; return s;
+        case EState::eSERVICE_DESCRIPTION_DOWNSTREAM: s << "eSERVICE_DESCRIPTION_DOWNSTREAM"; return s;
         case EState::eNOT_AVAILABLE_NOT_READY: s << "eNOT_AVAILABLE_NOT_READY"; return s;
         case EState::eBOARD_AVAILABLE: s << "eBOARD_AVAILABLE"; return s;
         case EState::eMACHINE_READY: s << "eMACHINE_READY"; return s;
@@ -59,16 +200,17 @@ namespace Hermes
         case EState::eTRANSPORT_STOPPED: s << "eTRANSPORT_STOPPED"; return s;
         case EState::eTRANSPORT_FINISHED: s << "eTRANSPORT_FINISHED"; return s;
         case EState::eDISCONNECTED: s << "eDISCONNECTED"; return s;
-        default: s << "INVALID_STATE:" << static_cast<int>(e); return s;
+        default: s << "INVALID_STATE: " << static_cast<int>(e); return s;
         }
     }
-    inline constexpr std::size_t size(EState) { return static_cast<std::size_t>(EState::eDISCONNECTED) + 1U; }
+    inline constexpr std::size_t size(EState) { return 11; }
 
+    //========== Trace levels of the implementation (not part of The Hermes Standard) ==========
     enum class ETraceType
     {
         eSENT, // raw message sent
         eRECEIVED, // raw message received
-        eDEBUG, // debug trace from implementation internals
+        eDEBUG,
         eINFO,
         eWARNING,
         eERROR
@@ -84,120 +226,16 @@ namespace Hermes
         case ETraceType::eINFO: s << "eINFO"; return s;
         case ETraceType::eWARNING: s << "eWARNING"; return s;
         case ETraceType::eERROR: s << "eERROR"; return s;
-        default: s << "INVALID_TRACE_TYPE:" << static_cast<int>(e); return s;
+        default: s << "INVALID_TRACE_TYPE: " << static_cast<int>(e); return s;
         }
     }
-    inline constexpr std::size_t size(ETraceType) { return static_cast<std::size_t>(ETraceType::eERROR) + 1U; }
+    inline constexpr std::size_t size(ETraceType) { return 6; }
 
-    enum class EBoardQuality
-    {
-        eANY,
-        eGOOD,
-        eFAILED
-    };
-    template<class S>
-    S& operator<<(S& s, EBoardQuality e)
-    {
-        switch (e)
-        {
-        case EBoardQuality::eANY: s << "eANY"; return s;
-        case EBoardQuality::eGOOD: s << "eGOOD"; return s;
-        case EBoardQuality::eFAILED: s << "eFAILED"; return s;
-        default: s << "INVALID_BOARD_QUALITY:" << static_cast<int>(e); return s;
-        }
-    }
-    inline constexpr std::size_t size(EBoardQuality) { return static_cast<std::size_t>(EBoardQuality::eFAILED) + 1U; }
-
-    enum class EFlippedBoard
-    {
-        eSIDE_UP_IS_UNKNOWN,
-        eTOP_SIDE_IS_UP,
-        eBOTTOM_SIDE_IS_UP
-    };
-    template<class S>
-    S& operator<<(S& s, EFlippedBoard e)
-    {
-        switch (e)
-        {
-        case EFlippedBoard::eSIDE_UP_IS_UNKNOWN: s << "eSIDE_UP_IS_UNKNOWN"; return s;
-        case EFlippedBoard::eTOP_SIDE_IS_UP: s << "eTOP_SIDE_IS_UP"; return s;
-        case EFlippedBoard::eBOTTOM_SIDE_IS_UP: s << "eBOTTOM_SIDE_IS_UP"; return s;
-        default: s << "INVALID_FLIPPED_BOARD:" << static_cast<int>(e); return s;
-        }
-    }
-    inline constexpr std::size_t size(EFlippedBoard) { return static_cast<std::size_t>(EFlippedBoard::eBOTTOM_SIDE_IS_UP) + 1U; }
-
-    enum class ETransferState
-    {
-        eNOT_STARTED = 1,
-        eINCOMPLETE = 2,
-        eCOMPLETE = 3
-    };
-    template<class S>
-    S& operator<<(S& s, ETransferState e)
-    {
-        switch (e)
-        {
-        case ETransferState::eNOT_STARTED: s << "eNOT_STARTED"; return s;
-        case ETransferState::eINCOMPLETE: s << "eINCOMPLETE"; return s;
-        case ETransferState::eCOMPLETE: s << "eCOMPLETE"; return s;
-        default: s << "INVALID_TRANSFER_STATE:" << static_cast<int>(e); return s;
-        }
-    }
-    inline constexpr std::size_t size(ETransferState) { return static_cast<std::size_t>(ETransferState::eCOMPLETE) + 1U; }
-
-    enum class ENotificationCode
-    {
-        eUNSPECIFIC,
-        ePROTOCOL_ERROR,
-        eCONNECTION_REFUSED_BECAUSE_OF_ESTABLISHED_CONNECTION,
-        eCONNECTION_RESET_BECAUSE_OF_CHANGED_CONFIGURATION,
-        eCONFIGURATION_ERROR,
-        eMACHINE_SHUTDOWN
-    };
-    template<class S>
-    S& operator<<(S& s, ENotificationCode e)
-    {
-        switch (e)
-        {
-        case ENotificationCode::eUNSPECIFIC: s << "eUNSPECIFIC"; return s;
-        case ENotificationCode::ePROTOCOL_ERROR: s << "ePROTOCOL_ERROR"; return s;
-        case ENotificationCode::eCONNECTION_REFUSED_BECAUSE_OF_ESTABLISHED_CONNECTION: s << "eCONNECTION_REFUSED_BECAUSE_OF_ESTABLISHED_CONNECTION"; return s;
-        case ENotificationCode::eCONNECTION_RESET_BECAUSE_OF_CHANGED_CONFIGURATION: s << "eCONNECTION_RESET_BECAUSE_OF_CHANGED_CONFIGURATION"; return s;
-        case ENotificationCode::eCONFIGURATION_ERROR: s << "eCONFIGURATION_ERROR"; return s;
-        case ENotificationCode::eMACHINE_SHUTDOWN: s << "eMACHINE_SHUTDOWN"; return s;
-        default: s << "UNKNOWN_NOTIFICATION_CODE:" << static_cast<int>(e); return s;
-        }
-    }
-    inline constexpr std::size_t size(ENotificationCode) { return static_cast<std::size_t>(ENotificationCode::eMACHINE_SHUTDOWN) + 1U; }
-
-    enum class ESeverity
-    {
-        eUNKNOWN,
-        eFATAL,
-        eERROR,
-        eWARNING,
-        eINFO
-    };
-    template<class S>
-    S& operator<<(S& s, ESeverity e)
-    {
-        switch (e)
-        {
-        case ESeverity::eUNKNOWN: s << "eUNKNOWN"; return s;
-        case ESeverity::eFATAL: s << "eFATAL"; return s;
-        case ESeverity::eERROR: s << "eERROR"; return s;
-        case ESeverity::eWARNING: s << "eWARNING"; return s;
-        case ESeverity::eINFO: s << "eINFO"; return s;
-        default: s << "INVALID_SEVERITY:" << static_cast<int>(e); return s;
-        }
-    }
-    inline constexpr std::size_t size(ESeverity) { return static_cast<std::size_t>(ESeverity::eINFO) + 1U; }
-
+    //========== Internal state check modes of the implementation (not part of The Hermes Standard) ==========
     enum class ECheckState
     {
-        eSEND_AND_RECEIVE,
-        eONLY_RECEIVE
+        eSEND_AND_RECEIVE, // check sent and received messages for conformance with state machine
+        eONLY_RECEIVE // check only received message for conformance with state machine
     };
     template<class S>
     S& operator<<(S& s, ECheckState e)
@@ -206,19 +244,38 @@ namespace Hermes
         {
         case ECheckState::eSEND_AND_RECEIVE: s << "eSEND_AND_RECEIVE"; return s;
         case ECheckState::eONLY_RECEIVE: s << "eONLY_RECEIVE"; return s;
-        default: s << "INVALID_CHECK_STATE:" << static_cast<int>(e); return s;
+        default: s << "INVALID_CHECK_STATE: " << static_cast<int>(e); return s;
         }
     }
-    inline constexpr std::size_t size(ECheckState) { return static_cast<std::size_t>(ECheckState::eONLY_RECEIVE) + 1U; }
+    inline constexpr std::size_t size(ECheckState) { return 2; }
 
+    //========== How to respond to a check alive ping) ==========
+    enum class ECheckAliveResponseMode
+    {
+        eAUTO, // automatically respond to a check alive ping with a pong
+        eAPPLICATION // let the application respond with a pong
+    };
+    template<class S>
+    S& operator<<(S& s, ECheckAliveResponseMode e)
+    {
+        switch (e)
+        {
+        case ECheckAliveResponseMode::eAUTO: s << "eAUTO"; return s;
+        case ECheckAliveResponseMode::eAPPLICATION: s << "eAPPLICATION"; return s;
+        default: s << "INVALID_CHECK_ALIVE_RESPONSE_MODE: " << static_cast<int>(e); return s;
+        }
+    }
+    inline constexpr std::size_t size(ECheckAliveResponseMode) { return 2; }
+
+    //========== Error codes (not part of The Hermes Standard) ==========
     enum class EErrorCode
     {
         eSUCCESS,
         eIMPLEMENTATION_ERROR, // error inside the Hermes DLL
-        ePEER_ERROR,  // the remote host has misbehaved
+        ePEER_ERROR, // the remote peer has misbehaved
         eCLIENT_ERROR, // the client code making the API calls has misbehaved
         eNETWORK_ERROR, // something is wrong with the network or its configuration
-        eTIMEOUT // a specified timeout has been reached
+        eTIMEOUT // the specified timeout has been exceeded
     };
     template<class S>
     S& operator<<(S& s, EErrorCode e)
@@ -231,258 +288,177 @@ namespace Hermes
         case EErrorCode::eCLIENT_ERROR: s << "eCLIENT_ERROR"; return s;
         case EErrorCode::eNETWORK_ERROR: s << "eNETWORK_ERROR"; return s;
         case EErrorCode::eTIMEOUT: s << "eTIMEOUT"; return s;
-        default: s << "INVALID_ERROR_CODE:" << static_cast<int>(e); return s;
+        default: s << "INVALID_ERROR_CODE: " << static_cast<int>(e); return s;
         }
     }
-    inline constexpr std::size_t size(EErrorCode) { return static_cast<std::size_t>(EErrorCode::eTIMEOUT) + 1U; }
+    inline constexpr std::size_t size(EErrorCode) { return 6; }
 
-    struct UpstreamConfiguration
+    //========== The Hermes Standard 3.3 ==========
+    struct CheckAliveData
     {
-        unsigned m_upstreamLaneId = 0;
-        std::string m_hostAddress;
-        uint16_t m_port = 0;
+        Optional<ECheckAliveType> m_optionalType;
+        Optional<std::string> m_optionalId;
 
-        UpstreamConfiguration() = default;
-        UpstreamConfiguration(uint32_t upstreamLaneId, StringView hostName, uint16_t port = 0) :
-            m_upstreamLaneId(upstreamLaneId),
-            m_hostAddress(hostName),
-            m_port(port)
-        {}
-
-        friend bool operator==(const UpstreamConfiguration& lhs, const UpstreamConfiguration& rhs)
+        friend bool operator==(const CheckAliveData& lhs, const CheckAliveData& rhs)
         {
-            return lhs.m_upstreamLaneId == rhs.m_upstreamLaneId
-                && lhs.m_hostAddress == rhs.m_hostAddress
-                && lhs.m_port == rhs.m_port;
+            return lhs.m_optionalType == rhs.m_optionalType
+                && lhs.m_optionalId == rhs.m_optionalId;
         }
-        friend bool operator!=(const UpstreamConfiguration& lhs, const UpstreamConfiguration& rhs) { return !operator==(lhs, rhs); }
+        friend bool operator!=(const CheckAliveData& lhs, const CheckAliveData& rhs) { return !operator==(lhs, rhs); }
 
-
-        template<class S>
-        friend S& operator<<(S& s, const UpstreamConfiguration& in_config)
+        template <class S> friend S& operator<<(S& s, const CheckAliveData& data)
         {
-            s << "{m_upstreamLaneId=" << in_config.m_upstreamLaneId
-                << "\n,m_hostAddress=" << in_config.m_hostAddress
-                << "\n,m_port=" << in_config.m_port
-                << '}';
+            s << '{';
+            if (data.m_optionalType) { s << " Type=" << *data.m_optionalType; }
+            if (data.m_optionalId) { s << " Id=" << *data.m_optionalId; }
+            s << " }";
             return s;
         }
     };
 
-    struct DownstreamConfiguration
+    //========== The Hermes Standard 3.4 ==========
+    struct FeatureBoardForecast
     {
-        uint32_t m_downstreamLaneId = 0;
-        std::string m_optionalClientAddress;
-        uint16_t m_port = 0;
+        friend bool operator==(const FeatureBoardForecast&, const FeatureBoardForecast&) { return true; }
+        friend bool operator!=(const FeatureBoardForecast&, const FeatureBoardForecast&) { return false; }
+        template <class S> friend S& operator<<(S& s, const FeatureBoardForecast&) { s << "{}"; return s; }
+    };
 
-        DownstreamConfiguration() = default;
-        DownstreamConfiguration(int32_t downstreamLaneId, uint16_t port = 0) :
-            m_downstreamLaneId(downstreamLaneId),
-            m_port(port)
-        {}
-        DownstreamConfiguration(uint32_t downstreamLaneId, const std::string& clientName, uint16_t port = 0) :
-            m_downstreamLaneId(downstreamLaneId),
-            m_optionalClientAddress(clientName),
-            m_port(port)
-        {}
+    //========== The Hermes Standard 3.4 ==========
+    struct FeatureCheckAliveResponse
+    {
+        friend bool operator==(const FeatureCheckAliveResponse&, const FeatureCheckAliveResponse&) { return true; }
+        friend bool operator!=(const FeatureCheckAliveResponse&, const FeatureCheckAliveResponse&) { return false; }
+        template <class S> friend S& operator<<(S& s, const FeatureCheckAliveResponse&) { s << "{}"; return s; }
+    };
 
-        friend bool operator==(const DownstreamConfiguration& lhs, const DownstreamConfiguration& rhs)
+    //========== The Hermes Standard 3.4 ==========
+    struct FeatureQueryBoardInfo
+    {
+        friend bool operator==(const FeatureQueryBoardInfo&, const FeatureQueryBoardInfo&) { return true; }
+        friend bool operator!=(const FeatureQueryBoardInfo&, const FeatureQueryBoardInfo&) { return false; }
+        template <class S> friend S& operator<<(S& s, const FeatureQueryBoardInfo&) { s << "{}"; return s; }
+    };
+
+    //========== The Hermes Standard 3.4 ==========
+    struct FeatureSendBoardInfo
+    {
+        friend bool operator==(const FeatureSendBoardInfo&, const FeatureSendBoardInfo&) { return true; }
+        friend bool operator!=(const FeatureSendBoardInfo&, const FeatureSendBoardInfo&) { return false; }
+        template <class S> friend S& operator<<(S& s, const FeatureSendBoardInfo&) { s << "{}"; return s; }
+    };
+
+    //========== The Hermes Standard 3.4 ==========
+    struct SupportedFeatures
+    {
+        Optional<FeatureBoardForecast> m_optionalFeatureBoardForecast;
+        Optional<FeatureCheckAliveResponse> m_optionalFeatureCheckAliveResponse;
+        Optional<FeatureQueryBoardInfo> m_optionalFeatureQueryBoardInfo;
+        Optional<FeatureSendBoardInfo> m_optionalFeatureSendBoardInfo;
+
+        friend bool operator==(const SupportedFeatures& lhs, const SupportedFeatures& rhs)
         {
-            return lhs.m_downstreamLaneId == rhs.m_downstreamLaneId
-                && lhs.m_optionalClientAddress == rhs.m_optionalClientAddress
-                && lhs.m_port == rhs.m_port;
+            return lhs.m_optionalFeatureBoardForecast == rhs.m_optionalFeatureBoardForecast
+                && lhs.m_optionalFeatureCheckAliveResponse == rhs.m_optionalFeatureCheckAliveResponse
+                && lhs.m_optionalFeatureQueryBoardInfo == rhs.m_optionalFeatureQueryBoardInfo
+                && lhs.m_optionalFeatureSendBoardInfo == rhs.m_optionalFeatureSendBoardInfo;
         }
-        friend bool operator!=(const DownstreamConfiguration& lhs, const DownstreamConfiguration& rhs) { return !operator==(lhs, rhs); }
+        friend bool operator!=(const SupportedFeatures& lhs, const SupportedFeatures& rhs) { return !operator==(lhs, rhs); }
 
-        template<class S>
-        friend S& operator<<(S& s, const DownstreamConfiguration& in_config)
+        template <class S> friend S& operator<<(S& s, const SupportedFeatures& data)
         {
-            s << "{ m_downstreamLaneId=" << in_config.m_downstreamLaneId 
-                << "\n,m_optionalClientAddress=" << in_config.m_optionalClientAddress
-                << "\n,m_port=" << in_config.m_port << '}';
+            s << '{';
+            if (data.m_optionalFeatureBoardForecast) { s << " FeatureBoardForecast=" << *data.m_optionalFeatureBoardForecast; }
+            if (data.m_optionalFeatureCheckAliveResponse) { s << " FeatureCheckAliveResponse=" << *data.m_optionalFeatureCheckAliveResponse; }
+            if (data.m_optionalFeatureQueryBoardInfo) { s << " FeatureQueryBoardInfo=" << *data.m_optionalFeatureQueryBoardInfo; }
+            if (data.m_optionalFeatureSendBoardInfo) { s << " FeatureSendBoardInfo=" << *data.m_optionalFeatureSendBoardInfo; }
+            s << " }";
             return s;
         }
     };
 
-    struct SetConfigurationData
+    //========== The Hermes Standard 3.4 ==========
+    struct ServiceDescriptionData
     {
         std::string m_machineId;
-        std::vector<UpstreamConfiguration> m_upstreamConfigurations;
-        std::vector<DownstreamConfiguration> m_downstreamConfigurations;
+        unsigned m_laneId{0};
+        Optional<std::string> m_optionalInterfaceId;
+        std::string m_version{"1.1"};
+        SupportedFeatures m_supportedFeatures;
 
-        friend bool operator==(const SetConfigurationData& lhs, const SetConfigurationData& rhs)
-        {
-            return lhs.m_machineId == rhs.m_machineId
-                && lhs.m_downstreamConfigurations == rhs.m_downstreamConfigurations
-                && lhs.m_upstreamConfigurations == rhs.m_upstreamConfigurations;
-        }
-        friend bool operator!=(const SetConfigurationData& lhs, const SetConfigurationData& rhs) { return !operator==(lhs, rhs); }
-
-
-        template<class S>
-        friend S& operator<<(S& s, const SetConfigurationData& in_data)
-        {
-            s << "{m_machineId=" << in_data.m_machineId;
-            for (const auto& config : in_data.m_upstreamConfigurations)
-            {
-                s << "\n,upstream=" << config;
-            }
-            for (const auto& config : in_data.m_downstreamConfigurations)
-            {
-                s << "\n,downstream=" << config;
-            }
-            s << '}';
-            return s;
-        }
-    };
-
-    struct GetConfigurationData // for uniformity and future extensions
-    {
-        friend bool operator==(const GetConfigurationData&, const GetConfigurationData&) { return true; }
-        friend bool operator!=(const GetConfigurationData&, const GetConfigurationData&) { return false; }
-        template<class S> friend S& operator<<(S& s, const GetConfigurationData&) 
-        { 
-            s << "{}";
-            return s; 
-        }
-    };
-
-    struct CurrentConfigurationData
-    {
-        Optional<std::string> m_optionalMachineId;
-        std::vector<UpstreamConfiguration> m_upstreamConfigurations;
-        std::vector<DownstreamConfiguration> m_downstreamConfigurations;
-
-        CurrentConfigurationData() = default;
-
-        friend bool operator==(const CurrentConfigurationData& lhs, const CurrentConfigurationData& rhs)
-        {
-            return lhs.m_optionalMachineId == rhs.m_optionalMachineId
-                && lhs.m_downstreamConfigurations == rhs.m_downstreamConfigurations
-                && lhs.m_upstreamConfigurations == rhs.m_upstreamConfigurations;
-        }
-        friend bool operator!=(const CurrentConfigurationData& lhs, const CurrentConfigurationData& rhs) { return !operator==(lhs, rhs); }
-
-        template<class S>
-        friend S& operator<<(S& s, const CurrentConfigurationData& in_data)
-        {
-            s << "{m_optionalMachineId=" << in_data.m_optionalMachineId;
-            for (const auto& upstreamConfig : in_data.m_upstreamConfigurations)
-            {
-                s << "\n,upstream=" << upstreamConfig;
-            }
-            for (const auto& downstreamConfig : in_data.m_downstreamConfigurations)
-            {
-                s << "\n,downstream=" << downstreamConfig;
-            }
-            s << '}';
-            return s;
-        }
-    };
-
-    struct ConnectionInfo
-    {
-        std::string m_address;
-        uint16_t m_port = 0U;
-        std::string m_hostName;
-
-        ConnectionInfo() = default;
-        ConnectionInfo(StringView address, uint16_t port, StringView hostName) :
-            m_address(address),
-            m_port(port),
-            m_hostName(hostName)
-        {}
-
-        friend bool operator==(const ConnectionInfo& lhs, const ConnectionInfo& rhs)
-        {
-            return lhs.m_address == rhs.m_address
-                && lhs.m_port == rhs.m_port
-                && lhs.m_hostName == rhs.m_hostName;
-        }
-        friend bool operator!=(const ConnectionInfo& lhs, const ConnectionInfo& rhs) { return !operator==(lhs, rhs); }
-
-        template<class S>
-        friend S& operator<<(S& s, const ConnectionInfo& info)
-        {
-            s << "{m_address=" << info.m_address
-                << "\n,m_port=" << info.m_port
-                << "\n,m_hostName=" << info.m_hostName
-                << '}';
-            return s;
-        }
-    };
-
-    struct ServiceDescription
-    {
-        std::string m_machineId;
-        uint32_t m_laneId = 1;
-        std::string m_version{"1.0"};
-
-        ServiceDescription() = default;
-        ServiceDescription(StringView machineId, uint32_t laneId) :
+        ServiceDescriptionData() = default;
+        ServiceDescriptionData(StringView machineId,
+            unsigned laneId) :
             m_machineId(machineId),
             m_laneId(laneId)
         {}
 
-        friend bool operator==(const ServiceDescription& lhs, const ServiceDescription& rhs)
+        friend bool operator==(const ServiceDescriptionData& lhs, const ServiceDescriptionData& rhs)
         {
             return lhs.m_machineId == rhs.m_machineId
                 && lhs.m_laneId == rhs.m_laneId
-                && lhs.m_version == rhs.m_version;
+                && lhs.m_optionalInterfaceId == rhs.m_optionalInterfaceId
+                && lhs.m_version == rhs.m_version
+                && lhs.m_supportedFeatures == rhs.m_supportedFeatures;
         }
-        friend bool operator!=(const ServiceDescription& lhs, const ServiceDescription& rhs) { return !operator==(lhs, rhs); }
+        friend bool operator!=(const ServiceDescriptionData& lhs, const ServiceDescriptionData& rhs) { return !operator==(lhs, rhs); }
 
-        template<class S>
-        friend S& operator<<(S& s, const ServiceDescription& in_data)
+        template <class S> friend S& operator<<(S& s, const ServiceDescriptionData& data)
         {
-            s << "{m_machineId=" << in_data.m_machineId
-                << "\n,m_laneId=" << in_data.m_laneId
-                << "\n,m_version=" << in_data.m_version
-                << '}';
+            s << '{';
+            s << " MachineId=" << data.m_machineId;
+            s << " LaneId=" << data.m_laneId;
+            if (data.m_optionalInterfaceId) { s << " InterfaceId=" << *data.m_optionalInterfaceId; }
+            s << " Version=" << data.m_version;
+            s << " SupportedFeatures=" << data.m_supportedFeatures;
+            s << " }";
             return s;
         }
     };
 
-    struct MachineReadyData
+    //========== The Hermes Standard 3.5 ==========
+    struct NotificationData
     {
-        EBoardQuality m_failedBoard = EBoardQuality::eANY;
+        ENotificationCode m_notificationCode{ENotificationCode::eUNSPECIFIC};
+        ESeverity m_severity{ESeverity::eUNKNOWN};
+        std::string m_description;
 
-        MachineReadyData() = default;
-        explicit MachineReadyData(EBoardQuality quality) : m_failedBoard(quality) {}
+        NotificationData() = default;
+        NotificationData(ENotificationCode notificationCode,
+            ESeverity severity,
+            StringView description) :
+            m_notificationCode(notificationCode),
+            m_severity(severity),
+            m_description(description)
+        {}
 
-        friend bool operator==(const MachineReadyData& lhs, const MachineReadyData& rhs)
+        friend bool operator==(const NotificationData& lhs, const NotificationData& rhs)
         {
-            return lhs.m_failedBoard == rhs.m_failedBoard;
+            return lhs.m_notificationCode == rhs.m_notificationCode
+                && lhs.m_severity == rhs.m_severity
+                && lhs.m_description == rhs.m_description;
         }
-        friend bool operator!=(const MachineReadyData& lhs, const MachineReadyData& rhs) { return !operator==(lhs, rhs); }
+        friend bool operator!=(const NotificationData& lhs, const NotificationData& rhs) { return !operator==(lhs, rhs); }
 
-        template<class S>
-        friend S& operator<<(S& s, const MachineReadyData& in_data)
+        template <class S> friend S& operator<<(S& s, const NotificationData& data)
         {
-            s << "{m_failedBoard=" << in_data.m_failedBoard << '}';
+            s << '{';
+            s << " NotificationCode=" << data.m_notificationCode;
+            s << " Severity=" << data.m_severity;
+            s << " Description=" << data.m_description;
+            s << " }";
             return s;
         }
     };
 
-
-    struct RevokeMachineReadyData // for uniformity and future extensions
-    {
-        friend bool operator==(const RevokeMachineReadyData&, const RevokeMachineReadyData&) { return true; }
-        friend bool operator!=(const RevokeMachineReadyData&, const RevokeMachineReadyData&) { return false; }
-        template<class S> friend S& operator<<(S& s, const RevokeMachineReadyData&)
-        {
-            s << "{}";
-            return s;
-        }
-    };
-
+    //========== The Hermes Standard 3.6 ==========
     struct BoardAvailableData
     {
-        std::string m_boardId;
+        std::string m_boardId{"00000000-0000-0000-0000-000000000000"};
         std::string m_boardIdCreatedBy;
-        EBoardQuality m_failedBoard = EBoardQuality::eANY;
+        EBoardQuality m_failedBoard{EBoardQuality::eANY};
         Optional<std::string> m_optionalProductTypeId;
-        EFlippedBoard m_flippedBoard = EFlippedBoard::eSIDE_UP_IS_UNKNOWN;
+        EFlippedBoard m_flippedBoard{EFlippedBoard::eSIDE_UP_IS_UNKNOWN};
         Optional<std::string> m_optionalTopBarcode;
         Optional<std::string> m_optionalBottomBarcode;
         Optional<double> m_optionalLengthInMM;
@@ -491,11 +467,13 @@ namespace Hermes
         Optional<double> m_optionalConveyorSpeedInMMPerSecs;
         Optional<double> m_optionalTopClearanceHeightInMM;
         Optional<double> m_optionalBottomClearanceHeightInMM;
+        Optional<double> m_optionalWeightInGrams;
 
         BoardAvailableData() = default;
-        BoardAvailableData(StringView boardId, StringView boardIdCreatedBy, 
-            EBoardQuality failedBoard = EBoardQuality::eANY,
-            EFlippedBoard flippedBoard = EFlippedBoard::eSIDE_UP_IS_UNKNOWN) :
+        BoardAvailableData(StringView boardId,
+            StringView boardIdCreatedBy,
+            EBoardQuality failedBoard,
+            EFlippedBoard flippedBoard) :
             m_boardId(boardId),
             m_boardIdCreatedBy(boardIdCreatedBy),
             m_failedBoard(failedBoard),
@@ -516,45 +494,117 @@ namespace Hermes
                 && lhs.m_optionalThicknessInMM == rhs.m_optionalThicknessInMM
                 && lhs.m_optionalConveyorSpeedInMMPerSecs == rhs.m_optionalConveyorSpeedInMMPerSecs
                 && lhs.m_optionalTopClearanceHeightInMM == rhs.m_optionalTopClearanceHeightInMM
-                && lhs.m_optionalBottomClearanceHeightInMM == rhs.m_optionalBottomClearanceHeightInMM;
+                && lhs.m_optionalBottomClearanceHeightInMM == rhs.m_optionalBottomClearanceHeightInMM
+                && lhs.m_optionalWeightInGrams == rhs.m_optionalWeightInGrams;
         }
         friend bool operator!=(const BoardAvailableData& lhs, const BoardAvailableData& rhs) { return !operator==(lhs, rhs); }
 
-        template<class S>
-        friend S& operator<<(S& s, const BoardAvailableData& in_data)
+        template <class S> friend S& operator<<(S& s, const BoardAvailableData& data)
         {
-            s << "{m_boardId=" << in_data.m_boardId
-                << "\n,m_boardIdCreatedBy=" << in_data.m_boardIdCreatedBy
-                << "\n,m_failedBoard=" << in_data.m_failedBoard
-                << "\n,m_optionalProductTypeId=" << in_data.m_optionalProductTypeId
-                << "\n,m_flippedBoard=" << in_data.m_flippedBoard
-                << "\n,m_optionalTopBarcode=" << in_data.m_optionalTopBarcode
-                << "\n,m_optionalBottomBarcode=" << in_data.m_optionalBottomBarcode
-                << "\n,m_optionalLengthInMM=" << in_data.m_optionalLengthInMM
-                << "\n,m_optionalWidthInMM=" << in_data.m_optionalWidthInMM
-                << "\n,m_optionalThicknessInMM=" << in_data.m_optionalThicknessInMM
-                << "\n,m_optionalConveyorSpeedInMMPerSecs=" << in_data.m_optionalConveyorSpeedInMMPerSecs
-                << "\n,m_optionalTopClearanceHeightInMM=" << in_data.m_optionalTopClearanceHeightInMM
-                << "\n,m_optionalBottomClearanceHeightInMM=" << in_data.m_optionalBottomClearanceHeightInMM
-                << '}';
+            s << '{';
+            s << " BoardId=" << data.m_boardId;
+            s << " BoardIdCreatedBy=" << data.m_boardIdCreatedBy;
+            s << " FailedBoard=" << data.m_failedBoard;
+            if (data.m_optionalProductTypeId) { s << " ProductTypeId=" << *data.m_optionalProductTypeId; }
+            s << " FlippedBoard=" << data.m_flippedBoard;
+            if (data.m_optionalTopBarcode) { s << " TopBarcode=" << *data.m_optionalTopBarcode; }
+            if (data.m_optionalBottomBarcode) { s << " BottomBarcode=" << *data.m_optionalBottomBarcode; }
+            if (data.m_optionalLengthInMM) { s << " Length=" << *data.m_optionalLengthInMM; }
+            if (data.m_optionalWidthInMM) { s << " Width=" << *data.m_optionalWidthInMM; }
+            if (data.m_optionalThicknessInMM) { s << " Thickness=" << *data.m_optionalThicknessInMM; }
+            if (data.m_optionalConveyorSpeedInMMPerSecs) { s << " ConveyorSpeed=" << *data.m_optionalConveyorSpeedInMMPerSecs; }
+            if (data.m_optionalTopClearanceHeightInMM) { s << " TopClearanceHeight=" << *data.m_optionalTopClearanceHeightInMM; }
+            if (data.m_optionalBottomClearanceHeightInMM) { s << " BottomClearanceHeight=" << *data.m_optionalBottomClearanceHeightInMM; }
+            if (data.m_optionalWeightInGrams) { s << " Weight=" << *data.m_optionalWeightInGrams; }
+            s << " }";
             return s;
         }
     };
 
-    struct RevokeBoardAvailableData // for uniformity and future extensions
+    //========== The Hermes Standard 3.7 ==========
+    struct RevokeBoardAvailableData
     {
         friend bool operator==(const RevokeBoardAvailableData&, const RevokeBoardAvailableData&) { return true; }
         friend bool operator!=(const RevokeBoardAvailableData&, const RevokeBoardAvailableData&) { return false; }
-        template<class S> friend S& operator<<(S& s, const RevokeBoardAvailableData&)
+        template <class S> friend S& operator<<(S& s, const RevokeBoardAvailableData&) { s << "{}"; return s; }
+    };
+
+    //========== The Hermes Standard 3.8 ==========
+    struct MachineReadyData
+    {
+        EBoardQuality m_failedBoard{EBoardQuality::eANY};
+        Optional<std::string> m_optionalForecastId;
+        Optional<std::string> m_optionalBoardId;
+        Optional<std::string> m_optionalProductTypeId;
+        Optional<EFlippedBoard> m_optionalFlippedBoard;
+        Optional<std::string> m_optionalTopBarcode;
+        Optional<std::string> m_optionalBottomBarcode;
+        Optional<double> m_optionalLengthInMM;
+        Optional<double> m_optionalWidthInMM;
+        Optional<double> m_optionalThicknessInMM;
+        Optional<double> m_optionalConveyorSpeedInMMPerSecs;
+        Optional<double> m_optionalTopClearanceHeightInMM;
+        Optional<double> m_optionalBottomClearanceHeightInMM;
+        Optional<double> m_optionalWeightInGrams;
+
+        MachineReadyData() = default;
+        explicit MachineReadyData(EBoardQuality failedBoard) :
+            m_failedBoard(failedBoard)
+        {}
+
+        friend bool operator==(const MachineReadyData& lhs, const MachineReadyData& rhs)
         {
-            s << "{}";
+            return lhs.m_failedBoard == rhs.m_failedBoard
+                && lhs.m_optionalForecastId == rhs.m_optionalForecastId
+                && lhs.m_optionalBoardId == rhs.m_optionalBoardId
+                && lhs.m_optionalProductTypeId == rhs.m_optionalProductTypeId
+                && lhs.m_optionalFlippedBoard == rhs.m_optionalFlippedBoard
+                && lhs.m_optionalTopBarcode == rhs.m_optionalTopBarcode
+                && lhs.m_optionalBottomBarcode == rhs.m_optionalBottomBarcode
+                && lhs.m_optionalLengthInMM == rhs.m_optionalLengthInMM
+                && lhs.m_optionalWidthInMM == rhs.m_optionalWidthInMM
+                && lhs.m_optionalThicknessInMM == rhs.m_optionalThicknessInMM
+                && lhs.m_optionalConveyorSpeedInMMPerSecs == rhs.m_optionalConveyorSpeedInMMPerSecs
+                && lhs.m_optionalTopClearanceHeightInMM == rhs.m_optionalTopClearanceHeightInMM
+                && lhs.m_optionalBottomClearanceHeightInMM == rhs.m_optionalBottomClearanceHeightInMM
+                && lhs.m_optionalWeightInGrams == rhs.m_optionalWeightInGrams;
+        }
+        friend bool operator!=(const MachineReadyData& lhs, const MachineReadyData& rhs) { return !operator==(lhs, rhs); }
+
+        template <class S> friend S& operator<<(S& s, const MachineReadyData& data)
+        {
+            s << '{';
+            s << " FailedBoard=" << data.m_failedBoard;
+            if (data.m_optionalForecastId) { s << " ForecastId=" << *data.m_optionalForecastId; }
+            if (data.m_optionalBoardId) { s << " BoardId=" << *data.m_optionalBoardId; }
+            if (data.m_optionalProductTypeId) { s << " ProductTypeId=" << *data.m_optionalProductTypeId; }
+            if (data.m_optionalFlippedBoard) { s << " FlippedBoard=" << *data.m_optionalFlippedBoard; }
+            if (data.m_optionalTopBarcode) { s << " TopBarcode=" << *data.m_optionalTopBarcode; }
+            if (data.m_optionalBottomBarcode) { s << " BottomBarcode=" << *data.m_optionalBottomBarcode; }
+            if (data.m_optionalLengthInMM) { s << " Length=" << *data.m_optionalLengthInMM; }
+            if (data.m_optionalWidthInMM) { s << " Width=" << *data.m_optionalWidthInMM; }
+            if (data.m_optionalThicknessInMM) { s << " Thickness=" << *data.m_optionalThicknessInMM; }
+            if (data.m_optionalConveyorSpeedInMMPerSecs) { s << " ConveyorSpeed=" << *data.m_optionalConveyorSpeedInMMPerSecs; }
+            if (data.m_optionalTopClearanceHeightInMM) { s << " TopClearanceHeight=" << *data.m_optionalTopClearanceHeightInMM; }
+            if (data.m_optionalBottomClearanceHeightInMM) { s << " BottomClearanceHeight=" << *data.m_optionalBottomClearanceHeightInMM; }
+            if (data.m_optionalWeightInGrams) { s << " Weight=" << *data.m_optionalWeightInGrams; }
+            s << " }";
             return s;
         }
     };
 
+    //========== The Hermes Standard 3.9 ==========
+    struct RevokeMachineReadyData
+    {
+        friend bool operator==(const RevokeMachineReadyData&, const RevokeMachineReadyData&) { return true; }
+        friend bool operator!=(const RevokeMachineReadyData&, const RevokeMachineReadyData&) { return false; }
+        template <class S> friend S& operator<<(S& s, const RevokeMachineReadyData&) { s << "{}"; return s; }
+    };
+
+    //========== The Hermes Standard 3.10 ==========
     struct StartTransportData
     {
-        std::string m_boardId;
+        std::string m_boardId{"00000000-0000-0000-0000-000000000000"};
         Optional<double> m_optionalConveyorSpeedInMMPerSecs;
 
         StartTransportData() = default;
@@ -569,129 +619,415 @@ namespace Hermes
         }
         friend bool operator!=(const StartTransportData& lhs, const StartTransportData& rhs) { return !operator==(lhs, rhs); }
 
-        template<class S>
-        friend S& operator<<(S& s, const StartTransportData& in_data)
+        template <class S> friend S& operator<<(S& s, const StartTransportData& data)
         {
-            s << "{m_boardId=" << in_data.m_boardId
-                << "\n,m_optionalConveyorSpeedInMMPerSecs=" << in_data.m_optionalConveyorSpeedInMMPerSecs
-                << '}';
+            s << '{';
+            s << " BoardId=" << data.m_boardId;
+            if (data.m_optionalConveyorSpeedInMMPerSecs) { s << " ConveyorSpeed=" << *data.m_optionalConveyorSpeedInMMPerSecs; }
+            s << " }";
             return s;
         }
     };
 
+    //========== The Hermes Standard 3.11 ==========
     struct StopTransportData
     {
-        ETransferState m_transferState = ETransferState::eINCOMPLETE;
-        std::string m_boardId;
+        ETransferState m_transferState{ETransferState::eUNKNOWN};
+        std::string m_boardId{"00000000-0000-0000-0000-000000000000"};
 
         StopTransportData() = default;
-        StopTransportData(ETransferState state, StringView boardId) :
-            m_transferState(state),
+        StopTransportData(ETransferState transferState,
+            StringView boardId) :
+            m_transferState(transferState),
             m_boardId(boardId)
         {}
 
         friend bool operator==(const StopTransportData& lhs, const StopTransportData& rhs)
         {
-            return lhs.m_boardId == rhs.m_boardId
-                && lhs.m_transferState == rhs.m_transferState;
+            return lhs.m_transferState == rhs.m_transferState
+                && lhs.m_boardId == rhs.m_boardId;
         }
         friend bool operator!=(const StopTransportData& lhs, const StopTransportData& rhs) { return !operator==(lhs, rhs); }
 
-        template<class S>
-        friend S& operator<<(S& s, const StopTransportData& in_data)
+        template <class S> friend S& operator<<(S& s, const StopTransportData& data)
         {
-            s << "{m_transferState=" << in_data.m_transferState
-                << "\n,m_boardId=" << in_data.m_boardId
-                << '}';
+            s << '{';
+            s << " TransferState=" << data.m_transferState;
+            s << " BoardId=" << data.m_boardId;
+            s << " }";
             return s;
         }
     };
 
+    //========== The Hermes Standard 3.12 ==========
     struct TransportFinishedData
     {
-        ETransferState m_transferState = ETransferState::eINCOMPLETE;
-        std::string m_boardId;
+        ETransferState m_transferState{ETransferState::eUNKNOWN};
+        std::string m_boardId{"00000000-0000-0000-0000-000000000000"};
 
         TransportFinishedData() = default;
-        TransportFinishedData(ETransferState state, StringView boardId) :
-            m_transferState(state),
+        TransportFinishedData(ETransferState transferState,
+            StringView boardId) :
+            m_transferState(transferState),
             m_boardId(boardId)
         {}
 
         friend bool operator==(const TransportFinishedData& lhs, const TransportFinishedData& rhs)
         {
-            return lhs.m_boardId == rhs.m_boardId
-                && lhs.m_transferState == rhs.m_transferState;
+            return lhs.m_transferState == rhs.m_transferState
+                && lhs.m_boardId == rhs.m_boardId;
         }
         friend bool operator!=(const TransportFinishedData& lhs, const TransportFinishedData& rhs) { return !operator==(lhs, rhs); }
 
-        template<class S>
-        friend S& operator<<(S& s, const TransportFinishedData& in_data)
+        template <class S> friend S& operator<<(S& s, const TransportFinishedData& data)
         {
-            s << "{m_transferState=" << in_data.m_transferState
-                << "\n,m_boardId=" << in_data.m_boardId
-                << '}';
+            s << '{';
+            s << " TransferState=" << data.m_transferState;
+            s << " BoardId=" << data.m_boardId;
+            s << " }";
             return s;
         }
     };
 
-    struct NotificationData
+    //========== The Hermes Standard 3.13 ==========
+    struct UpstreamConfiguration
     {
-        ENotificationCode m_notificationCode = ENotificationCode::eUNSPECIFIC;
-        ESeverity m_severity{};
-        std::string m_description;
+        unsigned m_upstreamLaneId{0};
+        Optional<std::string> m_optionalUpstreamInterfaceId;
+        std::string m_hostAddress;
+        uint16_t m_port{0};
 
-        NotificationData() = default;
-        NotificationData(ENotificationCode code, ESeverity severity, StringView description) :
-            m_notificationCode(code),
-            m_severity(severity),
-            m_description(description)
+        UpstreamConfiguration() = default;
+        UpstreamConfiguration(unsigned upstreamLaneId,
+            StringView hostAddress,
+            uint16_t port) :
+            m_upstreamLaneId(upstreamLaneId),
+            m_hostAddress(hostAddress),
+            m_port(port)
         {}
 
-        friend bool operator==(const NotificationData& lhs, const NotificationData& rhs)
+        friend bool operator==(const UpstreamConfiguration& lhs, const UpstreamConfiguration& rhs)
         {
-            return lhs.m_notificationCode == rhs.m_notificationCode
-                && lhs.m_severity == rhs.m_severity
-                && lhs.m_description == rhs.m_description;
+            return lhs.m_upstreamLaneId == rhs.m_upstreamLaneId
+                && lhs.m_optionalUpstreamInterfaceId == rhs.m_optionalUpstreamInterfaceId
+                && lhs.m_hostAddress == rhs.m_hostAddress
+                && lhs.m_port == rhs.m_port;
         }
-        friend bool operator!=(const NotificationData& lhs, const NotificationData& rhs) { return !operator==(lhs, rhs); }
+        friend bool operator!=(const UpstreamConfiguration& lhs, const UpstreamConfiguration& rhs) { return !operator==(lhs, rhs); }
 
-        template<class S>
-        friend S& operator<<(S& s, const NotificationData& in_data)
+        template <class S> friend S& operator<<(S& s, const UpstreamConfiguration& data)
         {
-            s << "{m_notificationCode=" << in_data.m_notificationCode
-                << "\n,m_severity=" << in_data.m_severity
-                << "\n,m_description=" << in_data.m_description
-                << '}';
+            s << '{';
+            s << " UpstreamLaneId=" << data.m_upstreamLaneId;
+            if (data.m_optionalUpstreamInterfaceId) { s << " UpstreamInterfaceId=" << *data.m_optionalUpstreamInterfaceId; }
+            s << " HostAddress=" << data.m_hostAddress;
+            s << " Port=" << data.m_port;
+            s << " }";
             return s;
         }
     };
 
-    struct CheckAliveData // for uniformity and future extensions
+    /* The Hermes Standard 3.13 */
+    using UpstreamConfigurations = std::vector<UpstreamConfiguration>;
+    inline std::ostream& operator<<(std::ostream& s, const UpstreamConfigurations& data)
     {
-        friend bool operator==(const CheckAliveData&, const CheckAliveData&) { return true; }
-        friend bool operator!=(const CheckAliveData&, const CheckAliveData&) { return false; }
-        template<class S> friend S& operator<<(S& s, const CheckAliveData&)
+        s << '[';
+        if (!data.empty()) { s << ' '; }
+        for (const auto& item : data)
         {
-            s << "{}";
+            s << item << ' ';
+        }
+        s << ']';
+        return s;
+    }
+
+    //========== The Hermes Standard 3.13 ==========
+    struct DownstreamConfiguration
+    {
+        unsigned m_downstreamLaneId{0};
+        Optional<std::string> m_optionalDownstreamInterfaceId;
+        Optional<std::string> m_optionalClientAddress;
+        uint16_t m_port{0};
+
+        DownstreamConfiguration() = default;
+        DownstreamConfiguration(unsigned downstreamLaneId,
+            uint16_t port) :
+            m_downstreamLaneId(downstreamLaneId),
+            m_port(port)
+        {}
+
+        friend bool operator==(const DownstreamConfiguration& lhs, const DownstreamConfiguration& rhs)
+        {
+            return lhs.m_downstreamLaneId == rhs.m_downstreamLaneId
+                && lhs.m_optionalDownstreamInterfaceId == rhs.m_optionalDownstreamInterfaceId
+                && lhs.m_optionalClientAddress == rhs.m_optionalClientAddress
+                && lhs.m_port == rhs.m_port;
+        }
+        friend bool operator!=(const DownstreamConfiguration& lhs, const DownstreamConfiguration& rhs) { return !operator==(lhs, rhs); }
+
+        template <class S> friend S& operator<<(S& s, const DownstreamConfiguration& data)
+        {
+            s << '{';
+            s << " DownstreamLaneId=" << data.m_downstreamLaneId;
+            if (data.m_optionalDownstreamInterfaceId) { s << " DownstreamInterfaceId=" << *data.m_optionalDownstreamInterfaceId; }
+            if (data.m_optionalClientAddress) { s << " ClientAddress=" << *data.m_optionalClientAddress; }
+            s << " Port=" << data.m_port;
+            s << " }";
             return s;
         }
     };
 
+    /* The Hermes Standard 3.13 */
+    using DownstreamConfigurations = std::vector<DownstreamConfiguration>;
+    inline std::ostream& operator<<(std::ostream& s, const DownstreamConfigurations& data)
+    {
+        s << '[';
+        if (!data.empty()) { s << ' '; }
+        for (const auto& item : data)
+        {
+            s << item << ' ';
+        }
+        s << ']';
+        return s;
+    }
+
+    //========== The Hermes Standard 3.13 ==========
+    struct SetConfigurationData
+    {
+        std::string m_machineId;
+        UpstreamConfigurations m_upstreamConfigurations;
+        DownstreamConfigurations m_downstreamConfigurations;
+
+        SetConfigurationData() = default;
+        explicit SetConfigurationData(StringView machineId) :
+            m_machineId(machineId)
+        {}
+
+        friend bool operator==(const SetConfigurationData& lhs, const SetConfigurationData& rhs)
+        {
+            return lhs.m_machineId == rhs.m_machineId
+                && lhs.m_upstreamConfigurations == rhs.m_upstreamConfigurations
+                && lhs.m_downstreamConfigurations == rhs.m_downstreamConfigurations;
+        }
+        friend bool operator!=(const SetConfigurationData& lhs, const SetConfigurationData& rhs) { return !operator==(lhs, rhs); }
+
+        template <class S> friend S& operator<<(S& s, const SetConfigurationData& data)
+        {
+            s << '{';
+            s << " MachineId=" << data.m_machineId;
+            s << " UpstreamConfigurations=" << data.m_upstreamConfigurations;
+            s << " DownstreamConfigurations=" << data.m_downstreamConfigurations;
+            s << " }";
+            return s;
+        }
+    };
+
+    //========== The Hermes Standard 3.14 ==========
+    struct GetConfigurationData
+    {
+        friend bool operator==(const GetConfigurationData&, const GetConfigurationData&) { return true; }
+        friend bool operator!=(const GetConfigurationData&, const GetConfigurationData&) { return false; }
+        template <class S> friend S& operator<<(S& s, const GetConfigurationData&) { s << "{}"; return s; }
+    };
+
+    //========== The Hermes Standard 3.15 ==========
+    struct CurrentConfigurationData
+    {
+        Optional<std::string> m_optionalMachineId;
+        UpstreamConfigurations m_upstreamConfigurations;
+        DownstreamConfigurations m_downstreamConfigurations;
+
+        friend bool operator==(const CurrentConfigurationData& lhs, const CurrentConfigurationData& rhs)
+        {
+            return lhs.m_optionalMachineId == rhs.m_optionalMachineId
+                && lhs.m_upstreamConfigurations == rhs.m_upstreamConfigurations
+                && lhs.m_downstreamConfigurations == rhs.m_downstreamConfigurations;
+        }
+        friend bool operator!=(const CurrentConfigurationData& lhs, const CurrentConfigurationData& rhs) { return !operator==(lhs, rhs); }
+
+        template <class S> friend S& operator<<(S& s, const CurrentConfigurationData& data)
+        {
+            s << '{';
+            if (data.m_optionalMachineId) { s << " MachineId=" << *data.m_optionalMachineId; }
+            s << " UpstreamConfigurations=" << data.m_upstreamConfigurations;
+            s << " DownstreamConfigurations=" << data.m_downstreamConfigurations;
+            s << " }";
+            return s;
+        }
+    };
+
+    //========== The Hermes Standard 3.16 ==========
+    struct BoardForecastData
+    {
+        Optional<std::string> m_optionalForecastId;
+        Optional<double> m_optionalTimeUntilAvailableInSeconds;
+        Optional<std::string> m_optionalBoardId;
+        Optional<std::string> m_optionalBoardIdCreatedBy;
+        EBoardQuality m_failedBoard{EBoardQuality::eANY};
+        Optional<std::string> m_optionalProductTypeId;
+        EFlippedBoard m_flippedBoard{EFlippedBoard::eSIDE_UP_IS_UNKNOWN};
+        Optional<std::string> m_optionalTopBarcode;
+        Optional<std::string> m_optionalBottomBarcode;
+        Optional<double> m_optionalLengthInMM;
+        Optional<double> m_optionalWidthInMM;
+        Optional<double> m_optionalThicknessInMM;
+        Optional<double> m_optionalConveyorSpeedInMMPerSecs;
+        Optional<double> m_optionalTopClearanceHeightInMM;
+        Optional<double> m_optionalBottomClearanceHeightInMM;
+        Optional<double> m_optionalWeightInGrams;
+
+        BoardForecastData() = default;
+        BoardForecastData(EBoardQuality failedBoard,
+            EFlippedBoard flippedBoard) :
+            m_failedBoard(failedBoard),
+            m_flippedBoard(flippedBoard)
+        {}
+
+        friend bool operator==(const BoardForecastData& lhs, const BoardForecastData& rhs)
+        {
+            return lhs.m_optionalForecastId == rhs.m_optionalForecastId
+                && lhs.m_optionalTimeUntilAvailableInSeconds == rhs.m_optionalTimeUntilAvailableInSeconds
+                && lhs.m_optionalBoardId == rhs.m_optionalBoardId
+                && lhs.m_optionalBoardIdCreatedBy == rhs.m_optionalBoardIdCreatedBy
+                && lhs.m_failedBoard == rhs.m_failedBoard
+                && lhs.m_optionalProductTypeId == rhs.m_optionalProductTypeId
+                && lhs.m_flippedBoard == rhs.m_flippedBoard
+                && lhs.m_optionalTopBarcode == rhs.m_optionalTopBarcode
+                && lhs.m_optionalBottomBarcode == rhs.m_optionalBottomBarcode
+                && lhs.m_optionalLengthInMM == rhs.m_optionalLengthInMM
+                && lhs.m_optionalWidthInMM == rhs.m_optionalWidthInMM
+                && lhs.m_optionalThicknessInMM == rhs.m_optionalThicknessInMM
+                && lhs.m_optionalConveyorSpeedInMMPerSecs == rhs.m_optionalConveyorSpeedInMMPerSecs
+                && lhs.m_optionalTopClearanceHeightInMM == rhs.m_optionalTopClearanceHeightInMM
+                && lhs.m_optionalBottomClearanceHeightInMM == rhs.m_optionalBottomClearanceHeightInMM
+                && lhs.m_optionalWeightInGrams == rhs.m_optionalWeightInGrams;
+        }
+        friend bool operator!=(const BoardForecastData& lhs, const BoardForecastData& rhs) { return !operator==(lhs, rhs); }
+
+        template <class S> friend S& operator<<(S& s, const BoardForecastData& data)
+        {
+            s << '{';
+            if (data.m_optionalForecastId) { s << " ForecastId=" << *data.m_optionalForecastId; }
+            if (data.m_optionalTimeUntilAvailableInSeconds) { s << " TimeUntilAvailable=" << *data.m_optionalTimeUntilAvailableInSeconds; }
+            if (data.m_optionalBoardId) { s << " BoardId=" << *data.m_optionalBoardId; }
+            if (data.m_optionalBoardIdCreatedBy) { s << " BoardIdCreatedBy=" << *data.m_optionalBoardIdCreatedBy; }
+            s << " FailedBoard=" << data.m_failedBoard;
+            if (data.m_optionalProductTypeId) { s << " ProductTypeId=" << *data.m_optionalProductTypeId; }
+            s << " FlippedBoard=" << data.m_flippedBoard;
+            if (data.m_optionalTopBarcode) { s << " TopBarcode=" << *data.m_optionalTopBarcode; }
+            if (data.m_optionalBottomBarcode) { s << " BottomBarcode=" << *data.m_optionalBottomBarcode; }
+            if (data.m_optionalLengthInMM) { s << " Length=" << *data.m_optionalLengthInMM; }
+            if (data.m_optionalWidthInMM) { s << " Width=" << *data.m_optionalWidthInMM; }
+            if (data.m_optionalThicknessInMM) { s << " Thickness=" << *data.m_optionalThicknessInMM; }
+            if (data.m_optionalConveyorSpeedInMMPerSecs) { s << " ConveyorSpeed=" << *data.m_optionalConveyorSpeedInMMPerSecs; }
+            if (data.m_optionalTopClearanceHeightInMM) { s << " TopClearanceHeight=" << *data.m_optionalTopClearanceHeightInMM; }
+            if (data.m_optionalBottomClearanceHeightInMM) { s << " BottomClearanceHeight=" << *data.m_optionalBottomClearanceHeightInMM; }
+            if (data.m_optionalWeightInGrams) { s << " Weight=" << *data.m_optionalWeightInGrams; }
+            s << " }";
+            return s;
+        }
+    };
+
+    //========== The Hermes Standard 3.17 ==========
+    struct QueryBoardInfoData
+    {
+        Optional<std::string> m_optionalTopBarcode;
+        Optional<std::string> m_optionalBottomBarcode;
+
+        friend bool operator==(const QueryBoardInfoData& lhs, const QueryBoardInfoData& rhs)
+        {
+            return lhs.m_optionalTopBarcode == rhs.m_optionalTopBarcode
+                && lhs.m_optionalBottomBarcode == rhs.m_optionalBottomBarcode;
+        }
+        friend bool operator!=(const QueryBoardInfoData& lhs, const QueryBoardInfoData& rhs) { return !operator==(lhs, rhs); }
+
+        template <class S> friend S& operator<<(S& s, const QueryBoardInfoData& data)
+        {
+            s << '{';
+            if (data.m_optionalTopBarcode) { s << " TopBarcode=" << *data.m_optionalTopBarcode; }
+            if (data.m_optionalBottomBarcode) { s << " BottomBarcode=" << *data.m_optionalBottomBarcode; }
+            s << " }";
+            return s;
+        }
+    };
+
+    //========== The Hermes Standard 3.18 ==========
+    struct SendBoardInfoData
+    {
+        Optional<std::string> m_optionalBoardId;
+        Optional<std::string> m_optionalBoardIdCreatedBy;
+        Optional<EBoardQuality> m_optionalFailedBoard;
+        Optional<std::string> m_optionalProductTypeId;
+        Optional<EFlippedBoard> m_optionalFlippedBoard;
+        Optional<std::string> m_optionalTopBarcode;
+        Optional<std::string> m_optionalBottomBarcode;
+        Optional<double> m_optionalLengthInMM;
+        Optional<double> m_optionalWidthInMM;
+        Optional<double> m_optionalThicknessInMM;
+        Optional<double> m_optionalConveyorSpeedInMMPerSecs;
+        Optional<double> m_optionalTopClearanceHeightInMM;
+        Optional<double> m_optionalBottomClearanceHeightInMM;
+        Optional<double> m_optionalWeightInGrams;
+
+        friend bool operator==(const SendBoardInfoData& lhs, const SendBoardInfoData& rhs)
+        {
+            return lhs.m_optionalBoardId == rhs.m_optionalBoardId
+                && lhs.m_optionalBoardIdCreatedBy == rhs.m_optionalBoardIdCreatedBy
+                && lhs.m_optionalFailedBoard == rhs.m_optionalFailedBoard
+                && lhs.m_optionalProductTypeId == rhs.m_optionalProductTypeId
+                && lhs.m_optionalFlippedBoard == rhs.m_optionalFlippedBoard
+                && lhs.m_optionalTopBarcode == rhs.m_optionalTopBarcode
+                && lhs.m_optionalBottomBarcode == rhs.m_optionalBottomBarcode
+                && lhs.m_optionalLengthInMM == rhs.m_optionalLengthInMM
+                && lhs.m_optionalWidthInMM == rhs.m_optionalWidthInMM
+                && lhs.m_optionalThicknessInMM == rhs.m_optionalThicknessInMM
+                && lhs.m_optionalConveyorSpeedInMMPerSecs == rhs.m_optionalConveyorSpeedInMMPerSecs
+                && lhs.m_optionalTopClearanceHeightInMM == rhs.m_optionalTopClearanceHeightInMM
+                && lhs.m_optionalBottomClearanceHeightInMM == rhs.m_optionalBottomClearanceHeightInMM
+                && lhs.m_optionalWeightInGrams == rhs.m_optionalWeightInGrams;
+        }
+        friend bool operator!=(const SendBoardInfoData& lhs, const SendBoardInfoData& rhs) { return !operator==(lhs, rhs); }
+
+        template <class S> friend S& operator<<(S& s, const SendBoardInfoData& data)
+        {
+            s << '{';
+            if (data.m_optionalBoardId) { s << " BoardId=" << *data.m_optionalBoardId; }
+            if (data.m_optionalBoardIdCreatedBy) { s << " BoardIdCreatedBy=" << *data.m_optionalBoardIdCreatedBy; }
+            if (data.m_optionalFailedBoard) { s << " FailedBoard=" << *data.m_optionalFailedBoard; }
+            if (data.m_optionalProductTypeId) { s << " ProductTypeId=" << *data.m_optionalProductTypeId; }
+            if (data.m_optionalFlippedBoard) { s << " FlippedBoard=" << *data.m_optionalFlippedBoard; }
+            if (data.m_optionalTopBarcode) { s << " TopBarcode=" << *data.m_optionalTopBarcode; }
+            if (data.m_optionalBottomBarcode) { s << " BottomBarcode=" << *data.m_optionalBottomBarcode; }
+            if (data.m_optionalLengthInMM) { s << " Length=" << *data.m_optionalLengthInMM; }
+            if (data.m_optionalWidthInMM) { s << " Width=" << *data.m_optionalWidthInMM; }
+            if (data.m_optionalThicknessInMM) { s << " Thickness=" << *data.m_optionalThicknessInMM; }
+            if (data.m_optionalConveyorSpeedInMMPerSecs) { s << " ConveyorSpeed=" << *data.m_optionalConveyorSpeedInMMPerSecs; }
+            if (data.m_optionalTopClearanceHeightInMM) { s << " TopClearanceHeight=" << *data.m_optionalTopClearanceHeightInMM; }
+            if (data.m_optionalBottomClearanceHeightInMM) { s << " BottomClearanceHeight=" << *data.m_optionalBottomClearanceHeightInMM; }
+            if (data.m_optionalWeightInGrams) { s << " Weight=" << *data.m_optionalWeightInGrams; }
+            s << " }";
+            return s;
+        }
+    };
+
+    //========== Configuration of upstream interface (not part of The Hermes Standard) ==========
     struct UpstreamSettings
     {
         std::string m_machineId;
         std::string m_hostAddress;
-        uint16_t m_port = 0U; // if 0, then HermesProcol will use the default port for this lane
-        uint32_t m_checkAlivePeriodInSeconds = 60U;
-        uint32_t m_reconnectWaitTimeInSeconds = 10U;
-        ECheckState m_checkState = ECheckState::eSEND_AND_RECEIVE;
+        uint16_t m_port{0};
+        double m_checkAlivePeriodInSeconds{60};
+        double m_reconnectWaitTimeInSeconds{10};
+        ECheckAliveResponseMode m_checkAliveResponseMode{ECheckAliveResponseMode::eAUTO};
+        ECheckState m_checkState{ECheckState::eSEND_AND_RECEIVE};
 
         UpstreamSettings() = default;
-        UpstreamSettings(StringView machineId, StringView upstreamHostName, uint16_t upstreamPort) :
+        UpstreamSettings(StringView machineId,
+            StringView hostAddress,
+            uint16_t port) :
             m_machineId(machineId),
-            m_hostAddress(upstreamHostName),
-            m_port(upstreamPort)
+            m_hostAddress(hostAddress),
+            m_port(port)
         {}
 
         friend bool operator==(const UpstreamSettings& lhs, const UpstreamSettings& rhs)
@@ -701,37 +1037,42 @@ namespace Hermes
                 && lhs.m_port == rhs.m_port
                 && lhs.m_checkAlivePeriodInSeconds == rhs.m_checkAlivePeriodInSeconds
                 && lhs.m_reconnectWaitTimeInSeconds == rhs.m_reconnectWaitTimeInSeconds
+                && lhs.m_checkAliveResponseMode == rhs.m_checkAliveResponseMode
                 && lhs.m_checkState == rhs.m_checkState;
         }
         friend bool operator!=(const UpstreamSettings& lhs, const UpstreamSettings& rhs) { return !operator==(lhs, rhs); }
 
-        template<class S>
-        friend S& operator<<(S& s, const UpstreamSettings& in_data)
+        template <class S> friend S& operator<<(S& s, const UpstreamSettings& data)
         {
-            s << "{m_machineId=" << in_data.m_machineId
-                << "\n,m_hostAddress=" << in_data.m_hostAddress
-                << "\n,m_port=" << in_data.m_port
-                << "\n,m_checkAlivePeriodInSeconds=" << in_data.m_checkAlivePeriodInSeconds
-                << "\n,m_reconnectWaitTimeInSeconds=" << in_data.m_reconnectWaitTimeInSeconds
-                << "\n,m_checkState=" << in_data.m_checkState
-                << '}';
+            s << '{';
+            s << " MachineId=" << data.m_machineId;
+            s << " HostAddress=" << data.m_hostAddress;
+            s << " Port=" << data.m_port;
+            s << " CheckAlivePeriod=" << data.m_checkAlivePeriodInSeconds;
+            s << " ReconnectWaitTime=" << data.m_reconnectWaitTimeInSeconds;
+            s << " CheckAliveResponseMode=" << data.m_checkAliveResponseMode;
+            s << " CheckState=" << data.m_checkState;
+            s << " }";
             return s;
         }
     };
 
+    //========== Configuration of downstream interface (not part of The Hermes Standard) ==========
     struct DownstreamSettings
     {
         std::string m_machineId;
-        std::string m_optionalClientAddress; // if empty then requests from any client will be accepted
-        uint16_t m_port = 0; // if 0, then HermesProcol will use the default port for this lane
-        uint32_t m_checkAlivePeriodInSeconds = 60U;
-        uint32_t m_reconnectWaitTimeInSeconds = 10U;
-        ECheckState m_checkState = ECheckState::eSEND_AND_RECEIVE;
+        Optional<std::string> m_optionalClientAddress;
+        uint16_t m_port{0};
+        double m_checkAlivePeriodInSeconds{60};
+        double m_reconnectWaitTimeInSeconds{10};
+        ECheckAliveResponseMode m_checkAliveResponseMode{ECheckAliveResponseMode::eAUTO};
+        ECheckState m_checkState{ECheckState::eSEND_AND_RECEIVE};
 
         DownstreamSettings() = default;
-        explicit DownstreamSettings(StringView machineId, uint16_t myPort) :
+        DownstreamSettings(StringView machineId,
+            uint16_t port) :
             m_machineId(machineId),
-            m_port(myPort)
+            m_port(port)
         {}
 
         friend bool operator==(const DownstreamSettings& lhs, const DownstreamSettings& rhs)
@@ -741,28 +1082,36 @@ namespace Hermes
                 && lhs.m_port == rhs.m_port
                 && lhs.m_checkAlivePeriodInSeconds == rhs.m_checkAlivePeriodInSeconds
                 && lhs.m_reconnectWaitTimeInSeconds == rhs.m_reconnectWaitTimeInSeconds
+                && lhs.m_checkAliveResponseMode == rhs.m_checkAliveResponseMode
                 && lhs.m_checkState == rhs.m_checkState;
         }
         friend bool operator!=(const DownstreamSettings& lhs, const DownstreamSettings& rhs) { return !operator==(lhs, rhs); }
 
-        template<class S>
-        friend S& operator<<(S& s, const DownstreamSettings& in_data)
+        template <class S> friend S& operator<<(S& s, const DownstreamSettings& data)
         {
-            s << "{m_machineId=" << in_data.m_machineId
-                << "\n,m_optionalClientAddress=" << in_data.m_optionalClientAddress
-                << "\n,m_port=" << in_data.m_port
-                << "\n,m_checkAlivePeriodInSeconds=" << in_data.m_checkAlivePeriodInSeconds
-                << "\n,m_reconnectWaitTimeInSeconds=" << in_data.m_reconnectWaitTimeInSeconds
-                << "\n,m_checkState=" << in_data.m_checkState
-                << '}';
+            s << '{';
+            s << " MachineId=" << data.m_machineId;
+            if (data.m_optionalClientAddress) { s << " ClientAddress=" << *data.m_optionalClientAddress; }
+            s << " Port=" << data.m_port;
+            s << " CheckAlivePeriod=" << data.m_checkAlivePeriodInSeconds;
+            s << " ReconnectWaitTime=" << data.m_reconnectWaitTimeInSeconds;
+            s << " CheckAliveResponseMode=" << data.m_checkAliveResponseMode;
+            s << " CheckState=" << data.m_checkState;
+            s << " }";
             return s;
         }
     };
 
+    //========== Configuration of configuration service interface (not part of The Hermes Standard) ==========
     struct ConfigurationServiceSettings
     {
-        uint16_t m_port = 0;
-        uint32_t m_reconnectWaitTimeInSeconds = 10U;
+        uint16_t m_port{0};
+        double m_reconnectWaitTimeInSeconds{10};
+
+        ConfigurationServiceSettings() = default;
+        explicit ConfigurationServiceSettings(uint16_t port) :
+            m_port(port)
+        {}
 
         friend bool operator==(const ConfigurationServiceSettings& lhs, const ConfigurationServiceSettings& rhs)
         {
@@ -771,26 +1120,27 @@ namespace Hermes
         }
         friend bool operator!=(const ConfigurationServiceSettings& lhs, const ConfigurationServiceSettings& rhs) { return !operator==(lhs, rhs); }
 
-        template<class S>
-        friend S& operator<<(S& s, const ConfigurationServiceSettings& in_data)
+        template <class S> friend S& operator<<(S& s, const ConfigurationServiceSettings& data)
         {
-            s << "{m_port=" << in_data.m_port
-                << "\n,m_reconnectWaitTimeInSeconds=" << in_data.m_reconnectWaitTimeInSeconds
-                << '}';
+            s << '{';
+            s << " Port=" << data.m_port;
+            s << " ReconnectWaitTime=" << data.m_reconnectWaitTimeInSeconds;
+            s << " }";
             return s;
         }
     };
 
-    class Error
+    //========== Error object (not part of The Hermes Standard) ==========
+    struct Error
     {
-    public:
-        EErrorCode m_code = EErrorCode::eSUCCESS;
+        EErrorCode m_code{EErrorCode::eSUCCESS};
         std::string m_text;
 
-        Error() {}
-        Error(EErrorCode code, StringView text) :
-            m_code(code), 
-            m_text(text) 
+        Error() = default;
+        Error(EErrorCode code,
+            StringView text) :
+            m_code(code),
+            m_text(text)
         {}
 
         explicit operator bool() const { return m_code != EErrorCode::eSUCCESS; }
@@ -802,14 +1152,50 @@ namespace Hermes
         }
         friend bool operator!=(const Error& lhs, const Error& rhs) { return !operator==(lhs, rhs); }
 
-        template<class S>
-        friend S& operator<<(S& s, const Error& error)
+        template <class S> friend S& operator<<(S& s, const Error& data)
         {
-            s << '{' << error.m_code;
-            if (!error.m_text.empty()) { s << "\n," << error.m_text; }
-            s << '}';
+            s << '{';
+            s << " Code=" << data.m_code;
+            s << " Text=" << data.m_text;
+            s << " }";
             return s;
         }
-
     };
-}
+
+    //========== Attributes for the established connection (not part of The Hermes Standard) ==========
+    struct ConnectionInfo
+    {
+        std::string m_address;
+        uint16_t m_port{0};
+        std::string m_hostName;
+
+        ConnectionInfo() = default;
+        ConnectionInfo(StringView address,
+            uint16_t port,
+            StringView hostName) :
+            m_address(address),
+            m_port(port),
+            m_hostName(hostName)
+        {}
+
+        friend bool operator==(const ConnectionInfo& lhs, const ConnectionInfo& rhs)
+        {
+            return lhs.m_address == rhs.m_address
+                && lhs.m_port == rhs.m_port
+                && lhs.m_hostName == rhs.m_hostName;
+        }
+        friend bool operator!=(const ConnectionInfo& lhs, const ConnectionInfo& rhs) { return !operator==(lhs, rhs); }
+
+        template <class S> friend S& operator<<(S& s, const ConnectionInfo& data)
+        {
+            s << '{';
+            s << " Address=" << data.m_address;
+            s << " Port=" << data.m_port;
+            s << " HostName=" << data.m_hostName;
+            s << " }";
+            return s;
+        }
+    };
+
+
+} // namespace Hermes

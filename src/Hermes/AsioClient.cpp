@@ -152,7 +152,7 @@ namespace Hermes
                 return;
 
             m_socket.m_timer.expires_from_now(
-                boost::posix_time::seconds(m_socket.m_configuration.m_retryDelayInSeconds));
+                boost::posix_time::milliseconds(static_cast<int>(1000.0 * m_socket.m_configuration.m_retryDelayInSeconds)));
             m_socket.m_timer.async_wait([spThis = shared_from_this()](const boost::system::error_code& ec)
             {
                 if (spThis->m_socket.Closed())

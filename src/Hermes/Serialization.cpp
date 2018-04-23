@@ -16,258 +16,126 @@ limitations under the License.
 
 #include "stdafx.h"
 #include <HermesSerialization.h>
-
 #include <HermesDataConversion.hpp>
-#include "Serializer.h"
 
-#include <boost/smart_ptr/intrusive_ref_counter.hpp>
-
-#include <atomic>
+#include "MessageDispatcher.h"
+#include "Service.h"
 
 
-struct HermesStringHandle
+void HermesSerializeServiceDescription(const HermesServiceDescriptionData* pData, HermesSerializationCallback callback)
 {
-    explicit HermesStringHandle(std::string&& rhs) : m_string(std::move(rhs)) {}
-    explicit HermesStringHandle(const std::string& rhs) : m_string(rhs) {}
-
-    std::string m_string;
-};
-
-HermesStringView HermesStringViewFromHandle(HermesStringHandle* pHandle)
+    callback.m_pCall(callback.m_pData, Hermes::ToC(Hermes::Serialize(Hermes::ToCpp(*pData))));
+}
+void HermesSerializeBoardAvailable(const HermesBoardAvailableData* pData, HermesSerializationCallback callback)
 {
-    return Hermes::ToC(pHandle->m_string);
+    callback.m_pCall(callback.m_pData, Hermes::ToC(Hermes::Serialize(Hermes::ToCpp(*pData))));
+}
+void HermesSerializeRevokeBoardAvailable(const HermesRevokeBoardAvailableData* pData, HermesSerializationCallback callback)
+{
+    callback.m_pCall(callback.m_pData, Hermes::ToC(Hermes::Serialize(Hermes::ToCpp(*pData))));
+}
+void HermesSerializeMachineReady(const HermesMachineReadyData* pData, HermesSerializationCallback callback)
+{
+    callback.m_pCall(callback.m_pData, Hermes::ToC(Hermes::Serialize(Hermes::ToCpp(*pData))));
+}
+void HermesSerializeRevokeMachineReady(const HermesRevokeMachineReadyData* pData, HermesSerializationCallback callback)
+{
+    callback.m_pCall(callback.m_pData, Hermes::ToC(Hermes::Serialize(Hermes::ToCpp(*pData))));
+}
+void HermesSerializeStartTransport(const HermesStartTransportData* pData, HermesSerializationCallback callback)
+{
+    callback.m_pCall(callback.m_pData, Hermes::ToC(Hermes::Serialize(Hermes::ToCpp(*pData))));
+}
+void HermesSerializeStopTransport(const HermesStopTransportData* pData, HermesSerializationCallback callback)
+{
+    callback.m_pCall(callback.m_pData, Hermes::ToC(Hermes::Serialize(Hermes::ToCpp(*pData))));
+}
+void HermesSerializeTransportFinished(const HermesTransportFinishedData* pData, HermesSerializationCallback callback)
+{
+    callback.m_pCall(callback.m_pData, Hermes::ToC(Hermes::Serialize(Hermes::ToCpp(*pData))));
+}
+void HermesSerializeBoardForecast(const HermesBoardForecastData* pData, HermesSerializationCallback callback)
+{
+    callback.m_pCall(callback.m_pData, Hermes::ToC(Hermes::Serialize(Hermes::ToCpp(*pData))));
+}
+void HermesSerializeQueryBoardInfo(const HermesQueryBoardInfoData* pData, HermesSerializationCallback callback)
+{
+    callback.m_pCall(callback.m_pData, Hermes::ToC(Hermes::Serialize(Hermes::ToCpp(*pData))));
+}
+void HermesSerializeSendBoardInfo(const HermesSendBoardInfoData* pData, HermesSerializationCallback callback)
+{
+    callback.m_pCall(callback.m_pData, Hermes::ToC(Hermes::Serialize(Hermes::ToCpp(*pData))));
+}
+void HermesSerializeNotification(const HermesNotificationData* pData, HermesSerializationCallback callback)
+{
+    callback.m_pCall(callback.m_pData, Hermes::ToC(Hermes::Serialize(Hermes::ToCpp(*pData))));
+}
+void HermesSerializeCheckAlive(const HermesCheckAliveData* pData, HermesSerializationCallback callback)
+{
+    callback.m_pCall(callback.m_pData, Hermes::ToC(Hermes::Serialize(Hermes::ToCpp(*pData))));
+}
+void HermesSerializeGetConfiguration(const HermesGetConfigurationData* pData, HermesSerializationCallback callback)
+{
+    callback.m_pCall(callback.m_pData, Hermes::ToC(Hermes::Serialize(Hermes::ToCpp(*pData))));
+}
+void HermesSerializeSetConfiguration(const HermesSetConfigurationData* pData, HermesSerializationCallback callback)
+{
+    callback.m_pCall(callback.m_pData, Hermes::ToC(Hermes::Serialize(Hermes::ToCpp(*pData))));
+}
+void HermesSerializeCurrentConfiguration(const HermesCurrentConfigurationData* pData, HermesSerializationCallback callback)
+{
+    callback.m_pCall(callback.m_pData, Hermes::ToC(Hermes::Serialize(Hermes::ToCpp(*pData))));
 }
 
-HermesStringHandle* HermesXmlFromServiceDescription(const HermesServiceDescription* pData)
+namespace
 {
-    return new HermesStringHandle(Hermes::Serialize(Hermes::ToCpp(*pData)));
-}
-HermesStringHandle* HermesXmlFromBoardAvailableData(const HermesBoardAvailableData* pData)
-{
-    return new HermesStringHandle(Hermes::Serialize(Hermes::ToCpp(*pData)));
-}
-HermesStringHandle* HermesXmlFromRevokeBoardAvailableData(const HermesRevokeBoardAvailableData* pData)
-{
-    return new HermesStringHandle(Hermes::Serialize(Hermes::ToCpp(*pData)));
-}
-HermesStringHandle* HermesXmlFromMachineReadyData(const HermesMachineReadyData* pData)
-{
-    return new HermesStringHandle(Hermes::Serialize(Hermes::ToCpp(*pData)));
-}
-HermesStringHandle* HermesXmlFromRevokeMachineReadyData(const HermesRevokeMachineReadyData* pData)
-{
-    return new HermesStringHandle(Hermes::Serialize(Hermes::ToCpp(*pData)));
-}
-HermesStringHandle* HermesXmlFromStartTransportData(const HermesStartTransportData* pData)
-{
-    return new HermesStringHandle(Hermes::Serialize(Hermes::ToCpp(*pData)));
-}
-HermesStringHandle* HermesXmlFromStopTransportData(const HermesStopTransportData* pData)
-{
-    return new HermesStringHandle(Hermes::Serialize(Hermes::ToCpp(*pData)));
-}
-HermesStringHandle* HermesXmlFromTransportFinishedData(const HermesTransportFinishedData* pData)
-{
-    return new HermesStringHandle(Hermes::Serialize(Hermes::ToCpp(*pData)));
-}
-HermesStringHandle* HermesXmlFromNotificationData(const HermesNotificationData* pData)
-{
-    return new HermesStringHandle(Hermes::Serialize(Hermes::ToCpp(*pData)));
-}
-HermesStringHandle* HermesXmlFromCheckAliveData(const HermesCheckAliveData* pData)
-{
-    return new HermesStringHandle(Hermes::Serialize(Hermes::ToCpp(*pData)));
-}
-HermesStringHandle* HermesXmlFromGetConfigurationData(const HermesGetConfigurationData* pData)
-{
-    return new HermesStringHandle(Hermes::Serialize(Hermes::ToCpp(*pData)));
-}
-HermesStringHandle* HermesXmlFromSetConfigurationData(const HermesSetConfigurationData* pData)
-{
-    return new HermesStringHandle(Hermes::Serialize(Hermes::ToCpp(*pData)));
-}
-HermesStringHandle* HermesXmlFromCurrentConfigurationData(const HermesCurrentConfigurationData* pData)
-{
-    return new HermesStringHandle(Hermes::Serialize(Hermes::ToCpp(*pData)));
-}
-
-void FreeHermesString(HermesStringHandle* pHandle)
-{
-    delete pHandle;
-}
-
-namespace Hermes
-{
-    namespace
+    template<class T, class CallbackT>
+    void Add_(Hermes::MessageDispatcher& dispatcher, CallbackT callback)
     {
-        template<class T>
-        struct DataHolder
-        { 
-            DataHolder(const T& cppData) : m_cppData(cppData) {}
-#ifdef _WINDOWS
-            DataHolder(const DataHolder&) = delete;
-            DataHolder& operator=(const DataHolder&) = delete;
-#else
-            DataHolder(const DataHolder&);
-            DataHolder& operator=(const DataHolder&);
-#endif
-            DataHolder(DataHolder&& rhs) : m_cppData(std::move(rhs.m_cppData)), m_convertedData(ToC(m_cppData)) {}
-            DataHolder& operator=(DataHolder&& rhs)
-            {
-                m_cppData = std::move(rhs.m_cppData);
-                m_convertedData = ToC(m_cppData);
-                return *this;
-            }
+        if (!callback.m_pCall)
+            return;
 
-            T m_cppData;
-            using ConvertedData = decltype(ToC(m_cppData));
-            ConvertedData m_convertedData = ToC(m_cppData);
-        };
-
-        template<>
-        struct DataHolder<boost::blank>
+        dispatcher.Add<T>([callback](const auto& data)
         {
-            DataHolder() = default;
-            DataHolder(boost::blank) {}
-        };
-
-        template<class... Ts>
-        struct VariantDataHolder : boost::static_visitor<>
-        {
-            using Variant = boost::variant<DataHolder<Ts>...>;
-            Variant m_variant;
-
-            //template<class T>
-            //VariantDataHolder(T&& m_value) : m_variant(std::forward<T>(m_value)) {}
-
-            template<class T>
-            void operator()(T&& value)
-            {
-                m_variant = Variant(std::forward<T>(value));
-            }
-        };
-
-        using MyVariantDataHolder = VariantDataHolder<boost::blank, Error,
-            ServiceDescription,
-            BoardAvailableData,
-            RevokeBoardAvailableData,
-            MachineReadyData,
-            RevokeMachineReadyData,
-            StartTransportData,
-            TransportFinishedData,
-            StopTransportData,
-            NotificationData,
-            CheckAliveData,
-            GetConfigurationData,
-            SetConfigurationData,
-            CurrentConfigurationData>;
-
+            auto cData{Hermes::ToC(data)};
+            callback.m_pCall(callback.m_pData, &cData);
+        });
     }
 }
 
-struct HermesDataHandle
+void HermesDeserialize(HermesStringView stringView, const HermesDeserializationCallbacks* pCallbacks)
 {
-    HermesDataHandle(Hermes::StringView message)
-    {
-        auto variant = Hermes::Deserialize(message);
-        boost::apply_visitor(m_holder, variant);
-    }
+    HermesTraceCallback traceCallback{};
+    Hermes::Service service{traceCallback};
+    Hermes::MessageDispatcher dispatcher{0U, service};
 
-    Hermes::MyVariantDataHolder m_holder;
-};
+    Add_<Hermes::ServiceDescriptionData>(dispatcher, pCallbacks->m_serviceDescriptionCallback);
+    Add_<Hermes::BoardAvailableData>(dispatcher, pCallbacks->m_boardAvailableCallback);
+    Add_<Hermes::RevokeBoardAvailableData>(dispatcher, pCallbacks->m_revokeBoardAvailableCallback);
+    Add_<Hermes::MachineReadyData>(dispatcher, pCallbacks->m_machineReadyCallback);
+    Add_<Hermes::RevokeMachineReadyData>(dispatcher, pCallbacks->m_revokeMachineReadyCallback);
+    Add_<Hermes::StartTransportData>(dispatcher, pCallbacks->m_startTransportCallback);
+    Add_<Hermes::StopTransportData>(dispatcher, pCallbacks->m_stopTransportCallback);
+    Add_<Hermes::TransportFinishedData>(dispatcher, pCallbacks->m_transportFinishedCallback);
+    Add_<Hermes::BoardForecastData>(dispatcher, pCallbacks->m_boardForecastCallback);
+    Add_<Hermes::QueryBoardInfoData>(dispatcher, pCallbacks->m_queryBoardInfoCallback);
+    Add_<Hermes::SendBoardInfoData>(dispatcher, pCallbacks->m_sendBoardInfoCallback);
+    Add_<Hermes::CheckAliveData>(dispatcher, pCallbacks->m_checkAliveCallback);
+    Add_<Hermes::NotificationData>(dispatcher, pCallbacks->m_notificationCallback);
+    Add_<Hermes::GetConfigurationData>(dispatcher, pCallbacks->m_getConfigurationCallback);
+    Add_<Hermes::SetConfigurationData>(dispatcher, pCallbacks->m_setConfigurationCallback);
+    Add_<Hermes::CurrentConfigurationData>(dispatcher, pCallbacks->m_currentConfigurationCallback);
 
-HermesDataHandle* HermesDataFromXml(HermesStringView message)
-{
-    return new HermesDataHandle(Hermes::ToCpp(message));
-}
+    std::string xmlParseString{Hermes::ToCpp(stringView)};
+    auto error = dispatcher.Dispatch(xmlParseString);
+    if (!error)
+        return;
+    
+    if (!pCallbacks->m_deserializationErrorCallback.m_pCall)
+        return;
 
-const HermesError* HermesErrorFromHandle(HermesDataHandle* pHandle)
-{
-    if (auto p = boost::get<Hermes::DataHolder<Hermes::Error>>(&pHandle->m_holder.m_variant))
-        return &p->m_convertedData;
-    return nullptr;
-}
-const HermesServiceDescription* HermesServiceDescriptionFromHandle(HermesDataHandle* pHandle)
-{
-    if (auto p = boost::get<Hermes::DataHolder<Hermes::ServiceDescription>>(&pHandle->m_holder.m_variant))
-        return &p->m_convertedData;
-    return nullptr;
-}
-const HermesBoardAvailableData* HermesBoardAvailableDataFromHandle(HermesDataHandle* pHandle)
-{
-    if (auto p = boost::get<Hermes::DataHolder<Hermes::BoardAvailableData>>(&pHandle->m_holder.m_variant))
-        return &p->m_convertedData;
-    return nullptr;
-}
-const HermesRevokeBoardAvailableData* HermesRevokeBoardAvailableDataFromHandle(HermesDataHandle* pHandle)
-{
-    if (auto p = boost::get<Hermes::DataHolder<Hermes::RevokeBoardAvailableData>>(&pHandle->m_holder.m_variant))
-        return &p->m_convertedData;
-    return nullptr;
-}
-const HermesMachineReadyData* HermesMachineReadyDataFromHandle(HermesDataHandle* pHandle)
-{
-    if (auto p = boost::get<Hermes::DataHolder<Hermes::MachineReadyData>>(&pHandle->m_holder.m_variant))
-        return &p->m_convertedData;
-    return nullptr;
-}
-const HermesRevokeMachineReadyData* HermesRevokeMachineReadyDataFromHandle(HermesDataHandle* pHandle)
-{
-    if (auto p = boost::get<Hermes::DataHolder<Hermes::RevokeMachineReadyData>>(&pHandle->m_holder.m_variant))
-        return &p->m_convertedData;
-    return nullptr;
-}
-const HermesStartTransportData* HermesStartTransportDataFromHandle(HermesDataHandle* pHandle)
-{
-    if (auto p = boost::get<Hermes::DataHolder<Hermes::StartTransportData>>(&pHandle->m_holder.m_variant))
-        return &p->m_convertedData;
-    return nullptr;
-}
-const HermesStopTransportData* HermesStopTransportDataFromHandle(HermesDataHandle* pHandle)
-{
-    if (auto p = boost::get<Hermes::DataHolder<Hermes::StopTransportData>>(&pHandle->m_holder.m_variant))
-        return &p->m_convertedData;
-    return nullptr;
-}
-const HermesTransportFinishedData* HermesTransportFinishedDataFromHandle(HermesDataHandle* pHandle)
-{
-    if (auto p = boost::get<Hermes::DataHolder<Hermes::TransportFinishedData>>(&pHandle->m_holder.m_variant))
-        return &p->m_convertedData;
-    return nullptr;
-}
-const HermesNotificationData* HermesNotificationDataFromHandle(HermesDataHandle* pHandle)
-{
-    if (auto p = boost::get<Hermes::DataHolder<Hermes::NotificationData>>(&pHandle->m_holder.m_variant))
-        return &p->m_convertedData;
-    return nullptr;
-}
-const HermesCheckAliveData* HermesCheckAliveDataFromHandle(HermesDataHandle* pHandle)
-{
-    if (auto p = boost::get<Hermes::DataHolder<Hermes::CheckAliveData>>(&pHandle->m_holder.m_variant))
-        return &p->m_convertedData;
-    return nullptr;
-}
-const HermesGetConfigurationData* HermesGetConfigurationDataFromHandle(HermesDataHandle* pHandle)
-{
-    if (auto p = boost::get<Hermes::DataHolder<Hermes::GetConfigurationData>>(&pHandle->m_holder.m_variant))
-        return &p->m_convertedData;
-    return nullptr;
-}
-const HermesSetConfigurationData* HermesSetConfigurationDataFromHandle(HermesDataHandle* pHandle)
-{
-    if (auto p = boost::get<Hermes::DataHolder<Hermes::SetConfigurationData>>(&pHandle->m_holder.m_variant))
-        return &p->m_convertedData;
-    return nullptr;
-}
-const HermesCurrentConfigurationData* HermesCurrentConfigurationDataFromHandle(HermesDataHandle* pHandle)
-{
-    if (auto p = boost::get<Hermes::DataHolder<Hermes::CurrentConfigurationData>>(&pHandle->m_holder.m_variant))
-        return &p->m_convertedData;
-    return nullptr;
+    auto cError = Hermes::ToC(error);
+    pCallbacks->m_deserializationErrorCallback.m_pCall(pCallbacks->m_deserializationErrorCallback.m_pData, &cError);
 }
 
-void FreeHermesData(HermesDataHandle* pHandle)
-{
-    delete pHandle;
-}
 

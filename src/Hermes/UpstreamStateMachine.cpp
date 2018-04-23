@@ -16,6 +16,7 @@ limitations under the License.
 
 #include "stdafx.h"
 #include "UpstreamStateMachine.h"
+#include "MessageSerialization.h"
 #include "UpstreamSerializer.h"
 
 #include "IService.h"
@@ -61,7 +62,7 @@ namespace Hermes
 
                 if (m_state != EState::eNOT_CONNECTED)
                 {
-                    m_forward.Signal(NotificationData(ENotificationCode::eUNSPECIFIC, ESeverity::eFATAL, "SoftwareError"));
+                    m_forward.Signal(Serialize(NotificationData(ENotificationCode::eUNSPECIFIC, ESeverity::eFATAL, "SoftwareError")));
                 }
 
                 m_state = EState::eDISCONNECTED;
@@ -80,7 +81,7 @@ namespace Hermes
 
                 m_state = EState::eDISCONNECTED;
                 m_pCallback->OnDisconnected(m_state, error);
-                m_forward.Signal(NotificationData(ENotificationCode::ePROTOCOL_ERROR, ESeverity::eFATAL, error.m_text));
+                m_forward.Signal(Serialize(NotificationData(ENotificationCode::ePROTOCOL_ERROR, ESeverity::eFATAL, error.m_text)));
                 m_forward.Disconnect();
             }
 
@@ -93,118 +94,119 @@ namespace Hermes
                 m_forward.Connect(std::move(wpOwner), *this);
             }
 
-            void Signal(const ServiceDescription& data) override
+            void Signal(const ServiceDescriptionData&, StringView rawXml) override
             {
                 switch (m_state)
                 {
                 case EState::eSOCKET_CONNECTED:
                     m_state = EState::eSERVICE_DESCRIPTION_DOWNSTREAM;
                     m_pCallback->OnState(m_state);
-                    m_forward.Signal(data);
+                    m_forward.Signal(rawXml);
                     return;
 
                 default:
                     if (DisconnectedDueToIllegalClientEvent_("ServiceDescription"))
                         return;
-                    m_forward.Signal(data);
+                    m_forward.Signal(rawXml);
                 }
             }
 
-            void Signal(const MachineReadyData& data) override
+            void Signal(const MachineReadyData&, StringView rawXml) override
             {
                 switch (m_state)
                 {
                 case EState::eNOT_AVAILABLE_NOT_READY:
                     m_state = EState::eMACHINE_READY;
                     m_pCallback->OnState(m_state);
-                    m_forward.Signal(data);
+                    m_forward.Signal(rawXml);
                     return;
 
                 case EState::eBOARD_AVAILABLE:
                     m_state = EState::eAVAILABLE_AND_READY;
                     m_pCallback->OnState(m_state);
-                    m_forward.Signal(data);
+                    m_forward.Signal(rawXml);
                     return;
 
                 default:
                     if (DisconnectedDueToIllegalClientEvent_("MachineReady"))
                         return;
-                    m_forward.Signal(data);
+                    m_forward.Signal(rawXml);
                 }
             }
 
-            void Signal(const RevokeMachineReadyData& data) override
+            void Signal(const RevokeMachineReadyData&, StringView rawXml) override
             {
                 switch (m_state)
                 {
                 case EState::eMACHINE_READY:
                     m_state = EState::eNOT_AVAILABLE_NOT_READY;
                     m_pCallback->OnState(m_state);
-                    m_forward.Signal(data);
+                    m_forward.Signal(rawXml);
                     return;
 
                 case EState::eAVAILABLE_AND_READY:
                     m_state = EState::eBOARD_AVAILABLE;
                     m_pCallback->OnState(m_state);
-                    m_forward.Signal(data);
+                    m_forward.Signal(rawXml);
                     return;
 
                 default:
                     if (DisconnectedDueToIllegalClientEvent_("RevokeMachineReady"))
                         return;
-                    m_forward.Signal(data);
+                    m_forward.Signal(rawXml);
                 }
             }
 
-            void Signal(const StartTransportData& data) override
+            void Signal(const StartTransportData& data, StringView rawXml) override
             {
                 switch (m_state)
                 {
                 case EState::eAVAILABLE_AND_READY:
                     m_state = EState::eTRANSPORTING;
-                    m_startTransportBoardId = data.m_boardId;
+                    m_startTransportBoardId = rawXml.empty() ? data.m_boardId : std::string();
                     m_pCallback->OnState(m_state);
-                    m_forward.Signal(data);
+                    m_forward.Signal(rawXml);
                     return;
 
                 case EState::eMACHINE_READY:
                     m_state = EState::eTRANSPORTING;
-                    m_startTransportBoardId = data.m_boardId;
+                    m_startTransportBoardId = rawXml.empty() ? data.m_boardId : std::string();
                     m_pCallback->OnState(m_state);
-                    m_forward.Signal(data);
+                    m_forward.Signal(rawXml);
                     return;
 
                 default:
                     if (DisconnectedDueToIllegalClientEvent_("StartTransport"))
                         return;
-                    m_forward.Signal(data);
+                    m_startTransportBoardId.clear();
+                    m_forward.Signal(rawXml);
                 }
             }
 
-            void Signal(const StopTransportData& data) override
+            void Signal(const StopTransportData&, StringView rawXml) override
             {
                 switch (m_state)
                 {
                 case EState::eTRANSPORTING:
                     m_state = EState::eTRANSPORT_STOPPED;
                     m_pCallback->OnState(m_state);
-                    m_forward.Signal(data);
+                    m_forward.Signal(rawXml);
                     return;
 
                 case EState::eTRANSPORT_FINISHED:
                     m_state = EState::eNOT_AVAILABLE_NOT_READY;
                     m_pCallback->OnState(m_state);
-                    m_forward.Signal(data);
+                    m_forward.Signal(rawXml);
                     return;
 
                 default:
                     if (DisconnectedDueToIllegalClientEvent_("StopTransport"))
                         return;
-                    m_forward.Signal(data);
+                    m_forward.Signal(rawXml);
                 }
             }
 
-            void Signal(const NotificationData& data) override
+            void Signal(const QueryBoardInfoData&, StringView rawXml) override
             {
                 switch (m_state)
                 {
@@ -213,12 +215,12 @@ namespace Hermes
                     return;
 
                 default:
-                    m_forward.Signal(data);
+                    m_forward.Signal(rawXml);
                     return;
                 }
             }
 
-            void Signal(const CheckAliveData& data) override
+            void Signal(const NotificationData&, StringView rawXml) override
             {
                 switch (m_state)
                 {
@@ -227,28 +229,35 @@ namespace Hermes
                     return;
 
                 default:
-                    m_forward.Signal(data);
+                    m_forward.Signal(rawXml);
                     return;
                 }
             }
 
-            void Disconnect(const NotificationData& data) override
+            void Signal(const CheckAliveData&, StringView rawXml) override
+            {
+                switch (m_state)
+                {
+                case EState::eNOT_CONNECTED:
+                case EState::eDISCONNECTED:
+                    return;
+
+                default:
+                    m_forward.Signal(rawXml);
+                    return;
+                }
+            }
+
+            void Disconnect() override
             {
                 switch (m_state)
                 {
                 case EState::eDISCONNECTED:
                     return;
 
-                case EState::eNOT_CONNECTED:
+                default:
                     m_state = EState::eDISCONNECTED;
                     m_pCallback->OnState(m_state);
-                    m_forward.Disconnect();
-                    return;
-
-                default:
-                    m_state = EState::eDISCONNECTED;
-                    m_pCallback->OnState(m_state);
-                    m_forward.Signal(data);
                     m_forward.Disconnect();
 
                 }
@@ -269,7 +278,7 @@ namespace Hermes
                 }
             }
 
-            void On(const ServiceDescription& data) override
+            void On(const ServiceDescriptionData& data) override
             {
                 switch (m_state)
                 {
@@ -347,7 +356,7 @@ namespace Hermes
                 {
                 case EState::eTRANSPORT_STOPPED:
                 {
-                    if (data.m_boardId != m_startTransportBoardId)
+                    if (data.m_boardId != m_startTransportBoardId && !m_startTransportBoardId.empty())
                         return StartAndStopBoardIdDoNotMatch_(m_startTransportBoardId, data.m_boardId);
                     m_state = EState::eNOT_AVAILABLE_NOT_READY;
                     m_pCallback->On(m_state, data);
@@ -355,7 +364,7 @@ namespace Hermes
                 }
                 case EState::eTRANSPORTING:
                 {
-                    if (data.m_boardId != m_startTransportBoardId)
+                    if (data.m_boardId != m_startTransportBoardId && !m_startTransportBoardId.empty())
                         return StartAndStopBoardIdDoNotMatch_(m_startTransportBoardId, data.m_boardId);
                     m_state = EState::eTRANSPORT_FINISHED;
                     m_pCallback->On(m_state, data);
@@ -363,6 +372,43 @@ namespace Hermes
                 }
                 default:
                     return OnUnexpectedPeerEvent_("TransportFinished");
+                }
+            }
+
+            void On(const BoardForecastData& data) override
+            {
+                switch (m_state)
+                {
+                case EState::eNOT_AVAILABLE_NOT_READY:
+                {
+                    m_pCallback->On(m_state, data);
+                    return;
+                }
+                case EState::eMACHINE_READY:
+                {
+                    m_pCallback->On(m_state, data);
+                    return;
+                }
+                case EState::eTRANSPORTING:
+                case EState::eTRANSPORT_STOPPED:
+                    return;
+
+                default:
+                    return OnUnexpectedPeerEvent_("BoardForeast");
+                }
+            }
+
+            void On(const SendBoardInfoData& data) override
+            {
+                switch (m_state)
+                {
+                case EState::eNOT_CONNECTED:
+                case EState::eDISCONNECTED:
+                    return;
+
+                default:
+                    m_pCallback->On(m_state, data);
+                    return;
                 }
             }
 

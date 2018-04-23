@@ -17,7 +17,7 @@ limitations under the License.
 #include "stdafx.h"
 #include "AsioSocket.h"
 #include "IService.h"
-#include "Serializer.h"
+#include "MessageSerialization.h"
 #include "StringBuilder.h"
 
 #include <HermesData.hpp>
@@ -332,7 +332,7 @@ namespace Hermes
             boost::system::error_code ecDummy;
             m_spResources->m_acceptor.close(ecDummy);
 
-            m_spResources->m_timer.expires_from_now(boost::posix_time::seconds(configuration.m_retryDelayInSeconds));
+            m_spResources->m_timer.expires_from_now(boost::posix_time::milliseconds(static_cast<int>(1000.0 * configuration.m_retryDelayInSeconds)));
             m_spResources->m_timer.async_wait([this, spResources = m_spResources](const boost::system::error_code& ec)
             {
                 if (spResources->m_closed)

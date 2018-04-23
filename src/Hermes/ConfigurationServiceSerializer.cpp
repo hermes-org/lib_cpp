@@ -19,7 +19,7 @@ limitations under the License.
 
 #include "Network.h"
 #include "IService.h"
-#include "Serializer.h"
+#include "MessageDispatcher.h"
 
 namespace Hermes
 {
@@ -29,7 +29,7 @@ namespace Hermes
             IAsioService& m_service;
             IServerSocket& m_socket;
             IConfigurationServiceSerializerCallback* m_pCallback = nullptr;
-            std::string m_receiveBuffer;
+            MessageDispatcher m_dispatcher{m_sessionId, m_service};
             bool m_connected = false;
 
             ConfigurationServiceSerializer(unsigned sessionId, IAsioService& service, 
@@ -37,7 +37,10 @@ namespace Hermes
                 m_sessionId(sessionId),
                 m_service(service),
                 m_socket(socket)
-            {}
+            {
+                m_dispatcher.Add<GetConfigurationData>([this](const auto& data) { m_pCallback->On(data); });
+                m_dispatcher.Add<SetConfigurationData>([this](const auto& data) { m_pCallback->On(data); });
+            }
 
             // ISocketCallback
             void OnConnected(const ConnectionInfo& connectionInfo) override
@@ -46,47 +49,13 @@ namespace Hermes
                 m_pCallback->OnSocketConnected(connectionInfo);
             }
 
-            void OnReceived(StringView dataView) override
+            void OnReceived(StringSpan xmlData) override
             {
-                m_receiveBuffer.append(dataView.data(), dataView.size());
-                m_service.Log(m_sessionId, "m_receiveBuffer=", m_receiveBuffer);
-
-                std::string messageXml;
-                while (TakeMessage(messageXml, m_receiveBuffer))
-                {
-                    m_service.Log(m_sessionId, "messageXml=", messageXml,  "\nm_receiveBuffer=", m_receiveBuffer);
-
-                    const auto& variant = Deserialize(messageXml);
-
-                    if (const auto* pData = boost::get<Error>(&variant))
-                    {
-                        auto error = m_service.Alarm(m_sessionId, EErrorCode::ePEER_ERROR, pData->m_text);
-                        Signal(NotificationData(ENotificationCode::ePROTOCOL_ERROR, ESeverity::eFATAL, error.m_text));
-                        m_socket.Close();
-                        m_pCallback->OnDisconnected(error);
-                        return;
-                    }
-
-                    if (const auto* pData = boost::get<SetConfigurationData>(&variant))
-                    {
-                        m_service.Log(m_sessionId, "SetConfigurationData=", *pData);
-                        m_pCallback->On(*pData);
-                        continue;
-                    }
-                    if (const auto* pData = boost::get<GetConfigurationData>(&variant))
-                    {
-                        m_service.Log(m_sessionId, "GetConfigurationData=", *pData);
-                        m_pCallback->On(*pData);
-                        continue;
-                    }
-
-                    m_service.Warn(m_sessionId, "Unexpected message");
-                }
-
-                if (m_receiveBuffer.size() <= cMAX_MESSAGE_SIZE)
+                auto error = m_dispatcher.Dispatch(xmlData);
+                if (!error)
                     return;
 
-                auto error = m_service.Alarm(m_sessionId, EErrorCode::ePEER_ERROR, "Maximum message size exceeded");
+                error = m_service.Alarm(m_sessionId, EErrorCode::ePEER_ERROR, error.m_text);
                 Signal(NotificationData(ENotificationCode::ePROTOCOL_ERROR, ESeverity::eFATAL, error.m_text));
                 m_socket.Close();
                 m_pCallback->OnDisconnected(error);
