@@ -72,7 +72,7 @@ struct HermesUpstream : ISessionCallback
         m_service.Inform(0U, "Created");
     }
 
-    ~HermesUpstream()
+    virtual ~HermesUpstream()
     {
         m_service.Inform(0U, "Deleted");
     }

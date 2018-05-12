@@ -82,7 +82,7 @@ struct HermesConfigurationService : IAcceptorCallback, IConfigurationServiceSess
         m_service.Inform(0U, "Created");
     }
 
-    ~HermesConfigurationService()
+    virtual ~HermesConfigurationService()
     {
         m_service.Inform(0U, "Deleted");
     }
