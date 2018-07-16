@@ -5,16 +5,6 @@ VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Hermes", "Hermes\Hermes.vcxproj", "{A52420C5-D236-47B7-883E-2166E83C2F43}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BoostTestHermes", "test\BoostTestHermes\BoostTestHermes.vcxproj", "{B4CB35B8-B453-4B1E-8469-5A8059F2CE25}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "HermesTest", "test\HermesTest\HermesTest.vcxproj", "{A0FE866F-50A9-4CEF-876F-1B8251C6F1C5}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "HermesDotNet", "HermesDotNet\HermesDotNet.vcxproj", "{EB6C775D-6A4E-4708-A4A9-3365DE88D625}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HermesDotNetTest", "HermesDotNetTest\HermesDotNetTest.csproj", "{500DB8FC-4FAE-49C5-B9A6-D8ED7F224E9D}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "HermesManInTheMiddle", "HermesManInTheMiddle\HermesManInTheMiddle.vcxproj", "{6C404C67-FD84-4775-92D0-B45609CA760A}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -35,84 +25,8 @@ Global
 		{A52420C5-D236-47B7-883E-2166E83C2F43}.Release|x64.Build.0 = Release|x64
 		{A52420C5-D236-47B7-883E-2166E83C2F43}.Release|x86.ActiveCfg = Release|Win32
 		{A52420C5-D236-47B7-883E-2166E83C2F43}.Release|x86.Build.0 = Release|Win32
-		{B4CB35B8-B453-4B1E-8469-5A8059F2CE25}.Debug|Any CPU.ActiveCfg = Debug|Win32
-		{B4CB35B8-B453-4B1E-8469-5A8059F2CE25}.Debug|x64.ActiveCfg = Debug|x64
-		{B4CB35B8-B453-4B1E-8469-5A8059F2CE25}.Debug|x64.Build.0 = Debug|x64
-		{B4CB35B8-B453-4B1E-8469-5A8059F2CE25}.Debug|x86.ActiveCfg = Debug|Win32
-		{B4CB35B8-B453-4B1E-8469-5A8059F2CE25}.Debug|x86.Build.0 = Debug|Win32
-		{B4CB35B8-B453-4B1E-8469-5A8059F2CE25}.Release|Any CPU.ActiveCfg = Release|Win32
-		{B4CB35B8-B453-4B1E-8469-5A8059F2CE25}.Release|x64.ActiveCfg = Release|x64
-		{B4CB35B8-B453-4B1E-8469-5A8059F2CE25}.Release|x64.Build.0 = Release|x64
-		{B4CB35B8-B453-4B1E-8469-5A8059F2CE25}.Release|x86.ActiveCfg = Release|Win32
-		{B4CB35B8-B453-4B1E-8469-5A8059F2CE25}.Release|x86.Build.0 = Release|Win32
-		{A0FE866F-50A9-4CEF-876F-1B8251C6F1C5}.Debug|Any CPU.ActiveCfg = Debug|Win32
-		{A0FE866F-50A9-4CEF-876F-1B8251C6F1C5}.Debug|x64.ActiveCfg = Debug|x64
-		{A0FE866F-50A9-4CEF-876F-1B8251C6F1C5}.Debug|x64.Build.0 = Debug|x64
-		{A0FE866F-50A9-4CEF-876F-1B8251C6F1C5}.Debug|x86.ActiveCfg = Debug|Win32
-		{A0FE866F-50A9-4CEF-876F-1B8251C6F1C5}.Debug|x86.Build.0 = Debug|Win32
-		{A0FE866F-50A9-4CEF-876F-1B8251C6F1C5}.Release|Any CPU.ActiveCfg = Release|Win32
-		{A0FE866F-50A9-4CEF-876F-1B8251C6F1C5}.Release|x64.ActiveCfg = Release|x64
-		{A0FE866F-50A9-4CEF-876F-1B8251C6F1C5}.Release|x64.Build.0 = Release|x64
-		{A0FE866F-50A9-4CEF-876F-1B8251C6F1C5}.Release|x86.ActiveCfg = Release|Win32
-		{A0FE866F-50A9-4CEF-876F-1B8251C6F1C5}.Release|x86.Build.0 = Release|Win32
-		{EB6C775D-6A4E-4708-A4A9-3365DE88D625}.Debug|Any CPU.ActiveCfg = Debug|Win32
-		{EB6C775D-6A4E-4708-A4A9-3365DE88D625}.Debug|x64.ActiveCfg = Debug|x64
-		{EB6C775D-6A4E-4708-A4A9-3365DE88D625}.Debug|x64.Build.0 = Debug|x64
-		{EB6C775D-6A4E-4708-A4A9-3365DE88D625}.Debug|x86.ActiveCfg = Debug|Win32
-		{EB6C775D-6A4E-4708-A4A9-3365DE88D625}.Debug|x86.Build.0 = Debug|Win32
-		{EB6C775D-6A4E-4708-A4A9-3365DE88D625}.Release|Any CPU.ActiveCfg = Release|Win32
-		{EB6C775D-6A4E-4708-A4A9-3365DE88D625}.Release|x64.ActiveCfg = Release|x64
-		{EB6C775D-6A4E-4708-A4A9-3365DE88D625}.Release|x64.Build.0 = Release|x64
-		{EB6C775D-6A4E-4708-A4A9-3365DE88D625}.Release|x86.ActiveCfg = Release|Win32
-		{EB6C775D-6A4E-4708-A4A9-3365DE88D625}.Release|x86.Build.0 = Release|Win32
-		{500DB8FC-4FAE-49C5-B9A6-D8ED7F224E9D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{500DB8FC-4FAE-49C5-B9A6-D8ED7F224E9D}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{500DB8FC-4FAE-49C5-B9A6-D8ED7F224E9D}.Debug|x64.ActiveCfg = Debug|x64
-		{500DB8FC-4FAE-49C5-B9A6-D8ED7F224E9D}.Debug|x64.Build.0 = Debug|x64
-		{500DB8FC-4FAE-49C5-B9A6-D8ED7F224E9D}.Debug|x86.ActiveCfg = Debug|x86
-		{500DB8FC-4FAE-49C5-B9A6-D8ED7F224E9D}.Debug|x86.Build.0 = Debug|x86
-		{500DB8FC-4FAE-49C5-B9A6-D8ED7F224E9D}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{500DB8FC-4FAE-49C5-B9A6-D8ED7F224E9D}.Release|Any CPU.Build.0 = Release|Any CPU
-		{500DB8FC-4FAE-49C5-B9A6-D8ED7F224E9D}.Release|x64.ActiveCfg = Release|x64
-		{500DB8FC-4FAE-49C5-B9A6-D8ED7F224E9D}.Release|x64.Build.0 = Release|x64
-		{500DB8FC-4FAE-49C5-B9A6-D8ED7F224E9D}.Release|x86.ActiveCfg = Release|x86
-		{500DB8FC-4FAE-49C5-B9A6-D8ED7F224E9D}.Release|x86.Build.0 = Release|x86
-		{6C404C67-FD84-4775-92D0-B45609CA760A}.Debug|Any CPU.ActiveCfg = Debug|Win32
-		{6C404C67-FD84-4775-92D0-B45609CA760A}.Debug|x64.ActiveCfg = Debug|x64
-		{6C404C67-FD84-4775-92D0-B45609CA760A}.Debug|x64.Build.0 = Debug|x64
-		{6C404C67-FD84-4775-92D0-B45609CA760A}.Debug|x86.ActiveCfg = Debug|Win32
-		{6C404C67-FD84-4775-92D0-B45609CA760A}.Debug|x86.Build.0 = Debug|Win32
-		{6C404C67-FD84-4775-92D0-B45609CA760A}.Release|Any CPU.ActiveCfg = Release|Win32
-		{6C404C67-FD84-4775-92D0-B45609CA760A}.Release|x64.ActiveCfg = Release|x64
-		{6C404C67-FD84-4775-92D0-B45609CA760A}.Release|x64.Build.0 = Release|x64
-		{6C404C67-FD84-4775-92D0-B45609CA760A}.Release|x86.ActiveCfg = Release|Win32
-		{6C404C67-FD84-4775-92D0-B45609CA760A}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
-	EndGlobalSection
-	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 7
-		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
-		SccTeamFoundationServer = http://tfs.siplaceworld.net:8080/tfs/defaultcollection
-		SccLocalPath0 = .
-		SccProjectUniqueName1 = Hermes\\Hermes.vcxproj
-		SccProjectName1 = Hermes
-		SccLocalPath1 = Hermes
-		SccProjectUniqueName2 = test\\BoostTestHermes\\BoostTestHermes.vcxproj
-		SccProjectName2 = test/BoostTestHermes
-		SccLocalPath2 = test\\BoostTestHermes
-		SccProjectUniqueName3 = test\\HermesTest\\HermesTest.vcxproj
-		SccProjectName3 = test/HermesTest
-		SccLocalPath3 = test\\HermesTest
-		SccProjectUniqueName4 = HermesDotNet\\HermesDotNet.vcxproj
-		SccProjectName4 = HermesDotNet
-		SccLocalPath4 = HermesDotNet
-		SccProjectUniqueName5 = HermesDotNetTest\\HermesDotNetTest.csproj
-		SccProjectName5 = HermesDotNetTest
-		SccLocalPath5 = HermesDotNetTest
-		SccProjectUniqueName6 = HermesManInTheMiddle\\HermesManInTheMiddle.vcxproj
-		SccProjectName6 = HermesManInTheMiddle
-		SccLocalPath6 = HermesManInTheMiddle
 	EndGlobalSection
 EndGlobal
