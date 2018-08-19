@@ -22,7 +22,7 @@ LINK=libtool --mode=link g++ -shared -rpath /usr/lib64 -version-info $(VERSION)
 OBJECTS = AsioClient.lo AsioServer.lo ConfigurationClient.lo ConfigurationService.lo ConfigurationServiceSerializer.lo \
 	ConfigurationServiceSession.lo DeserializationHelper.lo Downstream.lo DownstreamSerializer.lo DownstreamSession.lo DownstreamStateMachine.lo \
 	GeneratedHermesGuid.lo MessageDispatcher.lo MessageSerialization.lo SenderEnvelope.lo Serialization.lo Upstream.lo \
-	UpstreamSerializer.lo UpstreamSession.lo UpstreamStateMachine.lo
+	UpstreamSerializer.lo UpstreamSession.lo UpstreamStateMachine.lo MessageSerialization.cpp
 
 
 default: $(EXECUTABLE)
@@ -35,6 +35,5 @@ $(EXECUTABLE): $(OBJECTS)
 
 clean:
 	rm -f $(OBJECTS) $(EXECUTABLE)
-
 
 
