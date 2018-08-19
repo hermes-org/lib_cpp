@@ -18,7 +18,11 @@ limitations under the License.
 
 #include <HermesDataConversion.hpp>
 
-#include "pugixml/pugixml.hpp"
+#ifdef _WINDOWS
+# include "pugixml/pugixml.hpp"
+#else
+# include "pugixml.hpp"
+#endif
 
 #include <boost/variant.hpp>
 
