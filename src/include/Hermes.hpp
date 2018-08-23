@@ -18,7 +18,6 @@ limitations under the License.
 #pragma once
 
 #include "HermesDataConversion.hpp"
-#include "HermesData.hpp"
 
 #include <functional>
 #include <memory>

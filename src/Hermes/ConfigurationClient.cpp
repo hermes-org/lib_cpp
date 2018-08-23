@@ -222,7 +222,7 @@ void SetHermesConfiguration(HermesStringView hostName, const HermesSetConfigurat
     asio::write(helper.m_socket, asio::buffer(xmlString.data(), xmlString.size()), ec);
     if (ec)
         return helper.GenerateError(EErrorCode::eNETWORK_ERROR, "asio::write", ec.message());
-    helper.m_service.Log(eHERMES_TRACE_TYPE_SENT, 0U, xmlString);
+    helper.m_service.Trace(ETraceType::eSENT, 0U, xmlString);
     helper.GetConfiguration();
 }
 
