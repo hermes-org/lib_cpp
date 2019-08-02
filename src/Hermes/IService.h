@@ -25,10 +25,12 @@ limitations under the License.
 #include <functional>
 #include <memory>
 
-namespace boost
+#include <boost/asio.hpp>
+
+/*namespace boost
 {
     namespace asio { class io_context; using io_service = io_context; }
-}
+}*/
 
 
 namespace Hermes

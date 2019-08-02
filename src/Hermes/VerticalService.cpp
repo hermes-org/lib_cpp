@@ -46,8 +46,8 @@ struct HermesVerticalService : IAcceptorCallback, ISessionCallback
     ApiCallback<HermesSendWorkOrderInfoCallback> m_sendWorkOrderInfoCallback;
     ApiCallback<HermesNotificationCallback> m_notificationCallback;
     ApiCallback<HermesCheckAliveCallback> m_checkAliveCallback;
-    ApiCallback<HermesGetConfigurationCallback> m_getConfigurationCallback;
     ApiCallback<HermesSetConfigurationCallback> m_setConfigurationCallback;
+    ApiCallback<HermesGetConfigurationCallback> m_getConfigurationCallback;
     ApiCallback<HermesVerticalDisconnectedCallback> m_disconnectedCallback;
 
     bool m_enabled{ false };
@@ -192,7 +192,7 @@ struct HermesVerticalService : IAcceptorCallback, ISessionCallback
 #ifdef _WINDOWS
         auto result = m_sessionMap.try_emplace(sessionId, std::move(upSocket), m_service, m_settings);
 #else
-        auto result = m_sessionMap.emplace(sessionId, VerticalServiceSession(std::move(upSocket), m_service, m_settings));
+        auto result = m_sessionMap.emplace(sessionId, VerticalService::Session(std::move(upSocket), m_service, m_settings));
 #endif
         if (!result.second)
         {

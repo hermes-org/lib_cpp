@@ -15,6 +15,9 @@ limitations under the License.
 ************************************************************************/
 
 #include "stdafx.h"
+
+#include <boost/asio.hpp>
+
 #include <HermesSerialization.h>
 #include <HermesDataConversion.hpp>
 

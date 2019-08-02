@@ -13,7 +13,7 @@ namespace Hermes
         constexpr StringSpan(char* pData, std::size_t size) : m_pData(pData), m_size(size) {}
         StringSpan(std::string& rhs) : m_pData(const_cast<char*>(rhs.data())), m_size(rhs.size()) {}
 
-        operator std::string() const { return std::string(m_pData, m_size); }
+//        operator std::string() const { return std::string(m_pData, m_size); }
         operator StringView() const { return{m_pData, m_size}; }
 
         constexpr char* data() const { return m_pData; }
