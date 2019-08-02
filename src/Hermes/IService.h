@@ -27,7 +27,7 @@ limitations under the License.
 
 namespace boost
 {
-    namespace asio { class io_service; }
+    namespace asio { class io_context; using io_service = io_context; }
 }
 
 

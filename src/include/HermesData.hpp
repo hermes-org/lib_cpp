@@ -169,6 +169,46 @@ namespace Hermes
     }
     inline constexpr std::size_t size(ETransferState) { return 4; }
 
+//========== The Hermes Standard 3.23 ==========
+enum class EBoardArrivedTransfer
+{
+    eTRANSFERRED,
+    eLOADED,
+    eINSERTED
+};
+template<class S>
+S& operator<<(S& s, EBoardArrivedTransfer e)
+{
+   switch(e)
+   {
+        case EBoardArrivedTransfer::eTRANSFERRED: s << "eTRANSFERRED"; return s;
+        case EBoardArrivedTransfer::eLOADED: s << "eLOADED"; return s;
+        case EBoardArrivedTransfer::eINSERTED: s << "eINSERTED"; return s;
+        default: s << "INVALID_BOARD_ARRIVED_TRANSFER: " << static_cast<int>(e); return s;
+    }
+}
+inline constexpr std::size_t size(EBoardArrivedTransfer) { return 3; }
+
+//========== The Hermes Standard 3.24 ==========
+enum class EBoardDepartedTransfer
+{
+    eTRANSFERRED,
+    eUNLOADED,
+    eREMOVED
+};
+template<class S>
+S& operator<<(S& s, EBoardDepartedTransfer e)
+{
+   switch(e)
+   {
+        case EBoardDepartedTransfer::eTRANSFERRED: s << "eTRANSFERRED"; return s;
+        case EBoardDepartedTransfer::eUNLOADED: s << "eUNLOADED"; return s;
+        case EBoardDepartedTransfer::eREMOVED: s << "eREMOVED"; return s;
+        default: s << "INVALID_BOARD_DEPARTED_TRANSFER: " << static_cast<int>(e); return s;
+    }
+}
+inline constexpr std::size_t size(EBoardDepartedTransfer) { return 3; }
+
     //========== The Hermes Standard chapter 2.6 ==========
     enum class EState
     {
@@ -293,6 +333,30 @@ namespace Hermes
     }
     inline constexpr std::size_t size(EErrorCode) { return 6; }
 
+//========== The Hermes Standard chapter 2.5.3 ==========
+enum class EVerticalState
+{
+    eNOT_CONNECTED,
+    eSOCKET_CONNECTED,
+    eSUPERVISORY_SERVICE_DESCRIPTION,
+    eCONNECTED,
+    eDISCONNECTED
+};
+template<class S>
+S& operator<<(S& s, EVerticalState e)
+{
+   switch(e)
+   {
+        case EVerticalState::eNOT_CONNECTED: s << "eNOT_CONNECTED"; return s;
+        case EVerticalState::eSOCKET_CONNECTED: s << "eSOCKET_CONNECTED"; return s;
+        case EVerticalState::eSUPERVISORY_SERVICE_DESCRIPTION: s << "eSUPERVISORY_SERVICE_DESCRIPTION"; return s;
+        case EVerticalState::eCONNECTED: s << "eCONNECTED"; return s;
+        case EVerticalState::eDISCONNECTED: s << "eDISCONNECTED"; return s;
+        default: s << "INVALID_VERTICAL_STATE: " << static_cast<int>(e); return s;
+    }
+}
+inline constexpr std::size_t size(EVerticalState) { return 5; }
+
     //========== The Hermes Standard 3.3 ==========
     struct CheckAliveData
     {
@@ -383,7 +447,7 @@ namespace Hermes
         std::string m_machineId;
         unsigned m_laneId{0};
         Optional<std::string> m_optionalInterfaceId;
-        std::string m_version{"1.1"};
+    std::string m_version{"1.2"};
         SupportedFeatures m_supportedFeatures;
 
         ServiceDescriptionData() = default;
@@ -468,6 +532,7 @@ namespace Hermes
         Optional<double> m_optionalTopClearanceHeightInMM;
         Optional<double> m_optionalBottomClearanceHeightInMM;
         Optional<double> m_optionalWeightInGrams;
+    Optional<std::string> m_optionalWorkOrderId;
 
         BoardAvailableData() = default;
         BoardAvailableData(StringView boardId,
@@ -495,7 +560,8 @@ namespace Hermes
                 && lhs.m_optionalConveyorSpeedInMMPerSecs == rhs.m_optionalConveyorSpeedInMMPerSecs
                 && lhs.m_optionalTopClearanceHeightInMM == rhs.m_optionalTopClearanceHeightInMM
                 && lhs.m_optionalBottomClearanceHeightInMM == rhs.m_optionalBottomClearanceHeightInMM
-                && lhs.m_optionalWeightInGrams == rhs.m_optionalWeightInGrams;
+            && lhs.m_optionalWeightInGrams == rhs.m_optionalWeightInGrams
+            && lhs.m_optionalWorkOrderId == rhs.m_optionalWorkOrderId;
         }
         friend bool operator!=(const BoardAvailableData& lhs, const BoardAvailableData& rhs) { return !operator==(lhs, rhs); }
 
@@ -516,6 +582,7 @@ namespace Hermes
             if (data.m_optionalTopClearanceHeightInMM) { s << " TopClearanceHeight=" << *data.m_optionalTopClearanceHeightInMM; }
             if (data.m_optionalBottomClearanceHeightInMM) { s << " BottomClearanceHeight=" << *data.m_optionalBottomClearanceHeightInMM; }
             if (data.m_optionalWeightInGrams) { s << " Weight=" << *data.m_optionalWeightInGrams; }
+        if (data.m_optionalWorkOrderId) { s << " WorkOrderId=" << *data.m_optionalWorkOrderId; }
             s << " }";
             return s;
         }
@@ -546,6 +613,7 @@ namespace Hermes
         Optional<double> m_optionalTopClearanceHeightInMM;
         Optional<double> m_optionalBottomClearanceHeightInMM;
         Optional<double> m_optionalWeightInGrams;
+    Optional<std::string> m_optionalWorkOrderId;
 
         MachineReadyData() = default;
         explicit MachineReadyData(EBoardQuality failedBoard) :
@@ -567,7 +635,8 @@ namespace Hermes
                 && lhs.m_optionalConveyorSpeedInMMPerSecs == rhs.m_optionalConveyorSpeedInMMPerSecs
                 && lhs.m_optionalTopClearanceHeightInMM == rhs.m_optionalTopClearanceHeightInMM
                 && lhs.m_optionalBottomClearanceHeightInMM == rhs.m_optionalBottomClearanceHeightInMM
-                && lhs.m_optionalWeightInGrams == rhs.m_optionalWeightInGrams;
+            && lhs.m_optionalWeightInGrams == rhs.m_optionalWeightInGrams
+            && lhs.m_optionalWorkOrderId == rhs.m_optionalWorkOrderId;
         }
         friend bool operator!=(const MachineReadyData& lhs, const MachineReadyData& rhs) { return !operator==(lhs, rhs); }
 
@@ -588,6 +657,7 @@ namespace Hermes
             if (data.m_optionalTopClearanceHeightInMM) { s << " TopClearanceHeight=" << *data.m_optionalTopClearanceHeightInMM; }
             if (data.m_optionalBottomClearanceHeightInMM) { s << " BottomClearanceHeight=" << *data.m_optionalBottomClearanceHeightInMM; }
             if (data.m_optionalWeightInGrams) { s << " Weight=" << *data.m_optionalWeightInGrams; }
+        if (data.m_optionalWorkOrderId) { s << " WorkOrderId=" << *data.m_optionalWorkOrderId; }
             s << " }";
             return s;
         }
@@ -795,6 +865,7 @@ namespace Hermes
     struct SetConfigurationData
     {
         std::string m_machineId;
+    Optional<uint16_t> m_optionalSupervisorySystemPort;
         UpstreamConfigurations m_upstreamConfigurations;
         DownstreamConfigurations m_downstreamConfigurations;
 
@@ -806,6 +877,7 @@ namespace Hermes
         friend bool operator==(const SetConfigurationData& lhs, const SetConfigurationData& rhs)
         {
             return lhs.m_machineId == rhs.m_machineId
+            && lhs.m_optionalSupervisorySystemPort == rhs.m_optionalSupervisorySystemPort
                 && lhs.m_upstreamConfigurations == rhs.m_upstreamConfigurations
                 && lhs.m_downstreamConfigurations == rhs.m_downstreamConfigurations;
         }
@@ -815,6 +887,7 @@ namespace Hermes
         {
             s << '{';
             s << " MachineId=" << data.m_machineId;
+        if (data.m_optionalSupervisorySystemPort) { s << " SupervisorySystemPort=" << *data.m_optionalSupervisorySystemPort; }
             s << " UpstreamConfigurations=" << data.m_upstreamConfigurations;
             s << " DownstreamConfigurations=" << data.m_downstreamConfigurations;
             s << " }";
@@ -834,12 +907,14 @@ namespace Hermes
     struct CurrentConfigurationData
     {
         Optional<std::string> m_optionalMachineId;
+    Optional<uint16_t> m_optionalSupervisorySystemPort;
         UpstreamConfigurations m_upstreamConfigurations;
         DownstreamConfigurations m_downstreamConfigurations;
 
         friend bool operator==(const CurrentConfigurationData& lhs, const CurrentConfigurationData& rhs)
         {
             return lhs.m_optionalMachineId == rhs.m_optionalMachineId
+            && lhs.m_optionalSupervisorySystemPort == rhs.m_optionalSupervisorySystemPort
                 && lhs.m_upstreamConfigurations == rhs.m_upstreamConfigurations
                 && lhs.m_downstreamConfigurations == rhs.m_downstreamConfigurations;
         }
@@ -849,6 +924,7 @@ namespace Hermes
         {
             s << '{';
             if (data.m_optionalMachineId) { s << " MachineId=" << *data.m_optionalMachineId; }
+        if (data.m_optionalSupervisorySystemPort) { s << " SupervisorySystemPort=" << *data.m_optionalSupervisorySystemPort; }
             s << " UpstreamConfigurations=" << data.m_upstreamConfigurations;
             s << " DownstreamConfigurations=" << data.m_downstreamConfigurations;
             s << " }";
@@ -875,6 +951,7 @@ namespace Hermes
         Optional<double> m_optionalTopClearanceHeightInMM;
         Optional<double> m_optionalBottomClearanceHeightInMM;
         Optional<double> m_optionalWeightInGrams;
+    Optional<std::string> m_optionalWorkOrderId;
 
         BoardForecastData() = default;
         BoardForecastData(EBoardQuality failedBoard,
@@ -900,7 +977,8 @@ namespace Hermes
                 && lhs.m_optionalConveyorSpeedInMMPerSecs == rhs.m_optionalConveyorSpeedInMMPerSecs
                 && lhs.m_optionalTopClearanceHeightInMM == rhs.m_optionalTopClearanceHeightInMM
                 && lhs.m_optionalBottomClearanceHeightInMM == rhs.m_optionalBottomClearanceHeightInMM
-                && lhs.m_optionalWeightInGrams == rhs.m_optionalWeightInGrams;
+            && lhs.m_optionalWeightInGrams == rhs.m_optionalWeightInGrams
+            && lhs.m_optionalWorkOrderId == rhs.m_optionalWorkOrderId;
         }
         friend bool operator!=(const BoardForecastData& lhs, const BoardForecastData& rhs) { return !operator==(lhs, rhs); }
 
@@ -923,6 +1001,7 @@ namespace Hermes
             if (data.m_optionalTopClearanceHeightInMM) { s << " TopClearanceHeight=" << *data.m_optionalTopClearanceHeightInMM; }
             if (data.m_optionalBottomClearanceHeightInMM) { s << " BottomClearanceHeight=" << *data.m_optionalBottomClearanceHeightInMM; }
             if (data.m_optionalWeightInGrams) { s << " Weight=" << *data.m_optionalWeightInGrams; }
+        if (data.m_optionalWorkOrderId) { s << " WorkOrderId=" << *data.m_optionalWorkOrderId; }
             s << " }";
             return s;
         }
@@ -968,6 +1047,7 @@ namespace Hermes
         Optional<double> m_optionalTopClearanceHeightInMM;
         Optional<double> m_optionalBottomClearanceHeightInMM;
         Optional<double> m_optionalWeightInGrams;
+    Optional<std::string> m_optionalWorkOrderId;
 
         friend bool operator==(const SendBoardInfoData& lhs, const SendBoardInfoData& rhs)
         {
@@ -984,7 +1064,8 @@ namespace Hermes
                 && lhs.m_optionalConveyorSpeedInMMPerSecs == rhs.m_optionalConveyorSpeedInMMPerSecs
                 && lhs.m_optionalTopClearanceHeightInMM == rhs.m_optionalTopClearanceHeightInMM
                 && lhs.m_optionalBottomClearanceHeightInMM == rhs.m_optionalBottomClearanceHeightInMM
-                && lhs.m_optionalWeightInGrams == rhs.m_optionalWeightInGrams;
+            && lhs.m_optionalWeightInGrams == rhs.m_optionalWeightInGrams
+            && lhs.m_optionalWorkOrderId == rhs.m_optionalWorkOrderId;
         }
         friend bool operator!=(const SendBoardInfoData& lhs, const SendBoardInfoData& rhs) { return !operator==(lhs, rhs); }
 
@@ -1005,6 +1086,398 @@ namespace Hermes
             if (data.m_optionalTopClearanceHeightInMM) { s << " TopClearanceHeight=" << *data.m_optionalTopClearanceHeightInMM; }
             if (data.m_optionalBottomClearanceHeightInMM) { s << " BottomClearanceHeight=" << *data.m_optionalBottomClearanceHeightInMM; }
             if (data.m_optionalWeightInGrams) { s << " Weight=" << *data.m_optionalWeightInGrams; }
+        if (data.m_optionalWorkOrderId) { s << " WorkOrderId=" << *data.m_optionalWorkOrderId; }
+        s << " }";
+        return s;
+    }
+};
+
+//========== The Hermes Standard 3.22 ==========
+struct FeatureConfiguration
+{
+    friend bool operator==(const FeatureConfiguration&, const FeatureConfiguration&) { return true; }
+    friend bool operator!=(const FeatureConfiguration&, const FeatureConfiguration&) { return false; }
+    template <class S> friend S& operator<<(S& s, const FeatureConfiguration&) { s << "{}"; return s; }
+};
+
+//========== The Hermes Standard 3.22 ==========
+struct FeatureBoardTracking
+{
+    friend bool operator==(const FeatureBoardTracking&, const FeatureBoardTracking&) { return true; }
+    friend bool operator!=(const FeatureBoardTracking&, const FeatureBoardTracking&) { return false; }
+    template <class S> friend S& operator<<(S& s, const FeatureBoardTracking&) { s << "{}"; return s; }
+};
+
+//========== The Hermes Standard 3.22 ==========
+struct FeatureQueryWorkOrderInfo
+{
+    friend bool operator==(const FeatureQueryWorkOrderInfo&, const FeatureQueryWorkOrderInfo&) { return true; }
+    friend bool operator!=(const FeatureQueryWorkOrderInfo&, const FeatureQueryWorkOrderInfo&) { return false; }
+    template <class S> friend S& operator<<(S& s, const FeatureQueryWorkOrderInfo&) { s << "{}"; return s; }
+};
+
+//========== The Hermes Standard 3.22 ==========
+struct FeatureSendWorkOrderInfo
+{
+    friend bool operator==(const FeatureSendWorkOrderInfo&, const FeatureSendWorkOrderInfo&) { return true; }
+    friend bool operator!=(const FeatureSendWorkOrderInfo&, const FeatureSendWorkOrderInfo&) { return false; }
+    template <class S> friend S& operator<<(S& s, const FeatureSendWorkOrderInfo&) { s << "{}"; return s; }
+};
+
+//========== The Hermes Standard 3.22 ==========
+struct SupervisoryFeatures
+{
+    Optional<FeatureConfiguration> m_optionalFeatureConfiguration;
+    Optional<FeatureCheckAliveResponse> m_optionalFeatureCheckAliveResponse;
+    Optional<FeatureBoardTracking> m_optionalFeatureBoardTracking;
+    Optional<FeatureQueryWorkOrderInfo> m_optionalFeatureQueryWorkOrderInfo;
+    Optional<FeatureSendWorkOrderInfo> m_optionalFeatureSendWorkOrderInfo;
+
+    friend bool operator==(const SupervisoryFeatures& lhs, const SupervisoryFeatures& rhs)
+    {
+        return lhs.m_optionalFeatureConfiguration == rhs.m_optionalFeatureConfiguration
+            && lhs.m_optionalFeatureCheckAliveResponse == rhs.m_optionalFeatureCheckAliveResponse
+            && lhs.m_optionalFeatureBoardTracking == rhs.m_optionalFeatureBoardTracking
+            && lhs.m_optionalFeatureQueryWorkOrderInfo == rhs.m_optionalFeatureQueryWorkOrderInfo
+            && lhs.m_optionalFeatureSendWorkOrderInfo == rhs.m_optionalFeatureSendWorkOrderInfo;
+    }
+    friend bool operator!=(const SupervisoryFeatures& lhs, const SupervisoryFeatures& rhs) { return !operator==(lhs, rhs); }
+
+    template <class S> friend S& operator<<(S& s, const SupervisoryFeatures& data) 
+    {
+        s << '{';
+        if (data.m_optionalFeatureConfiguration) { s << " FeatureConfiguration=" << *data.m_optionalFeatureConfiguration; }
+        if (data.m_optionalFeatureCheckAliveResponse) { s << " FeatureCheckAliveResponse=" << *data.m_optionalFeatureCheckAliveResponse; }
+        if (data.m_optionalFeatureBoardTracking) { s << " FeatureBoardTracking=" << *data.m_optionalFeatureBoardTracking; }
+        if (data.m_optionalFeatureQueryWorkOrderInfo) { s << " FeatureQueryWorkOrderInfo=" << *data.m_optionalFeatureQueryWorkOrderInfo; }
+        if (data.m_optionalFeatureSendWorkOrderInfo) { s << " FeatureSendWorkOrderInfo=" << *data.m_optionalFeatureSendWorkOrderInfo; }
+        s << " }";
+        return s;
+    }
+};
+
+//========== The Hermes Standard 3.22 ==========
+struct SupervisoryServiceDescriptionData
+{
+    std::string m_systemId;
+    std::string m_version{"1.2"};
+    SupervisoryFeatures m_supportedFeatures;
+
+    SupervisoryServiceDescriptionData() = default;
+    explicit SupervisoryServiceDescriptionData(StringView systemId) :
+        m_systemId(systemId)
+    {}
+
+    friend bool operator==(const SupervisoryServiceDescriptionData& lhs, const SupervisoryServiceDescriptionData& rhs)
+    {
+        return lhs.m_systemId == rhs.m_systemId
+            && lhs.m_version == rhs.m_version
+            && lhs.m_supportedFeatures == rhs.m_supportedFeatures;
+    }
+    friend bool operator!=(const SupervisoryServiceDescriptionData& lhs, const SupervisoryServiceDescriptionData& rhs) { return !operator==(lhs, rhs); }
+
+    template <class S> friend S& operator<<(S& s, const SupervisoryServiceDescriptionData& data) 
+    {
+        s << '{';
+        s << " SystemId=" << data.m_systemId;
+        s << " Version=" << data.m_version;
+        s << " SupportedFeatures=" << data.m_supportedFeatures;
+        s << " }";
+        return s;
+    }
+};
+
+//========== The Hermes Standard 3.23 ==========
+struct BoardArrivedData
+{
+    std::string m_machineId;
+    unsigned m_upstreamLaneId{0};
+    Optional<std::string> m_optionalUpstreamInterfaceId;
+    Optional<std::string> m_optionalMagazineId;
+    Optional<unsigned> m_optionalSlotId;
+    EBoardArrivedTransfer m_boardTransfer{EBoardArrivedTransfer::eTRANSFERRED};
+    std::string m_boardId{"00000000-0000-0000-0000-000000000000"};
+    std::string m_boardIdCreatedBy;
+    EBoardQuality m_failedBoard{EBoardQuality::eANY};
+    Optional<std::string> m_optionalProductTypeId;
+    EFlippedBoard m_flippedBoard{EFlippedBoard::eSIDE_UP_IS_UNKNOWN};
+    Optional<std::string> m_optionalTopBarcode;
+    Optional<std::string> m_optionalBottomBarcode;
+    Optional<double> m_optionalLengthInMM;
+    Optional<double> m_optionalWidthInMM;
+    Optional<double> m_optionalThicknessInMM;
+    Optional<double> m_optionalConveyorSpeedInMMPerSecs;
+    Optional<double> m_optionalTopClearanceHeightInMM;
+    Optional<double> m_optionalBottomClearanceHeightInMM;
+    Optional<double> m_optionalWeightInGrams;
+    Optional<std::string> m_optionalWorkOrderId;
+
+    BoardArrivedData() = default;
+    BoardArrivedData(StringView machineId,
+        unsigned upstreamLaneId,
+        EBoardArrivedTransfer boardTransfer,
+        StringView boardId,
+        StringView boardIdCreatedBy,
+        EBoardQuality failedBoard,
+        EFlippedBoard flippedBoard) :
+        m_machineId(machineId),
+        m_upstreamLaneId(upstreamLaneId),
+        m_boardTransfer(boardTransfer),
+        m_boardId(boardId),
+        m_boardIdCreatedBy(boardIdCreatedBy),
+        m_failedBoard(failedBoard),
+        m_flippedBoard(flippedBoard)
+    {}
+
+    friend bool operator==(const BoardArrivedData& lhs, const BoardArrivedData& rhs)
+    {
+        return lhs.m_machineId == rhs.m_machineId
+            && lhs.m_upstreamLaneId == rhs.m_upstreamLaneId
+            && lhs.m_optionalUpstreamInterfaceId == rhs.m_optionalUpstreamInterfaceId
+            && lhs.m_optionalMagazineId == rhs.m_optionalMagazineId
+            && lhs.m_optionalSlotId == rhs.m_optionalSlotId
+            && lhs.m_boardTransfer == rhs.m_boardTransfer
+            && lhs.m_boardId == rhs.m_boardId
+            && lhs.m_boardIdCreatedBy == rhs.m_boardIdCreatedBy
+            && lhs.m_failedBoard == rhs.m_failedBoard
+            && lhs.m_optionalProductTypeId == rhs.m_optionalProductTypeId
+            && lhs.m_flippedBoard == rhs.m_flippedBoard
+            && lhs.m_optionalTopBarcode == rhs.m_optionalTopBarcode
+            && lhs.m_optionalBottomBarcode == rhs.m_optionalBottomBarcode
+            && lhs.m_optionalLengthInMM == rhs.m_optionalLengthInMM
+            && lhs.m_optionalWidthInMM == rhs.m_optionalWidthInMM
+            && lhs.m_optionalThicknessInMM == rhs.m_optionalThicknessInMM
+            && lhs.m_optionalConveyorSpeedInMMPerSecs == rhs.m_optionalConveyorSpeedInMMPerSecs
+            && lhs.m_optionalTopClearanceHeightInMM == rhs.m_optionalTopClearanceHeightInMM
+            && lhs.m_optionalBottomClearanceHeightInMM == rhs.m_optionalBottomClearanceHeightInMM
+            && lhs.m_optionalWeightInGrams == rhs.m_optionalWeightInGrams
+            && lhs.m_optionalWorkOrderId == rhs.m_optionalWorkOrderId;
+    }
+    friend bool operator!=(const BoardArrivedData& lhs, const BoardArrivedData& rhs) { return !operator==(lhs, rhs); }
+
+    template <class S> friend S& operator<<(S& s, const BoardArrivedData& data) 
+    {
+        s << '{';
+        s << " MachineId=" << data.m_machineId;
+        s << " UpstreamLaneId=" << data.m_upstreamLaneId;
+        if (data.m_optionalUpstreamInterfaceId) { s << " UpstreamInterfaceId=" << *data.m_optionalUpstreamInterfaceId; }
+        if (data.m_optionalMagazineId) { s << " MagazineId=" << *data.m_optionalMagazineId; }
+        if (data.m_optionalSlotId) { s << " SlotId=" << *data.m_optionalSlotId; }
+        s << " BoardTransfer=" << data.m_boardTransfer;
+        s << " BoardId=" << data.m_boardId;
+        s << " BoardIdCreatedBy=" << data.m_boardIdCreatedBy;
+        s << " FailedBoard=" << data.m_failedBoard;
+        if (data.m_optionalProductTypeId) { s << " ProductTypeId=" << *data.m_optionalProductTypeId; }
+        s << " FlippedBoard=" << data.m_flippedBoard;
+        if (data.m_optionalTopBarcode) { s << " TopBarcode=" << *data.m_optionalTopBarcode; }
+        if (data.m_optionalBottomBarcode) { s << " BottomBarcode=" << *data.m_optionalBottomBarcode; }
+        if (data.m_optionalLengthInMM) { s << " Length=" << *data.m_optionalLengthInMM; }
+        if (data.m_optionalWidthInMM) { s << " Width=" << *data.m_optionalWidthInMM; }
+        if (data.m_optionalThicknessInMM) { s << " Thickness=" << *data.m_optionalThicknessInMM; }
+        if (data.m_optionalConveyorSpeedInMMPerSecs) { s << " ConveyorSpeed=" << *data.m_optionalConveyorSpeedInMMPerSecs; }
+        if (data.m_optionalTopClearanceHeightInMM) { s << " TopClearanceHeight=" << *data.m_optionalTopClearanceHeightInMM; }
+        if (data.m_optionalBottomClearanceHeightInMM) { s << " BottomClearanceHeight=" << *data.m_optionalBottomClearanceHeightInMM; }
+        if (data.m_optionalWeightInGrams) { s << " Weight=" << *data.m_optionalWeightInGrams; }
+        if (data.m_optionalWorkOrderId) { s << " WorkOrderId=" << *data.m_optionalWorkOrderId; }
+        s << " }";
+        return s;
+    }
+};
+
+//========== The Hermes Standard 3.24 ==========
+struct BoardDepartedData
+{
+    std::string m_machineId;
+    unsigned m_downstreamLaneId{0};
+    Optional<std::string> m_optionalDownstreamInterfaceId;
+    Optional<std::string> m_optionalMagazineId;
+    Optional<unsigned> m_optionalSlotId;
+    EBoardDepartedTransfer m_boardTransfer{EBoardDepartedTransfer::eTRANSFERRED};
+    std::string m_boardId{"00000000-0000-0000-0000-000000000000"};
+    std::string m_boardIdCreatedBy;
+    EBoardQuality m_failedBoard{EBoardQuality::eANY};
+    Optional<std::string> m_optionalProductTypeId;
+    EFlippedBoard m_flippedBoard{EFlippedBoard::eSIDE_UP_IS_UNKNOWN};
+    Optional<std::string> m_optionalTopBarcode;
+    Optional<std::string> m_optionalBottomBarcode;
+    Optional<double> m_optionalLengthInMM;
+    Optional<double> m_optionalWidthInMM;
+    Optional<double> m_optionalThicknessInMM;
+    Optional<double> m_optionalConveyorSpeedInMMPerSecs;
+    Optional<double> m_optionalTopClearanceHeightInMM;
+    Optional<double> m_optionalBottomClearanceHeightInMM;
+    Optional<double> m_optionalWeightInGrams;
+    Optional<std::string> m_optionalWorkOrderId;
+
+    BoardDepartedData() = default;
+    BoardDepartedData(StringView machineId,
+        unsigned downstreamLaneId,
+        EBoardDepartedTransfer boardTransfer,
+        StringView boardId,
+        StringView boardIdCreatedBy,
+        EBoardQuality failedBoard,
+        EFlippedBoard flippedBoard) :
+        m_machineId(machineId),
+        m_downstreamLaneId(downstreamLaneId),
+        m_boardTransfer(boardTransfer),
+        m_boardId(boardId),
+        m_boardIdCreatedBy(boardIdCreatedBy),
+        m_failedBoard(failedBoard),
+        m_flippedBoard(flippedBoard)
+    {}
+
+    friend bool operator==(const BoardDepartedData& lhs, const BoardDepartedData& rhs)
+    {
+        return lhs.m_machineId == rhs.m_machineId
+            && lhs.m_downstreamLaneId == rhs.m_downstreamLaneId
+            && lhs.m_optionalDownstreamInterfaceId == rhs.m_optionalDownstreamInterfaceId
+            && lhs.m_optionalMagazineId == rhs.m_optionalMagazineId
+            && lhs.m_optionalSlotId == rhs.m_optionalSlotId
+            && lhs.m_boardTransfer == rhs.m_boardTransfer
+            && lhs.m_boardId == rhs.m_boardId
+            && lhs.m_boardIdCreatedBy == rhs.m_boardIdCreatedBy
+            && lhs.m_failedBoard == rhs.m_failedBoard
+            && lhs.m_optionalProductTypeId == rhs.m_optionalProductTypeId
+            && lhs.m_flippedBoard == rhs.m_flippedBoard
+            && lhs.m_optionalTopBarcode == rhs.m_optionalTopBarcode
+            && lhs.m_optionalBottomBarcode == rhs.m_optionalBottomBarcode
+            && lhs.m_optionalLengthInMM == rhs.m_optionalLengthInMM
+            && lhs.m_optionalWidthInMM == rhs.m_optionalWidthInMM
+            && lhs.m_optionalThicknessInMM == rhs.m_optionalThicknessInMM
+            && lhs.m_optionalConveyorSpeedInMMPerSecs == rhs.m_optionalConveyorSpeedInMMPerSecs
+            && lhs.m_optionalTopClearanceHeightInMM == rhs.m_optionalTopClearanceHeightInMM
+            && lhs.m_optionalBottomClearanceHeightInMM == rhs.m_optionalBottomClearanceHeightInMM
+            && lhs.m_optionalWeightInGrams == rhs.m_optionalWeightInGrams
+            && lhs.m_optionalWorkOrderId == rhs.m_optionalWorkOrderId;
+    }
+    friend bool operator!=(const BoardDepartedData& lhs, const BoardDepartedData& rhs) { return !operator==(lhs, rhs); }
+
+    template <class S> friend S& operator<<(S& s, const BoardDepartedData& data) 
+    {
+        s << '{';
+        s << " MachineId=" << data.m_machineId;
+        s << " DownstreamLaneId=" << data.m_downstreamLaneId;
+        if (data.m_optionalDownstreamInterfaceId) { s << " DownstreamInterfaceId=" << *data.m_optionalDownstreamInterfaceId; }
+        if (data.m_optionalMagazineId) { s << " MagazineId=" << *data.m_optionalMagazineId; }
+        if (data.m_optionalSlotId) { s << " SlotId=" << *data.m_optionalSlotId; }
+        s << " BoardTransfer=" << data.m_boardTransfer;
+        s << " BoardId=" << data.m_boardId;
+        s << " BoardIdCreatedBy=" << data.m_boardIdCreatedBy;
+        s << " FailedBoard=" << data.m_failedBoard;
+        if (data.m_optionalProductTypeId) { s << " ProductTypeId=" << *data.m_optionalProductTypeId; }
+        s << " FlippedBoard=" << data.m_flippedBoard;
+        if (data.m_optionalTopBarcode) { s << " TopBarcode=" << *data.m_optionalTopBarcode; }
+        if (data.m_optionalBottomBarcode) { s << " BottomBarcode=" << *data.m_optionalBottomBarcode; }
+        if (data.m_optionalLengthInMM) { s << " Length=" << *data.m_optionalLengthInMM; }
+        if (data.m_optionalWidthInMM) { s << " Width=" << *data.m_optionalWidthInMM; }
+        if (data.m_optionalThicknessInMM) { s << " Thickness=" << *data.m_optionalThicknessInMM; }
+        if (data.m_optionalConveyorSpeedInMMPerSecs) { s << " ConveyorSpeed=" << *data.m_optionalConveyorSpeedInMMPerSecs; }
+        if (data.m_optionalTopClearanceHeightInMM) { s << " TopClearanceHeight=" << *data.m_optionalTopClearanceHeightInMM; }
+        if (data.m_optionalBottomClearanceHeightInMM) { s << " BottomClearanceHeight=" << *data.m_optionalBottomClearanceHeightInMM; }
+        if (data.m_optionalWeightInGrams) { s << " Weight=" << *data.m_optionalWeightInGrams; }
+        if (data.m_optionalWorkOrderId) { s << " WorkOrderId=" << *data.m_optionalWorkOrderId; }
+        s << " }";
+        return s;
+    }
+};
+
+//========== The Hermes Standard 3.25 ==========
+struct QueryWorkOrderInfoData
+{
+    Optional<std::string> m_optionalQueryId;
+    std::string m_machineId;
+    Optional<std::string> m_optionalMagazineId;
+    Optional<unsigned> m_optionalSlotId;
+    Optional<std::string> m_optionalBarcode;
+
+    QueryWorkOrderInfoData() = default;
+    explicit QueryWorkOrderInfoData(StringView machineId) :
+        m_machineId(machineId)
+    {}
+
+    friend bool operator==(const QueryWorkOrderInfoData& lhs, const QueryWorkOrderInfoData& rhs)
+    {
+        return lhs.m_optionalQueryId == rhs.m_optionalQueryId
+            && lhs.m_machineId == rhs.m_machineId
+            && lhs.m_optionalMagazineId == rhs.m_optionalMagazineId
+            && lhs.m_optionalSlotId == rhs.m_optionalSlotId
+            && lhs.m_optionalBarcode == rhs.m_optionalBarcode;
+    }
+    friend bool operator!=(const QueryWorkOrderInfoData& lhs, const QueryWorkOrderInfoData& rhs) { return !operator==(lhs, rhs); }
+
+    template <class S> friend S& operator<<(S& s, const QueryWorkOrderInfoData& data) 
+    {
+        s << '{';
+        if (data.m_optionalQueryId) { s << " QueryId=" << *data.m_optionalQueryId; }
+        s << " MachineId=" << data.m_machineId;
+        if (data.m_optionalMagazineId) { s << " MagazineId=" << *data.m_optionalMagazineId; }
+        if (data.m_optionalSlotId) { s << " SlotId=" << *data.m_optionalSlotId; }
+        if (data.m_optionalBarcode) { s << " Barcode=" << *data.m_optionalBarcode; }
+        s << " }";
+        return s;
+    }
+};
+
+//========== The Hermes Standard 3.26 ==========
+struct SendWorkOrderInfoData
+{
+    Optional<std::string> m_optionalQueryId;
+    Optional<std::string> m_optionalWorkOrderId;
+    Optional<std::string> m_optionalBoardId;
+    Optional<std::string> m_optionalBoardIdCreatedBy;
+    Optional<EBoardQuality> m_optionalFailedBoard;
+    Optional<std::string> m_optionalProductTypeId;
+    Optional<EFlippedBoard> m_optionalFlippedBoard;
+    Optional<std::string> m_optionalTopBarcode;
+    Optional<std::string> m_optionalBottomBarcode;
+    Optional<double> m_optionalLengthInMM;
+    Optional<double> m_optionalWidthInMM;
+    Optional<double> m_optionalThicknessInMM;
+    Optional<double> m_optionalConveyorSpeedInMMPerSecs;
+    Optional<double> m_optionalTopClearanceHeightInMM;
+    Optional<double> m_optionalBottomClearanceHeightInMM;
+    Optional<double> m_optionalWeightInGrams;
+
+    friend bool operator==(const SendWorkOrderInfoData& lhs, const SendWorkOrderInfoData& rhs)
+    {
+        return lhs.m_optionalQueryId == rhs.m_optionalQueryId
+            && lhs.m_optionalWorkOrderId == rhs.m_optionalWorkOrderId
+            && lhs.m_optionalBoardId == rhs.m_optionalBoardId
+            && lhs.m_optionalBoardIdCreatedBy == rhs.m_optionalBoardIdCreatedBy
+            && lhs.m_optionalFailedBoard == rhs.m_optionalFailedBoard
+            && lhs.m_optionalProductTypeId == rhs.m_optionalProductTypeId
+            && lhs.m_optionalFlippedBoard == rhs.m_optionalFlippedBoard
+            && lhs.m_optionalTopBarcode == rhs.m_optionalTopBarcode
+            && lhs.m_optionalBottomBarcode == rhs.m_optionalBottomBarcode
+            && lhs.m_optionalLengthInMM == rhs.m_optionalLengthInMM
+            && lhs.m_optionalWidthInMM == rhs.m_optionalWidthInMM
+            && lhs.m_optionalThicknessInMM == rhs.m_optionalThicknessInMM
+            && lhs.m_optionalConveyorSpeedInMMPerSecs == rhs.m_optionalConveyorSpeedInMMPerSecs
+            && lhs.m_optionalTopClearanceHeightInMM == rhs.m_optionalTopClearanceHeightInMM
+            && lhs.m_optionalBottomClearanceHeightInMM == rhs.m_optionalBottomClearanceHeightInMM
+            && lhs.m_optionalWeightInGrams == rhs.m_optionalWeightInGrams;
+    }
+    friend bool operator!=(const SendWorkOrderInfoData& lhs, const SendWorkOrderInfoData& rhs) { return !operator==(lhs, rhs); }
+
+    template <class S> friend S& operator<<(S& s, const SendWorkOrderInfoData& data) 
+    {
+        s << '{';
+        if (data.m_optionalQueryId) { s << " QueryId=" << *data.m_optionalQueryId; }
+        if (data.m_optionalWorkOrderId) { s << " WorkOrderId=" << *data.m_optionalWorkOrderId; }
+        if (data.m_optionalBoardId) { s << " BoardId=" << *data.m_optionalBoardId; }
+        if (data.m_optionalBoardIdCreatedBy) { s << " BoardIdCreatedBy=" << *data.m_optionalBoardIdCreatedBy; }
+        if (data.m_optionalFailedBoard) { s << " FailedBoard=" << *data.m_optionalFailedBoard; }
+        if (data.m_optionalProductTypeId) { s << " ProductTypeId=" << *data.m_optionalProductTypeId; }
+        if (data.m_optionalFlippedBoard) { s << " FlippedBoard=" << *data.m_optionalFlippedBoard; }
+        if (data.m_optionalTopBarcode) { s << " TopBarcode=" << *data.m_optionalTopBarcode; }
+        if (data.m_optionalBottomBarcode) { s << " BottomBarcode=" << *data.m_optionalBottomBarcode; }
+        if (data.m_optionalLengthInMM) { s << " Length=" << *data.m_optionalLengthInMM; }
+        if (data.m_optionalWidthInMM) { s << " Width=" << *data.m_optionalWidthInMM; }
+        if (data.m_optionalThicknessInMM) { s << " Thickness=" << *data.m_optionalThicknessInMM; }
+        if (data.m_optionalConveyorSpeedInMMPerSecs) { s << " ConveyorSpeed=" << *data.m_optionalConveyorSpeedInMMPerSecs; }
+        if (data.m_optionalTopClearanceHeightInMM) { s << " TopClearanceHeight=" << *data.m_optionalTopClearanceHeightInMM; }
+        if (data.m_optionalBottomClearanceHeightInMM) { s << " BottomClearanceHeight=" << *data.m_optionalBottomClearanceHeightInMM; }
+        if (data.m_optionalWeightInGrams) { s << " Weight=" << *data.m_optionalWeightInGrams; }
             s << " }";
             return s;
         }
@@ -1129,6 +1602,89 @@ namespace Hermes
             return s;
         }
     };
+
+//========== Configuration of vertical service interface (not part of The Hermes Standard) ==========
+struct VerticalServiceSettings
+{
+    std::string m_systemId;
+    uint16_t m_port{0};
+    double m_reconnectWaitTimeInSeconds{10};
+    double m_checkAlivePeriodInSeconds{60};
+    ECheckAliveResponseMode m_checkAliveResponseMode{ECheckAliveResponseMode::eAUTO};
+
+    VerticalServiceSettings() = default;
+    VerticalServiceSettings(StringView systemId,
+        uint16_t port) :
+        m_systemId(systemId),
+        m_port(port)
+    {}
+
+    friend bool operator==(const VerticalServiceSettings& lhs, const VerticalServiceSettings& rhs)
+    {
+        return lhs.m_systemId == rhs.m_systemId
+            && lhs.m_port == rhs.m_port
+            && lhs.m_reconnectWaitTimeInSeconds == rhs.m_reconnectWaitTimeInSeconds
+            && lhs.m_checkAlivePeriodInSeconds == rhs.m_checkAlivePeriodInSeconds
+            && lhs.m_checkAliveResponseMode == rhs.m_checkAliveResponseMode;
+    }
+    friend bool operator!=(const VerticalServiceSettings& lhs, const VerticalServiceSettings& rhs) { return !operator==(lhs, rhs); }
+
+    template <class S> friend S& operator<<(S& s, const VerticalServiceSettings& data) 
+    {
+        s << '{';
+        s << " SystemId=" << data.m_systemId;
+        s << " Port=" << data.m_port;
+        s << " ReconnectWaitTime=" << data.m_reconnectWaitTimeInSeconds;
+        s << " CheckAlivePeriod=" << data.m_checkAlivePeriodInSeconds;
+        s << " CheckAliveResponseMode=" << data.m_checkAliveResponseMode;
+        s << " }";
+        return s;
+    }
+};
+
+//========== Configuration of vertical client interface (not part of The Hermes Standard) ==========
+struct VerticalClientSettings
+{
+    std::string m_systemId;
+    std::string m_hostAddress;
+    uint16_t m_port{0};
+    double m_reconnectWaitTimeInSeconds{10};
+    double m_checkAlivePeriodInSeconds{60};
+    ECheckAliveResponseMode m_checkAliveResponseMode{ECheckAliveResponseMode::eAUTO};
+
+    VerticalClientSettings() = default;
+    VerticalClientSettings(StringView systemId,
+        StringView hostAddress,
+        uint16_t port) :
+        m_systemId(systemId),
+        m_hostAddress(hostAddress),
+        m_port(port)
+    {}
+
+    friend bool operator==(const VerticalClientSettings& lhs, const VerticalClientSettings& rhs)
+    {
+        return lhs.m_systemId == rhs.m_systemId
+            && lhs.m_hostAddress == rhs.m_hostAddress
+            && lhs.m_port == rhs.m_port
+            && lhs.m_reconnectWaitTimeInSeconds == rhs.m_reconnectWaitTimeInSeconds
+            && lhs.m_checkAlivePeriodInSeconds == rhs.m_checkAlivePeriodInSeconds
+            && lhs.m_checkAliveResponseMode == rhs.m_checkAliveResponseMode;
+    }
+    friend bool operator!=(const VerticalClientSettings& lhs, const VerticalClientSettings& rhs) { return !operator==(lhs, rhs); }
+
+    template <class S> friend S& operator<<(S& s, const VerticalClientSettings& data) 
+    {
+        s << '{';
+        s << " SystemId=" << data.m_systemId;
+        s << " HostAddress=" << data.m_hostAddress;
+        s << " Port=" << data.m_port;
+        s << " ReconnectWaitTime=" << data.m_reconnectWaitTimeInSeconds;
+        s << " CheckAlivePeriod=" << data.m_checkAlivePeriodInSeconds;
+        s << " CheckAliveResponseMode=" << data.m_checkAliveResponseMode;
+        s << " }";
+        return s;
+    }
+};
 
     //========== Error object (not part of The Hermes Standard) ==========
     struct Error

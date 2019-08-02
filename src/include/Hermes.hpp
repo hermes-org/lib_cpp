@@ -212,8 +212,113 @@ namespace Hermes
         ITraceCallback* // optional
     );
 
-    // stand-alone helper function to create a GUID
-    std::string GenerateGuid();
+    //======================= VerticalService interface =====================================
+    struct IVerticalServiceCallback;
+    class VerticalService
+    {
+    public:
+        explicit VerticalService(IVerticalServiceCallback&);
+        VerticalService(const VerticalService&) = delete;
+        VerticalService& operator=(const VerticalService&) = delete;
+        ~VerticalService() { ::DeleteHermesVerticalService(m_pImpl); }
+
+        void Run();
+        template<class F> void Post(F&&);
+        void Enable(const VerticalServiceSettings&);
+
+        void Signal(unsigned sessionId, const SupervisoryServiceDescriptionData&);
+        void Signal(unsigned sessionId, const BoardArrivedData&); // only to a specific client
+        void Signal(const BoardArrivedData&); // to all clients that have specified FeatureBoardTracking
+        void Signal(unsigned sessionId, const BoardDepartedData&); // only to a specific client
+        void Signal(const BoardDepartedData&); // to all clients that have specified FeatureBoardTracking
+        void Signal(unsigned sessionId, const QueryWorkOrderInfoData&);
+        void Signal(unsigned sessionId, const CurrentConfigurationData&);
+        void Signal(unsigned sessionId, const NotificationData&);
+        void Signal(unsigned sessionId, const CheckAliveData&);
+        void ResetSession(unsigned sessionId, const NotificationData&);
+
+        void Disable(const NotificationData&);
+        void Stop();
+
+    private:
+        HermesVerticalService* m_pImpl = nullptr;
+    };
+
+    struct IVerticalServiceCallback
+    {
+        IVerticalServiceCallback() = default;
+
+        // callbacks must not be moved or copied!
+        IVerticalServiceCallback(const IVerticalServiceCallback&) = delete;
+        IVerticalServiceCallback& operator=(const IVerticalServiceCallback&) = delete;
+
+        virtual void OnConnected(unsigned sessionId, EVerticalState, const ConnectionInfo&) = 0;
+        virtual void On(unsigned sessionId, EVerticalState, const SupervisoryServiceDescriptionData&) = 0;
+        virtual void On(unsigned sessionId, const GetConfigurationData&, const ConnectionInfo&) = 0;
+        virtual void On(unsigned sessionId, const SetConfigurationData&, const ConnectionInfo&) = 0;
+        virtual void On(unsigned /*sessionId*/, const SendWorkOrderInfoData&) {}; // not necessarily interesting, hence not abstract
+        virtual void On(unsigned sessionId, const NotificationData&) = 0;
+        virtual void On(unsigned /*sessionId*/, const CheckAliveData&) {} // not necessarily interesting, hence not abstract
+        virtual void OnDisconnected(unsigned sessionId, EVerticalState, const Error&) = 0;
+
+        virtual void OnTrace(unsigned sessionId, ETraceType, StringView trace) = 0;
+
+    protected:
+        virtual ~IVerticalServiceCallback() = default;
+    };
+
+    //======================= VerticalClient interface =====================================
+    struct IVerticalClientCallback;
+    class VerticalClient
+    {
+    public:
+        explicit VerticalClient(IVerticalClientCallback&);
+        VerticalClient(const VerticalClient&) = delete;
+        VerticalClient& operator=(const VerticalClient&) = delete;
+        ~VerticalClient() { ::DeleteHermesVerticalClient(m_pImpl); }
+
+        void Run();
+        template<class F> void Post(F&&);
+        void Enable(const VerticalClientSettings&);
+
+        void Signal(unsigned sessionId, const SupervisoryServiceDescriptionData&);
+        void Signal(unsigned sessionId, const GetConfigurationData&);
+        void Signal(unsigned sessionId, const SetConfigurationData&);
+        void Signal(unsigned sessionId, const SendWorkOrderInfoData&);
+        void Signal(unsigned sessionId, const NotificationData&);
+        void Signal(unsigned sessionId, const CheckAliveData&);
+        void Reset(const NotificationData&);
+
+        void Disable(const NotificationData&);
+        void Stop();
+
+    private:
+        HermesVerticalClient* m_pImpl = nullptr;
+    };
+
+    struct IVerticalClientCallback
+    {
+        IVerticalClientCallback() = default;
+
+        // callbacks must not be moved or copied!
+        IVerticalClientCallback(const IVerticalClientCallback&) = delete;
+        IVerticalClientCallback& operator=(const IVerticalClientCallback&) = delete;
+
+        virtual void OnConnected(unsigned sessionId, EVerticalState, const ConnectionInfo&) = 0;
+        virtual void On(unsigned sessionId, EVerticalState, const SupervisoryServiceDescriptionData&) = 0;
+        virtual void On(unsigned /*sessionId*/, const BoardArrivedData&) {}; // not necessarily interesting, hence not abstract
+        virtual void On(unsigned /*sessionId*/, const BoardDepartedData&) {} // not necessarily interesting, hence not abstract
+        virtual void On(unsigned sessionId, const QueryWorkOrderInfoData&) = 0;
+        virtual void On(unsigned /*sessionId*/, const CurrentConfigurationData&) {} // not necessarily interesting, hence not abstract
+        virtual void On(unsigned sessionId, const NotificationData&) = 0;
+        virtual void On(unsigned /*sessionId*/, const CheckAliveData&) {} // not necessarily interesting, hence not abstract
+        virtual void OnDisconnected(unsigned sessionId, EVerticalState, const Error&) = 0;
+
+        virtual void OnTrace(unsigned sessionId, ETraceType, StringView trace) = 0;
+
+    protected:
+        virtual ~IVerticalClientCallback() = default;
+    };
 
     // Convenience interface for situations in which the same class implements IUpstreamCallback and IDownstreamCallback.
     // Because some function names clash, this adds a level of indirection to different function names, eg.
@@ -656,7 +761,7 @@ namespace Hermes
 
         callbacks.m_getConfigurationCallback.m_pData = this;
         callbacks.m_getConfigurationCallback.m_pCall = [](void* pVoid, uint32_t sessionId, 
-            const HermesConnectionInfo* pConnectionInfo, const HermesGetConfigurationData*)
+            const HermesGetConfigurationData*, const HermesConnectionInfo* pConnectionInfo)
         {
             auto pThis = static_cast<ConfigurationService*>(pVoid);
             auto configuration = pThis->m_callback.OnGetConfiguration(sessionId, ToCpp(*pConnectionInfo));
@@ -666,7 +771,7 @@ namespace Hermes
 
         callbacks.m_setConfigurationCallback.m_pData = this;
         callbacks.m_setConfigurationCallback.m_pCall = [](void* pVoid, uint32_t sessionId,
-            const HermesConnectionInfo* pConnectionInfo, const HermesSetConfigurationData* pConfiguration)
+            const HermesSetConfigurationData* pConfiguration, const HermesConnectionInfo* pConnectionInfo)
         {
             auto pThis = static_cast<ConfigurationService*>(pVoid);
             auto error = pThis->m_callback.OnSetConfiguration(sessionId, ToCpp(*pConnectionInfo), ToCpp(*pConfiguration));
@@ -728,15 +833,6 @@ namespace Hermes
         ::StopHermesConfigurationService(m_pImpl);
     }
 
-    //======================== GenerateGuid implementation =================================
-    inline std::string GenerateGuid()
-    {
-        std::string guid;
-        guid.resize(cHERMES_GUID_LENGTH);
-        ::GenerateHermesGuid(const_cast<char*>(guid.data()));
-        return guid;
-    }
-
     //================= Configuration client implementation =======================
     inline std::pair<CurrentConfigurationData, Error> GetConfiguration(StringView hostName, unsigned timeoutInSeconds,
         ITraceCallback* pTraceCallback)
@@ -773,9 +869,9 @@ namespace Hermes
         return{configuration, error};
     }
 
-    inline Error SetConfiguration(StringView hostName, const SetConfigurationData& configuration,
+    inline Error Hermes::SetConfiguration(StringView hostName, const SetConfigurationData& configuration,
         unsigned timeoutInSeconds,
-        CurrentConfigurationData* out_pConfiguration, // resulting configuration
+        Hermes::CurrentConfigurationData* out_pConfiguration, // resulting configuration
         std::vector<NotificationData>* out_pNotifications, // out: notification data
         ITraceCallback* pTraceCallback)
     {
@@ -827,6 +923,328 @@ namespace Hermes
         auto apiConfiguration = ToC(configuration);
         ::SetHermesConfiguration(ToC(hostName), &apiConfiguration, timeoutInSeconds, &callbacks);
         return error;
+    }
+
+    inline  VerticalService::VerticalService(IVerticalServiceCallback& callback)
+    {
+        HermesVerticalServiceCallbacks callbacks{};
+
+        callbacks.m_connectedCallback.m_pData = &callback;
+        callbacks.m_connectedCallback.m_pCall = [](void* pCallback, uint32_t sessionId, EHermesVerticalState state,
+            const HermesConnectionInfo* pConnectionInfo)
+        {
+            static_cast<IVerticalServiceCallback*>(pCallback)->OnConnected(sessionId, ToCpp(state),
+                ToCpp(*pConnectionInfo));
+        };
+
+        callbacks.m_serviceDescriptionCallback.m_pData = &callback;
+        callbacks.m_serviceDescriptionCallback.m_pCall = [](void* pCallback, uint32_t sessionId, EHermesVerticalState state,
+            const HermesSupervisoryServiceDescriptionData* pServiceDescriptionData)
+        {
+            static_cast<IVerticalServiceCallback*>(pCallback)->On(sessionId, ToCpp(state), ToCpp(*pServiceDescriptionData));
+        };
+
+        callbacks.m_getConfigurationCallback.m_pData = &callback;
+        callbacks.m_getConfigurationCallback.m_pCall = [](void* pCallback, uint32_t sessionId, const HermesGetConfigurationData* pData,
+            const HermesConnectionInfo* pInfo)
+        {
+            static_cast<IVerticalServiceCallback*>(pCallback)->On(sessionId, ToCpp(*pData), ToCpp(*pInfo));
+        };
+
+        callbacks.m_setConfigurationCallback.m_pData = &callback;
+        callbacks.m_setConfigurationCallback.m_pCall = [](void* pCallback, uint32_t sessionId, const HermesSetConfigurationData* pData,
+            const HermesConnectionInfo* pInfo)
+        {
+            static_cast<IVerticalServiceCallback*>(pCallback)->On(sessionId, ToCpp(*pData), ToCpp(*pInfo));
+        };
+
+        callbacks.m_sendWorkOrderInfoCallback.m_pData = &callback;
+        callbacks.m_sendWorkOrderInfoCallback.m_pCall = [](void* pCallback, uint32_t sessionId,
+            const HermesSendWorkOrderInfoData* pData)
+        {
+            static_cast<IVerticalServiceCallback*>(pCallback)->On(sessionId, ToCpp(*pData));
+        };
+
+        callbacks.m_notificationCallback.m_pData = &callback;
+        callbacks.m_notificationCallback.m_pCall = [](void* pCallback, uint32_t sessionId,
+            const HermesNotificationData* pData)
+        {
+            static_cast<IVerticalServiceCallback*>(pCallback)->On(sessionId, ToCpp(*pData));
+        };
+
+        callbacks.m_checkAliveCallback.m_pData = &callback;
+        callbacks.m_checkAliveCallback.m_pCall = [](void* pCallback, uint32_t sessionId,
+            const HermesCheckAliveData* pData)
+        {
+            static_cast<IVerticalServiceCallback*>(pCallback)->On(sessionId, ToCpp(*pData));
+        };
+
+        callbacks.m_disconnectedCallback.m_pData = &callback;
+        callbacks.m_disconnectedCallback.m_pCall = [](void* pCallback, uint32_t sessionId, EHermesVerticalState state,
+            const HermesError* pError)
+        {
+            static_cast<IVerticalServiceCallback*>(pCallback)->OnDisconnected(sessionId, ToCpp(state), ToCpp(*pError));
+        };
+
+        callbacks.m_traceCallback.m_pData = &callback;
+        callbacks.m_traceCallback.m_pCall = [](void* pCallback, unsigned sessionId, EHermesTraceType type,
+            HermesStringView trace)
+        {
+            static_cast<IVerticalServiceCallback*>(pCallback)->OnTrace(sessionId, ToCpp(type), ToCpp(trace));
+        };
+
+        m_pImpl = ::CreateHermesVerticalService(&callbacks);
+    }
+
+    inline void VerticalService::Run()
+    {
+        ::RunHermesVerticalService(m_pImpl);
+    }
+
+    template<class F> void VerticalService::Post(F&& f)
+    {
+        HermesVoidCallback callback;
+        callback.m_pData = std::make_unique<F>(std::forward<F>(f)).release();
+        callback.m_pCall = [](void* pData)
+        {
+            auto upF = std::unique_ptr<F>(static_cast<F*>(pData));
+            (*upF)();
+        };
+        ::PostHermesVerticalService(m_pImpl, callback);
+    }
+
+    inline void VerticalService::Enable(const VerticalServiceSettings& settings)
+    {
+        auto apiSettings = ToC(settings);
+        ::EnableHermesVerticalService(m_pImpl, &apiSettings);
+    }
+
+    inline void VerticalService::Signal(unsigned sessionId, const SupervisoryServiceDescriptionData& data)
+    {
+        auto apiData = ToC(data);
+        ::SignalHermesVerticalServiceDescription(m_pImpl, sessionId, &apiData);
+    }
+
+    inline void VerticalService::Signal(unsigned sessionId, const BoardArrivedData& data)
+    {
+        auto apiData = ToC(data);
+        ::SignalHermesBoardArrived(m_pImpl, sessionId, &apiData);
+    }
+
+    inline void VerticalService::Signal(const BoardArrivedData& data)
+    {
+        auto apiData = ToC(data);
+        ::SignalHermesBoardArrived(m_pImpl, 0U, &apiData);
+    }
+
+    inline void VerticalService::Signal(unsigned sessionId, const BoardDepartedData& data)
+    {
+        auto apiData = ToC(data);
+        ::SignalHermesBoardDeparted(m_pImpl, sessionId, &apiData);
+    }
+
+    inline void VerticalService::Signal(const BoardDepartedData& data)
+    {
+        auto apiData = ToC(data);
+        ::SignalHermesBoardDeparted(m_pImpl, 0U, &apiData);
+    }
+
+    inline void VerticalService::Signal(unsigned sessionId, const QueryWorkOrderInfoData& data)
+    {
+        auto apiData = ToC(data);
+        ::SignalHermesQueryWorkOrderInfo(m_pImpl, sessionId, &apiData);
+    }
+
+    inline void VerticalService::Signal(unsigned sessionId, const CurrentConfigurationData& data)
+    {
+        auto apiData = ToC(data);
+        ::SignalHermesVerticalCurrentConfiguration(m_pImpl, sessionId, &apiData);
+    }
+
+
+    inline void VerticalService::Signal(unsigned sessionId, const NotificationData& data)
+    {
+        auto apiData = ToC(data);
+        ::SignalHermesVerticalServiceNotification(m_pImpl, sessionId, &apiData);
+    }
+
+    inline void VerticalService::Signal(unsigned sessionId, const CheckAliveData& data)
+    {
+        auto apiData = ToC(data);
+        ::SignalHermesVerticalServiceCheckAlive(m_pImpl, sessionId, &apiData);
+    }
+
+    inline void VerticalService::ResetSession(unsigned sessionId, const NotificationData& data)
+    {
+        auto apiData = ToC(data);
+        ::ResetHermesVerticalServiceSession(m_pImpl, sessionId, &apiData);
+    }
+
+
+    inline void VerticalService::Disable(const NotificationData& data)
+    {
+        auto apiData = ToC(data);
+        ::DisableHermesVerticalService(m_pImpl, &apiData);
+    }
+
+    inline void VerticalService::Stop()
+    {
+        ::StopHermesVerticalService(m_pImpl);
+    }
+
+    //======================== VerticalClient implementation =================================
+    inline VerticalClient::VerticalClient(IVerticalClientCallback& callback)
+    {
+        HermesVerticalClientCallbacks callbacks{};
+
+        callbacks.m_connectedCallback.m_pData = &callback;
+        callbacks.m_connectedCallback.m_pCall = [](void* pCallback, uint32_t sessionId, EHermesVerticalState state,
+            const HermesConnectionInfo* pConnectionInfo)
+        {
+            static_cast<IVerticalClientCallback*>(pCallback)->OnConnected(sessionId, ToCpp(state),
+                ToCpp(*pConnectionInfo));
+        };
+
+        callbacks.m_serviceDescriptionCallback.m_pData = &callback;
+        callbacks.m_serviceDescriptionCallback.m_pCall = [](void* pCallback, uint32_t sessionId, EHermesVerticalState state,
+            const HermesSupervisoryServiceDescriptionData* pServiceDescriptionData)
+        {
+            static_cast<IVerticalClientCallback*>(pCallback)->On(sessionId, ToCpp(state), ToCpp(*pServiceDescriptionData));
+        };
+
+        callbacks.m_boardArrivedCallback.m_pData = &callback;
+        callbacks.m_boardArrivedCallback.m_pCall = [](void* pCallback, uint32_t sessionId,
+            const HermesBoardArrivedData* pData)
+        {
+            static_cast<IVerticalClientCallback*>(pCallback)->On(sessionId, ToCpp(*pData));
+        };
+
+        callbacks.m_boardDepartedCallback.m_pData = &callback;
+        callbacks.m_boardDepartedCallback.m_pCall = [](void* pCallback, uint32_t sessionId,
+            const HermesBoardDepartedData* pData)
+        {
+            static_cast<IVerticalClientCallback*>(pCallback)->On(sessionId, ToCpp(*pData));
+        };
+
+        callbacks.m_queryWorkOrderInfoCallback.m_pData = &callback;
+        callbacks.m_queryWorkOrderInfoCallback.m_pCall = [](void* pCallback, uint32_t sessionId,
+            const HermesQueryWorkOrderInfoData* pData)
+        {
+            static_cast<IVerticalClientCallback*>(pCallback)->On(sessionId, ToCpp(*pData));
+        };
+
+        callbacks.m_currentConfigurationCallback.m_pData = &callback;
+        callbacks.m_currentConfigurationCallback.m_pCall = [](void* pCallback, uint32_t sessionId,
+            const HermesCurrentConfigurationData* pData)
+        {
+            static_cast<IVerticalClientCallback*>(pCallback)->On(sessionId, ToCpp(*pData));
+        };
+
+        callbacks.m_notificationCallback.m_pData = &callback;
+        callbacks.m_notificationCallback.m_pCall = [](void* pCallback, uint32_t sessionId,
+            const HermesNotificationData* pData)
+        {
+            static_cast<IVerticalClientCallback*>(pCallback)->On(sessionId, ToCpp(*pData));
+        };
+
+        callbacks.m_checkAliveCallback.m_pData = &callback;
+        callbacks.m_checkAliveCallback.m_pCall = [](void* pCallback, uint32_t sessionId,
+            const HermesCheckAliveData* pData)
+        {
+            static_cast<IVerticalClientCallback*>(pCallback)->On(sessionId, ToCpp(*pData));
+        };
+
+        callbacks.m_disconnectedCallback.m_pData = &callback;
+        callbacks.m_disconnectedCallback.m_pCall = [](void* pCallback, uint32_t sessionId, EHermesVerticalState state,
+            const HermesError* pError)
+        {
+            static_cast<IVerticalClientCallback*>(pCallback)->OnDisconnected(sessionId, ToCpp(state), ToCpp(*pError));
+        };
+
+        callbacks.m_traceCallback.m_pData = &callback;
+        callbacks.m_traceCallback.m_pCall = [](void* pCallback, unsigned sessionId, EHermesTraceType type,
+            HermesStringView trace)
+        {
+            static_cast<IVerticalClientCallback*>(pCallback)->OnTrace(sessionId, ToCpp(type), ToCpp(trace));
+        };
+
+        m_pImpl = ::CreateHermesVerticalClient(&callbacks);
+    }
+
+    inline void VerticalClient::Run()
+    {
+        ::RunHermesVerticalClient(m_pImpl);
+    }
+
+    template<class F> void VerticalClient::Post(F&& f)
+    {
+        HermesVoidCallback callback;
+        callback.m_pData = std::make_unique<F>(std::forward<F>(f)).release();
+        callback.m_pCall = [](void* pData)
+        {
+            auto upF = std::unique_ptr<F>(static_cast<F*>(pData));
+            (*upF)();
+        };
+        ::PostHermesVerticalClient(m_pImpl, callback);
+    }
+
+    inline void VerticalClient::Enable(const VerticalClientSettings& data)
+    {
+        auto apiData = ToC(data);
+        ::EnableHermesVerticalClient(m_pImpl, &apiData);
+    }
+
+    inline void VerticalClient::Signal(unsigned sessionId, const SupervisoryServiceDescriptionData& data)
+    {
+        auto apiData = ToC(data);
+        ::SignalHermesVerticalClientDescription(m_pImpl, sessionId, &apiData);
+    }
+
+    inline void VerticalClient::Signal(unsigned sessionId, const SendWorkOrderInfoData& data)
+    {
+        auto apiData = ToC(data);
+        ::SignalHermesSendWorkOrderInfo(m_pImpl, sessionId, &apiData);
+    }
+
+    inline void VerticalClient::Signal(unsigned sessionId, const GetConfigurationData& data)
+    {
+        auto apiData = ToC(data);
+        ::SignalHermesVerticalGetConfiguration(m_pImpl, sessionId, &apiData);
+    }
+
+    inline void VerticalClient::Signal(unsigned sessionId, const SetConfigurationData& data)
+    {
+        auto apiData = ToC(data);
+        ::SignalHermesVerticalSetConfiguration(m_pImpl, sessionId, &apiData);
+    }
+
+    inline void VerticalClient::Signal(unsigned sessionId, const NotificationData& data)
+    {
+        auto apiData = ToC(data);
+        ::SignalHermesVerticalClientNotification(m_pImpl, sessionId, &apiData);
+    }
+
+    inline void VerticalClient::Signal(unsigned sessionId, const CheckAliveData& data)
+    {
+        auto apiData = ToC(data);
+        ::SignalHermesVerticalClientCheckAlive(m_pImpl, sessionId, &apiData);
+    }
+
+    inline void VerticalClient::Reset(const NotificationData& data)
+    {
+        auto apiData = ToC(data);
+        ::ResetHermesVerticalClient(m_pImpl, &apiData);
+    }
+
+    inline void VerticalClient::Disable(const NotificationData& data)
+    {
+        auto apiData = ToC(data);
+        ::DisableHermesVerticalClient(m_pImpl, &apiData);
+    }
+
+    inline void VerticalClient::Stop()
+    {
+        ::StopHermesVerticalClient(m_pImpl);
     }
 
 

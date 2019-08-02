@@ -172,7 +172,7 @@ struct HermesConfigurationService : IAcceptorCallback, IConfigurationServiceSess
         HermesGetConfigurationData apiData = ToC(data);
 
         CallbackScope<IGetConfigurationResponse> scope(m_pGetConfigurationResponder, responder);
-        m_getConfigurationCallback(sessionId, &apiConnectionInfo, &apiData);
+        m_getConfigurationCallback(sessionId, &apiData, &apiConnectionInfo);
     }
 
     virtual void OnSet(unsigned sessionId, const ConnectionInfo& connectionInfo,
@@ -182,7 +182,7 @@ struct HermesConfigurationService : IAcceptorCallback, IConfigurationServiceSess
         auto apiConfiguration = ToC(configuration);
 
         CallbackScope<ISetConfigurationResponse> scope(m_pSetConfigurationResponder, responder);
-        m_setConfigurationCallback(sessionId, &apiConnectionInfo, &apiConfiguration);
+        m_setConfigurationCallback(sessionId, &apiConfiguration, &apiConnectionInfo);
     }
 
     virtual void OnDisconnected(unsigned sessionId, const Error& error) override

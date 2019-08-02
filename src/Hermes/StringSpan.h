@@ -13,20 +13,20 @@ namespace Hermes
         constexpr StringSpan(char* pData, std::size_t size) : m_pData(pData), m_size(size) {}
         StringSpan(std::string& rhs) : m_pData(const_cast<char*>(rhs.data())), m_size(rhs.size()) {}
 
+        operator std::string() const { return std::string(m_pData, m_size); }
+        operator StringView() const { return{m_pData, m_size}; }
+
         constexpr char* data() const { return m_pData; }
         constexpr std::size_t size() const { return m_size; }
         constexpr std::size_t length() const { return m_size; }
         constexpr bool empty() const { return m_size == 0U; }
         constexpr StringSpan substr(std::size_t pos, std::size_t count = std::string::npos) const { return{m_pData + pos, std::min(count, m_size - pos)}; }
 
-        std::size_t find(char c, std::size_t pos = 0U) const { return StringView(this->m_pData).find(c, pos); }
-        std::size_t find(StringView v) const { return StringView(this->m_pData).find(v); }
+        std::size_t find(char c, std::size_t pos = 0U) const { return StringView(*this).find(c, pos); }
+        std::size_t find(StringView v) const { return StringView(*this).find(v); }
 
-        operator std::string() const { return std::string(m_pData, m_size); }
-        operator StringView() const { return{m_pData, m_size}; }
-
-        int compare(StringView rhs) { return StringView(this->m_pData).compare(rhs); }
-        int compare(std::size_t pos, std::size_t count, StringView rhs) { return StringView(this->m_pData).compare(pos, count, rhs); }
+        int compare(StringView rhs) { return StringView(*this).compare(rhs); }
+        int compare(std::size_t pos, std::size_t count, StringView rhs) { return StringView(*this).compare(pos, count, rhs); }
 
         friend std::ostream& operator<<(std::ostream& os, StringSpan sv)
         {

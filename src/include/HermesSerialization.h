@@ -49,6 +49,11 @@ extern "C" {
     HERMESPROTOCOL_API void HermesSerializeGetConfiguration(const HermesGetConfigurationData*, HermesSerializationCallback);
     HERMESPROTOCOL_API void HermesSerializeSetConfiguration(const HermesSetConfigurationData*, HermesSerializationCallback);
     HERMESPROTOCOL_API void HermesSerializeCurrentConfiguration(const HermesCurrentConfigurationData*, HermesSerializationCallback);
+    HERMESPROTOCOL_API void HermesSerializeSupervisoryServiceDescription(const HermesSupervisoryServiceDescriptionData*, HermesSerializationCallback);
+    HERMESPROTOCOL_API void HermesSerializeBoardArrived(const HermesBoardArrivedData*, HermesSerializationCallback);
+    HERMESPROTOCOL_API void HermesSerializeBoardDeparted(const HermesBoardDepartedData*, HermesSerializationCallback);
+    HERMESPROTOCOL_API void HermesSerializeQueryWorkOrderInfo(const HermesQueryWorkOrderInfoData*, HermesSerializationCallback);
+    HERMESPROTOCOL_API void HermesSerializeSendWorkOrderInfo(const HermesSendWorkOrderInfoData*, HermesSerializationCallback);
 
     // Deserialize (just for unit testing)
     struct HermesDeserializationErrorCallback
@@ -136,6 +141,31 @@ extern "C" {
         void(*m_pCall)(void*, const HermesCurrentConfigurationData*);
         void* m_pData;
     };
+    struct HermesDeserializedSupervisoryServiceDescriptionCallback
+    {
+        void(*m_pCall)(void*, const HermesSupervisoryServiceDescriptionData*);
+        void* m_pData;
+    };
+    struct HermesDeserializedBoardArrivedCallback
+    {
+        void(*m_pCall)(void*, const HermesBoardArrivedData*);
+        void* m_pData;
+    };
+    struct HermesDeserializedBoardDepartedCallback
+    {
+        void(*m_pCall)(void*, const HermesBoardDepartedData*);
+        void* m_pData;
+    };
+    struct HermesDeserializedQueryWorkOrderInfoCallback
+    {
+        void(*m_pCall)(void*, const HermesQueryWorkOrderInfoData*);
+        void* m_pData;
+    };
+    struct HermesDeserializedSendWorkOrderInfoCallback
+    {
+        void(*m_pCall)(void*, const HermesSendWorkOrderInfoData*);
+        void* m_pData;
+    };
 
     struct HermesDeserializationCallbacks
     {
@@ -156,6 +186,12 @@ extern "C" {
         HermesDeserializedGetConfigurationCallback m_getConfigurationCallback;
         HermesDeserializedSetConfigurationCallback m_setConfigurationCallback;
         HermesDeserializedCurrentConfigurationCallback m_currentConfigurationCallback;
+        HermesDeserializedSupervisoryServiceDescriptionCallback m_supervisoryServiceDescriptionCallback;
+        HermesDeserializedBoardArrivedCallback m_boardArrivedCallback;
+        HermesDeserializedBoardDepartedCallback m_boardDepartedCallback;
+        HermesDeserializedQueryWorkOrderInfoCallback m_queryWorkOrderInfoCallback;
+        HermesDeserializedSendWorkOrderInfoCallback m_sendWorkOrderInfoCallback;
+
     };
     HERMESPROTOCOL_API void HermesDeserialize(HermesStringView, const HermesDeserializationCallbacks*);
 

@@ -147,6 +147,61 @@ namespace Hermes
             }
         }
     };
+
+    template<> struct PugiSerializer<FeatureConfiguration>
+    {
+        using AsElementTag = int;
+
+        static void WriteElement(pugi::xml_node, const FeatureConfiguration&) {}
+        static void ReadElement(pugi::xml_node, Error&, FeatureConfiguration&) {}
+    };
+
+    template<> struct PugiSerializer<FeatureBoardTracking>
+    {
+        using AsElementTag = int;
+
+        static void WriteElement(pugi::xml_node, const FeatureBoardTracking&) {}
+        static void ReadElement(pugi::xml_node, Error&, FeatureBoardTracking&) {}
+    };
+
+    template<> struct PugiSerializer<FeatureQueryWorkOrderInfo>
+    {
+        using AsElementTag = int;
+
+        static void WriteElement(pugi::xml_node, const FeatureQueryWorkOrderInfo&) {}
+        static void ReadElement(pugi::xml_node, Error&, FeatureQueryWorkOrderInfo&) {}
+    };
+
+    template<> struct PugiSerializer<FeatureSendWorkOrderInfo>
+    {
+        using AsElementTag = int;
+
+        static void WriteElement(pugi::xml_node, const FeatureSendWorkOrderInfo&) {}
+        static void ReadElement(pugi::xml_node, Error&, FeatureSendWorkOrderInfo&) {}
+    };
+
+    template<> struct PugiSerializer<SupervisoryFeatures>
+    {
+        using AsElementTag = int;
+
+        static void WriteElement(pugi::xml_node parent, const SupervisoryFeatures& data)
+        {
+            Serialize(parent, "FeatureConfiguration", data.m_optionalFeatureConfiguration);
+            Serialize(parent, "FeatureCheckAliveResponse", data.m_optionalFeatureCheckAliveResponse);
+            Serialize(parent, "FeatureBoardTracking", data.m_optionalFeatureBoardTracking);
+            Serialize(parent, "FeatureQueryWorkOrderInfo", data.m_optionalFeatureQueryWorkOrderInfo);
+            Serialize(parent, "FeatureSendWorkOrderInfo", data.m_optionalFeatureSendWorkOrderInfo);
+        }
+
+        static void ReadElement(pugi::xml_node parent, Error& error, SupervisoryFeatures& data)
+        {
+            Deserialize(parent, "FeatureConfiguration", error, data.m_optionalFeatureConfiguration);
+            Deserialize(parent, "FeatureCheckAliveResponse", error, data.m_optionalFeatureCheckAliveResponse);
+            Deserialize(parent, "FeatureBoardTracking", error, data.m_optionalFeatureBoardTracking);
+            Deserialize(parent, "FeatureQueryWorkOrderInfo", error, data.m_optionalFeatureQueryWorkOrderInfo);
+            Deserialize(parent, "FeatureSendWorkOrderInfo", error, data.m_optionalFeatureSendWorkOrderInfo);
+        }
+    };
 }
 
 std::string Hermes::Serialize(const ServiceDescriptionData& data)
@@ -177,6 +232,7 @@ std::string Hermes::Serialize(const BoardAvailableData& data)
     Serialize(envelope.DataNode(), "TopClearanceHeight", data.m_optionalTopClearanceHeightInMM);
     Serialize(envelope.DataNode(), "BottomClearanceHeight", data.m_optionalBottomClearanceHeightInMM);
     Serialize(envelope.DataNode(), "Weight", data.m_optionalWeightInGrams);
+    Serialize(envelope.DataNode(), "WorkOrderId", data.m_optionalWorkOrderId);
     return envelope.ToXmlString();
 }
 
@@ -203,6 +259,7 @@ std::string Hermes::Serialize(const MachineReadyData& data)
     Serialize(envelope.DataNode(), "TopClearanceHeight", data.m_optionalTopClearanceHeightInMM);
     Serialize(envelope.DataNode(), "BottomClearanceHeight", data.m_optionalBottomClearanceHeightInMM);
     Serialize(envelope.DataNode(), "Weight", data.m_optionalWeightInGrams);
+    Serialize(envelope.DataNode(), "WorkOrderId", data.m_optionalWorkOrderId);
     return envelope.ToXmlString();
 }
 
@@ -263,6 +320,7 @@ std::string Hermes::Serialize(const SetConfigurationData& data)
 {
     SenderEnvelope envelope(Hermes::SerializationTraits<SetConfigurationData>::cTAG_VIEW);
     Serialize(envelope.DataNode(), "MachineId", data.m_machineId);
+    Serialize(envelope.DataNode(), "SupervisorySystemPort", data.m_optionalSupervisorySystemPort);
     Serialize(envelope.DataNode(), "UpstreamConfigurations", data.m_upstreamConfigurations);
     Serialize(envelope.DataNode(), "DownstreamConfigurations", data.m_downstreamConfigurations);
     return envelope.ToXmlString();
@@ -272,6 +330,7 @@ std::string Hermes::Serialize(const CurrentConfigurationData& data)
 {
     SenderEnvelope envelope(Hermes::SerializationTraits<CurrentConfigurationData>::cTAG_VIEW);
     Serialize(envelope.DataNode(), "MachineId", data.m_optionalMachineId);
+    Serialize(envelope.DataNode(), "SupervisorySystemPort", data.m_optionalSupervisorySystemPort);
     Serialize(envelope.DataNode(), "UpstreamConfigurations", data.m_upstreamConfigurations);
     Serialize(envelope.DataNode(), "DownstreamConfigurations", data.m_downstreamConfigurations);
     return envelope.ToXmlString();
@@ -296,6 +355,7 @@ std::string Hermes::Serialize(const BoardForecastData& data)
     Serialize(envelope.DataNode(), "TopClearanceHeight", data.m_optionalTopClearanceHeightInMM);
     Serialize(envelope.DataNode(), "BottomClearanceHeight", data.m_optionalBottomClearanceHeightInMM);
     Serialize(envelope.DataNode(), "Weight", data.m_optionalWeightInGrams);
+    Serialize(envelope.DataNode(), "WorkOrderId", data.m_optionalWorkOrderId);
     return envelope.ToXmlString();
 }
 
@@ -310,6 +370,103 @@ std::string Hermes::Serialize(const QueryBoardInfoData& data)
 std::string Hermes::Serialize(const SendBoardInfoData& data)
 {
     SenderEnvelope envelope(Hermes::SerializationTraits<SendBoardInfoData>::cTAG_VIEW);
+    Serialize(envelope.DataNode(), "BoardId", data.m_optionalBoardId);
+    Serialize(envelope.DataNode(), "BoardIdCreatedBy", data.m_optionalBoardIdCreatedBy);
+    Serialize(envelope.DataNode(), "FailedBoard", data.m_optionalFailedBoard);
+    Serialize(envelope.DataNode(), "ProductTypeId", data.m_optionalProductTypeId);
+    Serialize(envelope.DataNode(), "FlippedBoard", data.m_optionalFlippedBoard);
+    Serialize(envelope.DataNode(), "TopBarcode", data.m_optionalTopBarcode);
+    Serialize(envelope.DataNode(), "BottomBarcode", data.m_optionalBottomBarcode);
+    Serialize(envelope.DataNode(), "Length", data.m_optionalLengthInMM);
+    Serialize(envelope.DataNode(), "Width", data.m_optionalWidthInMM);
+    Serialize(envelope.DataNode(), "Thickness", data.m_optionalThicknessInMM);
+    Serialize(envelope.DataNode(), "ConveyorSpeed", data.m_optionalConveyorSpeedInMMPerSecs);
+    Serialize(envelope.DataNode(), "TopClearanceHeight", data.m_optionalTopClearanceHeightInMM);
+    Serialize(envelope.DataNode(), "BottomClearanceHeight", data.m_optionalBottomClearanceHeightInMM);
+    Serialize(envelope.DataNode(), "Weight", data.m_optionalWeightInGrams);
+    Serialize(envelope.DataNode(), "WorkOrderId", data.m_optionalWorkOrderId);
+    return envelope.ToXmlString();
+}
+
+std::string Hermes::Serialize(const SupervisoryServiceDescriptionData& data)
+{
+    SenderEnvelope envelope(Hermes::SerializationTraits<SupervisoryServiceDescriptionData>::cTAG_VIEW);
+    Serialize(envelope.DataNode(), "SystemId", data.m_systemId);
+    Serialize(envelope.DataNode(), "Version", data.m_version);
+    Serialize(envelope.DataNode(), "SupportedFeatures", data.m_supportedFeatures);
+    return envelope.ToXmlString();
+}
+
+std::string Hermes::Serialize(const BoardArrivedData& data)
+{
+    SenderEnvelope envelope(Hermes::SerializationTraits<BoardArrivedData>::cTAG_VIEW);
+    Serialize(envelope.DataNode(), "MachineId", data.m_machineId);
+    Serialize(envelope.DataNode(), "UpstreamLaneId", data.m_upstreamLaneId);
+    Serialize(envelope.DataNode(), "UpstreamInterfaceId", data.m_optionalUpstreamInterfaceId);
+    Serialize(envelope.DataNode(), "MagazineId", data.m_optionalMagazineId);
+    Serialize(envelope.DataNode(), "SlotId", data.m_optionalSlotId);
+    Serialize(envelope.DataNode(), "BoardTransfer", data.m_boardTransfer);
+    Serialize(envelope.DataNode(), "BoardId", data.m_boardId);
+    Serialize(envelope.DataNode(), "BoardIdCreatedBy", data.m_boardIdCreatedBy);
+    Serialize(envelope.DataNode(), "FailedBoard", data.m_failedBoard);
+    Serialize(envelope.DataNode(), "ProductTypeId", data.m_optionalProductTypeId);
+    Serialize(envelope.DataNode(), "FlippedBoard", data.m_flippedBoard);
+    Serialize(envelope.DataNode(), "TopBarcode", data.m_optionalTopBarcode);
+    Serialize(envelope.DataNode(), "BottomBarcode", data.m_optionalBottomBarcode);
+    Serialize(envelope.DataNode(), "Length", data.m_optionalLengthInMM);
+    Serialize(envelope.DataNode(), "Width", data.m_optionalWidthInMM);
+    Serialize(envelope.DataNode(), "Thickness", data.m_optionalThicknessInMM);
+    Serialize(envelope.DataNode(), "ConveyorSpeed", data.m_optionalConveyorSpeedInMMPerSecs);
+    Serialize(envelope.DataNode(), "TopClearanceHeight", data.m_optionalTopClearanceHeightInMM);
+    Serialize(envelope.DataNode(), "BottomClearanceHeight", data.m_optionalBottomClearanceHeightInMM);
+    Serialize(envelope.DataNode(), "Weight", data.m_optionalWeightInGrams);
+    Serialize(envelope.DataNode(), "WorkOrderId", data.m_optionalWorkOrderId);
+    return envelope.ToXmlString();
+}
+
+std::string Hermes::Serialize(const BoardDepartedData& data)
+{
+    SenderEnvelope envelope(Hermes::SerializationTraits<BoardDepartedData>::cTAG_VIEW);
+    Serialize(envelope.DataNode(), "MachineId", data.m_machineId);
+    Serialize(envelope.DataNode(), "DownstreamLaneId", data.m_downstreamLaneId);
+    Serialize(envelope.DataNode(), "DownstreamInterfaceId", data.m_optionalDownstreamInterfaceId);
+    Serialize(envelope.DataNode(), "MagazineId", data.m_optionalMagazineId);
+    Serialize(envelope.DataNode(), "SlotId", data.m_optionalSlotId);
+    Serialize(envelope.DataNode(), "BoardTransfer", data.m_boardTransfer);
+    Serialize(envelope.DataNode(), "BoardId", data.m_boardId);
+    Serialize(envelope.DataNode(), "BoardIdCreatedBy", data.m_boardIdCreatedBy);
+    Serialize(envelope.DataNode(), "FailedBoard", data.m_failedBoard);
+    Serialize(envelope.DataNode(), "ProductTypeId", data.m_optionalProductTypeId);
+    Serialize(envelope.DataNode(), "FlippedBoard", data.m_flippedBoard);
+    Serialize(envelope.DataNode(), "TopBarcode", data.m_optionalTopBarcode);
+    Serialize(envelope.DataNode(), "BottomBarcode", data.m_optionalBottomBarcode);
+    Serialize(envelope.DataNode(), "Length", data.m_optionalLengthInMM);
+    Serialize(envelope.DataNode(), "Width", data.m_optionalWidthInMM);
+    Serialize(envelope.DataNode(), "Thickness", data.m_optionalThicknessInMM);
+    Serialize(envelope.DataNode(), "ConveyorSpeed", data.m_optionalConveyorSpeedInMMPerSecs);
+    Serialize(envelope.DataNode(), "TopClearanceHeight", data.m_optionalTopClearanceHeightInMM);
+    Serialize(envelope.DataNode(), "BottomClearanceHeight", data.m_optionalBottomClearanceHeightInMM);
+    Serialize(envelope.DataNode(), "Weight", data.m_optionalWeightInGrams);
+    Serialize(envelope.DataNode(), "WorkOrderId", data.m_optionalWorkOrderId);
+    return envelope.ToXmlString();
+}
+
+std::string Hermes::Serialize(const QueryWorkOrderInfoData& data)
+{
+    SenderEnvelope envelope(Hermes::SerializationTraits<QueryWorkOrderInfoData>::cTAG_VIEW);
+    Serialize(envelope.DataNode(), "QueryId", data.m_optionalQueryId);
+    Serialize(envelope.DataNode(), "MachineId", data.m_machineId);
+    Serialize(envelope.DataNode(), "MagazineId", data.m_optionalMagazineId);
+    Serialize(envelope.DataNode(), "SlotId", data.m_optionalSlotId);
+    Serialize(envelope.DataNode(), "Barcode", data.m_optionalBarcode);
+    return envelope.ToXmlString();
+}
+
+std::string Hermes::Serialize(const SendWorkOrderInfoData& data)
+{
+    SenderEnvelope envelope(Hermes::SerializationTraits<SendWorkOrderInfoData>::cTAG_VIEW);
+    Serialize(envelope.DataNode(), "QueryId", data.m_optionalQueryId);
+    Serialize(envelope.DataNode(), "WorkOrderId", data.m_optionalWorkOrderId);
     Serialize(envelope.DataNode(), "BoardId", data.m_optionalBoardId);
     Serialize(envelope.DataNode(), "BoardIdCreatedBy", data.m_optionalBoardIdCreatedBy);
     Serialize(envelope.DataNode(), "FailedBoard", data.m_optionalFailedBoard);
@@ -355,6 +512,7 @@ Hermes::Error Hermes::Deserialize(pugi::xml_node xmlNode, BoardAvailableData& da
     Deserialize(xmlNode, "TopClearanceHeight", error, data.m_optionalTopClearanceHeightInMM);
     Deserialize(xmlNode, "BottomClearanceHeight", error, data.m_optionalBottomClearanceHeightInMM);
     Deserialize(xmlNode, "Weight", error, data.m_optionalWeightInGrams);
+    Deserialize(xmlNode, "WorkOrderId", error, data.m_optionalWorkOrderId);
     return error;
 }
 
@@ -381,6 +539,7 @@ Hermes::Error Hermes::Deserialize(pugi::xml_node xmlNode, MachineReadyData& data
     Deserialize(xmlNode, "TopClearanceHeight", error, data.m_optionalTopClearanceHeightInMM);
     Deserialize(xmlNode, "BottomClearanceHeight", error, data.m_optionalBottomClearanceHeightInMM);
     Deserialize(xmlNode, "Weight", error, data.m_optionalWeightInGrams);
+    Deserialize(xmlNode, "WorkOrderId", error, data.m_optionalWorkOrderId);
     return error;
 }
 
@@ -435,6 +594,7 @@ Hermes::Error Hermes::Deserialize(pugi::xml_node xmlNode, SetConfigurationData& 
 {
     Error error;
     Deserialize(xmlNode, "MachineId", error, data.m_machineId);
+    Deserialize(xmlNode, "SupervisorySystemPort", error, data.m_optionalSupervisorySystemPort);
     Deserialize(xmlNode, "UpstreamConfigurations", error, data.m_upstreamConfigurations);
     Deserialize(xmlNode, "DownstreamConfigurations", error, data.m_downstreamConfigurations);
     return{};
@@ -450,6 +610,7 @@ Hermes::Error Hermes::Deserialize(pugi::xml_node xmlNode, CurrentConfigurationDa
 {
     Error error;
     Deserialize(xmlNode, "MachineId", error, data.m_optionalMachineId);
+    Deserialize(xmlNode, "SupervisorySystemPort", error, data.m_optionalSupervisorySystemPort);
     Deserialize(xmlNode, "UpstreamConfigurations", error, data.m_upstreamConfigurations);
     Deserialize(xmlNode, "DownstreamConfigurations", error, data.m_downstreamConfigurations);
     return{};
@@ -474,6 +635,7 @@ Hermes::Error Hermes::Deserialize(pugi::xml_node xmlNode, BoardForecastData& dat
     Deserialize(xmlNode, "TopClearanceHeight", error, data.m_optionalTopClearanceHeightInMM);
     Deserialize(xmlNode, "BottomClearanceHeight", error, data.m_optionalBottomClearanceHeightInMM);
     Deserialize(xmlNode, "Weight", error, data.m_optionalWeightInGrams);
+    Deserialize(xmlNode, "WorkOrderId", error, data.m_optionalWorkOrderId);
     return error;
 }
 
@@ -502,7 +664,103 @@ Hermes::Error Hermes::Deserialize(pugi::xml_node xmlNode, SendBoardInfoData& dat
     Deserialize(xmlNode, "TopClearanceHeight", error, data.m_optionalTopClearanceHeightInMM);
     Deserialize(xmlNode, "BottomClearanceHeight", error, data.m_optionalBottomClearanceHeightInMM);
     Deserialize(xmlNode, "Weight", error, data.m_optionalWeightInGrams);
+    Deserialize(xmlNode, "WorkOrderId", error, data.m_optionalWorkOrderId);
     return error;
 }
 
+Hermes::Error Hermes::Deserialize(pugi::xml_node xmlNode, SupervisoryServiceDescriptionData& data)
+{
+    Error error;
+    Deserialize(xmlNode, "SystemId", error, data.m_systemId);
+    Deserialize(xmlNode, "Version", error, data.m_version);
+    Deserialize(xmlNode, "SupportedFeatures", error, data.m_supportedFeatures);
+    return error;
+}
+
+Hermes::Error Hermes::Deserialize(pugi::xml_node xmlNode, BoardArrivedData& data)
+{
+    Error error;
+    Deserialize(xmlNode, "MachineId", error, data.m_machineId);
+    Deserialize(xmlNode, "UpstreamLaneId", error, data.m_upstreamLaneId);
+    Deserialize(xmlNode, "UpstreamInterfaceId", error, data.m_optionalUpstreamInterfaceId);
+    Deserialize(xmlNode, "MagazineId", error, data.m_optionalMagazineId);
+    Deserialize(xmlNode, "SlotId", error, data.m_optionalSlotId);
+    Deserialize(xmlNode, "BoardTransfer", error, data.m_boardTransfer);
+    Deserialize(xmlNode, "BoardId", error, data.m_boardId);
+    Deserialize(xmlNode, "BoardIdCreatedBy", error, data.m_boardIdCreatedBy);
+    Deserialize(xmlNode, "FailedBoard", error, data.m_failedBoard);
+    Deserialize(xmlNode, "ProductTypeId", error, data.m_optionalProductTypeId);
+    Deserialize(xmlNode, "FlippedBoard", error, data.m_flippedBoard);
+    Deserialize(xmlNode, "TopBarcode", error, data.m_optionalTopBarcode);
+    Deserialize(xmlNode, "BottomBarcode", error, data.m_optionalBottomBarcode);
+    Deserialize(xmlNode, "Length", error, data.m_optionalLengthInMM);
+    Deserialize(xmlNode, "Width", error, data.m_optionalWidthInMM);
+    Deserialize(xmlNode, "Thickness", error, data.m_optionalThicknessInMM);
+    Deserialize(xmlNode, "ConveyorSpeed", error, data.m_optionalConveyorSpeedInMMPerSecs);
+    Deserialize(xmlNode, "TopClearanceHeight", error, data.m_optionalTopClearanceHeightInMM);
+    Deserialize(xmlNode, "BottomClearanceHeight", error, data.m_optionalBottomClearanceHeightInMM);
+    Deserialize(xmlNode, "Weight", error, data.m_optionalWeightInGrams);
+    Deserialize(xmlNode, "WorkOrderId", error, data.m_optionalWorkOrderId);
+    return error;
+}
+
+Hermes::Error Hermes::Deserialize(pugi::xml_node xmlNode, BoardDepartedData& data)
+{
+    Error error;
+    Deserialize(xmlNode, "MachineId", error, data.m_machineId);
+    Deserialize(xmlNode, "DownstreamLaneId", error, data.m_downstreamLaneId);
+    Deserialize(xmlNode, "DownstreamInterfaceId", error, data.m_optionalDownstreamInterfaceId);
+    Deserialize(xmlNode, "MagazineId", error, data.m_optionalMagazineId);
+    Deserialize(xmlNode, "SlotId", error, data.m_optionalSlotId);
+    Deserialize(xmlNode, "BoardTransfer", error, data.m_boardTransfer);
+    Deserialize(xmlNode, "BoardId", error, data.m_boardId);
+    Deserialize(xmlNode, "BoardIdCreatedBy", error, data.m_boardIdCreatedBy);
+    Deserialize(xmlNode, "FailedBoard", error, data.m_failedBoard);
+    Deserialize(xmlNode, "ProductTypeId", error, data.m_optionalProductTypeId);
+    Deserialize(xmlNode, "FlippedBoard", error, data.m_flippedBoard);
+    Deserialize(xmlNode, "TopBarcode", error, data.m_optionalTopBarcode);
+    Deserialize(xmlNode, "BottomBarcode", error, data.m_optionalBottomBarcode);
+    Deserialize(xmlNode, "Length", error, data.m_optionalLengthInMM);
+    Deserialize(xmlNode, "Width", error, data.m_optionalWidthInMM);
+    Deserialize(xmlNode, "Thickness", error, data.m_optionalThicknessInMM);
+    Deserialize(xmlNode, "ConveyorSpeed", error, data.m_optionalConveyorSpeedInMMPerSecs);
+    Deserialize(xmlNode, "TopClearanceHeight", error, data.m_optionalTopClearanceHeightInMM);
+    Deserialize(xmlNode, "BottomClearanceHeight", error, data.m_optionalBottomClearanceHeightInMM);
+    Deserialize(xmlNode, "Weight", error, data.m_optionalWeightInGrams);
+    Deserialize(xmlNode, "WorkOrderId", error, data.m_optionalWorkOrderId);
+    return error;
+}
+
+Hermes::Error Hermes::Deserialize(pugi::xml_node xmlNode, QueryWorkOrderInfoData& data)
+{
+    Error error;
+    Deserialize(xmlNode, "QueryId", error, data.m_optionalQueryId);
+    Deserialize(xmlNode, "MachineId", error, data.m_machineId);
+    Deserialize(xmlNode, "MagazineId", error, data.m_optionalMagazineId);
+    Deserialize(xmlNode, "SlotId", error, data.m_optionalSlotId);
+    Deserialize(xmlNode, "Barcode", error, data.m_optionalBarcode);
+    return error;
+}
+
+Hermes::Error Hermes::Deserialize(pugi::xml_node xmlNode, SendWorkOrderInfoData& data)
+{
+    Error error;
+    Deserialize(xmlNode, "QueryId", error, data.m_optionalQueryId);
+    Deserialize(xmlNode, "WorkOrderId", error, data.m_optionalWorkOrderId);
+    Deserialize(xmlNode, "BoardId", error, data.m_optionalBoardId);
+    Deserialize(xmlNode, "BoardIdCreatedBy", error, data.m_optionalBoardIdCreatedBy);
+    Deserialize(xmlNode, "FailedBoard", error, data.m_optionalFailedBoard);
+    Deserialize(xmlNode, "ProductTypeId", error, data.m_optionalProductTypeId);
+    Deserialize(xmlNode, "FlippedBoard", error, data.m_optionalFlippedBoard);
+    Deserialize(xmlNode, "TopBarcode", error, data.m_optionalTopBarcode);
+    Deserialize(xmlNode, "BottomBarcode", error, data.m_optionalBottomBarcode);
+    Deserialize(xmlNode, "Length", error, data.m_optionalLengthInMM);
+    Deserialize(xmlNode, "Width", error, data.m_optionalWidthInMM);
+    Deserialize(xmlNode, "Thickness", error, data.m_optionalThicknessInMM);
+    Deserialize(xmlNode, "ConveyorSpeed", error, data.m_optionalConveyorSpeedInMMPerSecs);
+    Deserialize(xmlNode, "TopClearanceHeight", error, data.m_optionalTopClearanceHeightInMM);
+    Deserialize(xmlNode, "BottomClearanceHeight", error, data.m_optionalBottomClearanceHeightInMM);
+    Deserialize(xmlNode, "Weight", error, data.m_optionalWeightInGrams);
+    return error;
+}
 

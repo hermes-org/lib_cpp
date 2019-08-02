@@ -142,6 +142,46 @@ namespace Hermes
         static constexpr StringView cTAG_VIEW = StringView{cTAG, sizeof(cTAG) - 1U};
     };
     
+    template<> struct SerializationTraits<SupervisoryServiceDescriptionData>
+    {
+        using Data = CurrentConfigurationData;
+
+        static constexpr const char cTAG[] = "SupervisoryServiceDescription";
+        static constexpr StringView cTAG_VIEW = StringView{cTAG, sizeof(cTAG) - 1U};
+    };
+
+    template<> struct SerializationTraits<BoardArrivedData>
+    {
+        using Data = CurrentConfigurationData;
+
+        static constexpr const char cTAG[] = "BoardArrived";
+        static constexpr StringView cTAG_VIEW = StringView{cTAG, sizeof(cTAG) - 1U};
+    };
+
+    template<> struct SerializationTraits<BoardDepartedData>
+    {
+        using Data = CurrentConfigurationData;
+
+        static constexpr const char cTAG[] = "BoardDeparted";
+        static constexpr StringView cTAG_VIEW = StringView{cTAG, sizeof(cTAG) - 1U};
+    };
+
+    template<> struct SerializationTraits<QueryWorkOrderInfoData>
+    {
+        using Data = CurrentConfigurationData;
+
+        static constexpr const char cTAG[] = "QueryWorkOrderInfo";
+        static constexpr StringView cTAG_VIEW = StringView{cTAG, sizeof(cTAG) - 1U};
+    };
+
+    template<> struct SerializationTraits<SendWorkOrderInfoData>
+    {
+        using Data = CurrentConfigurationData;
+
+        static constexpr const char cTAG[] = "SendWorkOrderInfo";
+        static constexpr StringView cTAG_VIEW = StringView{cTAG, sizeof(cTAG) - 1U};
+    };
+    
     std::string Serialize(const ServiceDescriptionData&);
     std::string Serialize(const BoardAvailableData&);
     std::string Serialize(const RevokeBoardAvailableData&);
@@ -158,6 +198,11 @@ namespace Hermes
     std::string Serialize(const BoardForecastData&);
     std::string Serialize(const QueryBoardInfoData&);
     std::string Serialize(const SendBoardInfoData&);
+    std::string Serialize(const SupervisoryServiceDescriptionData&);
+    std::string Serialize(const BoardArrivedData&);
+    std::string Serialize(const BoardDepartedData&);
+    std::string Serialize(const QueryWorkOrderInfoData&);
+    std::string Serialize(const SendWorkOrderInfoData&);
 
     Error Deserialize(pugi::xml_node, ServiceDescriptionData&);
     Error Deserialize(pugi::xml_node, BoardAvailableData&);
@@ -175,4 +220,10 @@ namespace Hermes
     Error Deserialize(pugi::xml_node, BoardForecastData&);
     Error Deserialize(pugi::xml_node, QueryBoardInfoData&);
     Error Deserialize(pugi::xml_node, SendBoardInfoData&);
+    Error Deserialize(pugi::xml_node, SupervisoryServiceDescriptionData&);
+    Error Deserialize(pugi::xml_node, BoardArrivedData&);
+    Error Deserialize(pugi::xml_node, BoardDepartedData&);
+    Error Deserialize(pugi::xml_node, QueryWorkOrderInfoData&);
+    Error Deserialize(pugi::xml_node, SendWorkOrderInfoData&);
+
 }

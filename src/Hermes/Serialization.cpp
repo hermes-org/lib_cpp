@@ -86,6 +86,27 @@ void HermesSerializeCurrentConfiguration(const HermesCurrentConfigurationData* p
 {
     callback.m_pCall(callback.m_pData, Hermes::ToC(Hermes::Serialize(Hermes::ToCpp(*pData))));
 }
+void HermesSerializeSupervisoryServiceDescription(const HermesSupervisoryServiceDescriptionData* pData, HermesSerializationCallback callback)
+{
+    callback.m_pCall(callback.m_pData, Hermes::ToC(Hermes::Serialize(Hermes::ToCpp(*pData))));
+}
+void HermesSerializeBoardArrived(const HermesBoardArrivedData* pData, HermesSerializationCallback callback)
+{
+    callback.m_pCall(callback.m_pData, Hermes::ToC(Hermes::Serialize(Hermes::ToCpp(*pData))));
+}
+void HermesSerializeBoardDeparted(const HermesBoardDepartedData* pData, HermesSerializationCallback callback)
+{
+    callback.m_pCall(callback.m_pData, Hermes::ToC(Hermes::Serialize(Hermes::ToCpp(*pData))));
+}
+void HermesSerializeQueryWorkOrderInfo(const HermesQueryWorkOrderInfoData* pData, HermesSerializationCallback callback)
+{
+    callback.m_pCall(callback.m_pData, Hermes::ToC(Hermes::Serialize(Hermes::ToCpp(*pData))));
+}
+void HermesSerializeSendWorkOrderInfo(const HermesSendWorkOrderInfoData* pData, HermesSerializationCallback callback)
+{
+    callback.m_pCall(callback.m_pData, Hermes::ToC(Hermes::Serialize(Hermes::ToCpp(*pData))));
+}
+
 
 namespace
 {
@@ -125,6 +146,11 @@ void HermesDeserialize(HermesStringView stringView, const HermesDeserializationC
     Add_<Hermes::GetConfigurationData>(dispatcher, pCallbacks->m_getConfigurationCallback);
     Add_<Hermes::SetConfigurationData>(dispatcher, pCallbacks->m_setConfigurationCallback);
     Add_<Hermes::CurrentConfigurationData>(dispatcher, pCallbacks->m_currentConfigurationCallback);
+    Add_<Hermes::SupervisoryServiceDescriptionData>(dispatcher, pCallbacks->m_supervisoryServiceDescriptionCallback);
+    Add_<Hermes::BoardArrivedData>(dispatcher, pCallbacks->m_boardArrivedCallback);
+    Add_<Hermes::BoardDepartedData>(dispatcher, pCallbacks->m_boardDepartedCallback);
+    Add_<Hermes::QueryWorkOrderInfoData>(dispatcher, pCallbacks->m_queryWorkOrderInfoCallback);
+    Add_<Hermes::SendWorkOrderInfoData>(dispatcher, pCallbacks->m_sendWorkOrderInfoCallback);
 
     std::string xmlParseString{Hermes::ToCpp(stringView)};
     auto error = dispatcher.Dispatch(xmlParseString);

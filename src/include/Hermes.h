@@ -283,13 +283,13 @@ extern "C" {
 
     struct HermesSetConfigurationCallback
     {
-        void(*m_pCall)(void* /*m_pData*/, uint32_t /*sessionId*/, const HermesConnectionInfo*, const HermesSetConfigurationData*);
+        void(*m_pCall)(void* /*m_pData*/, uint32_t /*sessionId*/, const HermesSetConfigurationData*, const HermesConnectionInfo*);
         void* m_pData;
     };
 
     struct HermesGetConfigurationCallback
     {
-        void(*m_pCall)(void* /*m_pData*/, uint32_t/*sessionId*/, const HermesConnectionInfo*, const HermesGetConfigurationData*);
+        void(*m_pCall)(void* /*m_pData*/, uint32_t/*sessionId*/, const HermesGetConfigurationData*, const HermesConnectionInfo*);
         void* m_pData;
     };
 
@@ -341,9 +341,123 @@ extern "C" {
     HERMESPROTOCOL_API void StopHermesConfigurationService(HermesConfigurationService*);
     HERMESPROTOCOL_API void DeleteHermesConfigurationService(HermesConfigurationService*);
 
-    // helper method for generating a GUID:
-    static const uint32_t cHERMES_GUID_LENGTH = 36; // the client must provider a buffer with this size; the GUID is not zero-terminated!
-    HERMESPROTOCOL_API void GenerateHermesGuid(char* pBuffer);
+    // vertical channel:
+    struct HermesVerticalConnectedCallback
+    {
+        void(*m_pCall)(void* /*m_pData*/, uint32_t /*sessionId*/, EHermesVerticalState, const HermesConnectionInfo*);
+        void* m_pData;
+    };
+
+    struct HermesSupervisoryServiceDescriptionCallback
+    {
+        void(*m_pCall)(void* /*m_pData*/, uint32_t /*sessionId*/, EHermesVerticalState, const HermesSupervisoryServiceDescriptionData*);
+        void* m_pData;
+    };
+
+    struct HermesSendWorkOrderInfoCallback
+    {
+        void(*m_pCall)(void* /*m_pData*/, uint32_t /*sessionId*/, const HermesSendWorkOrderInfoData*);
+        void* m_pData;
+    };
+
+    struct HermesVerticalDisconnectedCallback
+    {
+        void(*m_pCall)(void* /*m_pData*/, uint32_t /*sessionId*/, EHermesVerticalState, const HermesError*);
+        void* m_pData;
+    };
+
+    struct HermesVerticalServiceCallbacks
+    {
+        HermesVerticalConnectedCallback m_connectedCallback;
+        HermesSupervisoryServiceDescriptionCallback m_serviceDescriptionCallback;
+        HermesSendWorkOrderInfoCallback m_sendWorkOrderInfoCallback;
+        HermesNotificationCallback m_notificationCallback;
+        HermesCheckAliveCallback m_checkAliveCallback;
+        HermesGetConfigurationCallback m_getConfigurationCallback;
+        HermesSetConfigurationCallback m_setConfigurationCallback;
+        HermesVerticalDisconnectedCallback m_disconnectedCallback;
+        HermesTraceCallback m_traceCallback;
+    };
+
+    // The calling API
+    struct HermesVerticalService; // the opaque handle to the supervisor service
+    HERMESPROTOCOL_API HermesVerticalService* CreateHermesVerticalService(const HermesVerticalServiceCallbacks*);
+    HERMESPROTOCOL_API void RunHermesVerticalService(HermesVerticalService*); // blocks until ::StopHermesDownstream is called
+    HERMESPROTOCOL_API void PostHermesVerticalService(HermesVerticalService*, HermesVoidCallback);
+    HERMESPROTOCOL_API void EnableHermesVerticalService(HermesVerticalService*, const HermesVerticalServiceSettings*);
+
+    HERMESPROTOCOL_API void SignalHermesVerticalServiceDescription(HermesVerticalService*, uint32_t sessionId, const HermesSupervisoryServiceDescriptionData*);
+    HERMESPROTOCOL_API void SignalHermesQueryWorkOrderInfo(HermesVerticalService*, uint32_t sessionId, const HermesQueryWorkOrderInfoData*);
+    HERMESPROTOCOL_API void SignalHermesVerticalServiceNotification(HermesVerticalService*, uint32_t sessionId, const HermesNotificationData*);
+    HERMESPROTOCOL_API void SignalHermesVerticalServiceCheckAlive(HermesVerticalService*, uint32_t sessionId, const HermesCheckAliveData*);
+    HERMESPROTOCOL_API void SignalHermesVerticalCurrentConfiguration(HermesVerticalService*, uint32_t sessionId, const HermesCurrentConfigurationData*);
+
+    // if sessionId == 0, then the following two are propagated to all clients that have specified FeatureBoardTracking
+    HERMESPROTOCOL_API void SignalHermesBoardArrived(HermesVerticalService*, uint32_t sessionId, const HermesBoardArrivedData*);
+    HERMESPROTOCOL_API void SignalHermesBoardDeparted(HermesVerticalService*, uint32_t sessionId, const HermesBoardDepartedData*);
+
+    HERMESPROTOCOL_API void ResetHermesVerticalServiceSession(HermesVerticalService*, uint32_t sessionId, const HermesNotificationData*);
+
+    HERMESPROTOCOL_API void DisableHermesVerticalService(HermesVerticalService*, const HermesNotificationData*);
+    HERMESPROTOCOL_API void StopHermesVerticalService(HermesVerticalService*);
+    HERMESPROTOCOL_API void DeleteHermesVerticalService(HermesVerticalService*);
+
+    struct HermesQueryWorkOrderInfoCallback
+    {
+        void(*m_pCall)(void* /*m_pData*/, uint32_t /*sessionId*/, const HermesQueryWorkOrderInfoData*);
+        void* m_pData;
+    };
+
+    struct HermesBoardArrivedCallback
+    {
+        void(*m_pCall)(void* /*m_pData*/, uint32_t /*sessionId*/, const HermesBoardArrivedData*);
+        void* m_pData;
+    };
+
+    struct HermesBoardDepartedCallback
+    {
+        void(*m_pCall)(void* /*m_pData*/, uint32_t /*sessionId*/, const HermesBoardDepartedData*);
+        void* m_pData;
+    };
+
+    struct HermesVerticalClientCallbacks
+    {
+        HermesVerticalConnectedCallback m_connectedCallback;
+        HermesSupervisoryServiceDescriptionCallback m_serviceDescriptionCallback;
+        HermesBoardArrivedCallback m_boardArrivedCallback;
+        HermesBoardDepartedCallback m_boardDepartedCallback;
+        HermesQueryWorkOrderInfoCallback m_queryWorkOrderInfoCallback;
+        HermesNotificationCallback m_notificationCallback;
+        HermesCurrentConfigurationCallback m_currentConfigurationCallback;
+        HermesCheckAliveCallback m_checkAliveCallback;
+        HermesVerticalDisconnectedCallback m_disconnectedCallback;
+        HermesTraceCallback m_traceCallback;
+    };
+
+
+    // The calling API
+    struct HermesVerticalClient; // the opaque handle to the supervisor service
+    HERMESPROTOCOL_API HermesVerticalClient* CreateHermesVerticalClient(const HermesVerticalClientCallbacks*);
+    HERMESPROTOCOL_API void RunHermesVerticalClient(HermesVerticalClient*); // blocks until ::StopHermesDownstream is called
+    HERMESPROTOCOL_API void PostHermesVerticalClient(HermesVerticalClient*, HermesVoidCallback);
+    HERMESPROTOCOL_API void EnableHermesVerticalClient(HermesVerticalClient*, const HermesVerticalClientSettings*);
+
+    HERMESPROTOCOL_API void SignalHermesVerticalClientDescription(HermesVerticalClient*, uint32_t sessionId, const HermesSupervisoryServiceDescriptionData*);
+    HERMESPROTOCOL_API void SignalHermesSendWorkOrderInfo(HermesVerticalClient*, uint32_t sessionId, const HermesSendWorkOrderInfoData*);
+    HERMESPROTOCOL_API void SignalHermesVerticalGetConfiguration(HermesVerticalClient*, uint32_t sessionId, const HermesGetConfigurationData*);
+    HERMESPROTOCOL_API void SignalHermesVerticalSetConfiguration(HermesVerticalClient*, uint32_t sessionId, const HermesSetConfigurationData*);
+    HERMESPROTOCOL_API void SignalHermesVerticalClientNotification(HermesVerticalClient*, uint32_t sessionId, const HermesNotificationData*);
+    HERMESPROTOCOL_API void SignalHermesVerticalClientCheckAlive(HermesVerticalClient*, uint32_t sessionId, const HermesCheckAliveData*);
+    
+    HERMESPROTOCOL_API void ResetHermesVerticalClient(HermesVerticalClient*, const HermesNotificationData*);
+
+    HERMESPROTOCOL_API void DisableHermesVerticalClient(HermesVerticalClient*, const HermesNotificationData*);
+    HERMESPROTOCOL_API void StopHermesVerticalClient(HermesVerticalClient*);
+    HERMESPROTOCOL_API void DeleteHermesVerticalClient(HermesVerticalClient*);
+
+
+
+
 
 #ifdef __cplusplus
 }

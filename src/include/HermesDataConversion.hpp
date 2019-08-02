@@ -13,10 +13,6 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 ************************************************************************/
-
-
-
-// Copyright (c) ASM Assembly Systems GmbH & Co. KG
 #pragma once
 
 #include "Hermes.h"
@@ -182,6 +178,18 @@ namespace Hermes
     inline void CppToC(ECheckAliveResponseMode data, EHermesCheckAliveResponseMode& result) { result = static_cast<EHermesCheckAliveResponseMode>(data); }
     inline void CToCpp(EHermesCheckAliveResponseMode data, ECheckAliveResponseMode& result) { result = static_cast<ECheckAliveResponseMode>(data); }
 
+    static_assert(size(EBoardArrivedTransfer()) == cHERMES_BOARD_ARRIVED_TRANSFER_ENUM_SIZE, "enum mismatch");
+    inline void CppToC(EBoardArrivedTransfer data, EHermesBoardArrivedTransfer& result) { result = static_cast<EHermesBoardArrivedTransfer>(data); }
+    inline void CToCpp(EHermesBoardArrivedTransfer data, EBoardArrivedTransfer& result) { result = static_cast<EBoardArrivedTransfer>(data); }
+
+    static_assert(size(EBoardDepartedTransfer()) == cHERMES_BOARD_DEPARTED_TRANSFER_ENUM_SIZE, "enum mismatch");
+    inline void CppToC(EBoardDepartedTransfer data, EHermesBoardDepartedTransfer& result) { result = static_cast<EHermesBoardDepartedTransfer>(data); }
+    inline void CToCpp(EHermesBoardDepartedTransfer data, EBoardDepartedTransfer& result) { result = static_cast<EBoardDepartedTransfer>(data); }
+
+    static_assert(size(EVerticalState()) == cHERMES_VERTICAL_STATE_ENUM_SIZE, "enum mismatch");
+    inline EHermesVerticalState ToC(EVerticalState data) { return static_cast<EHermesVerticalState>(data); }
+    inline EVerticalState ToCpp(EHermesVerticalState data) { return static_cast<EVerticalState>(data); }
+
     // UpstreamConfiguration
     inline void CppToC(const UpstreamConfiguration& data, HermesUpstreamConfiguration& result)
     {
@@ -224,6 +232,7 @@ namespace Hermes
         explicit SetConfigurationDataHolder(const SetConfigurationData& data) 
         {
             CppToC(data.m_machineId, m_data.m_machineId);
+            CppToC(data.m_optionalSupervisorySystemPort, m_data.m_pOptionalSupervisorySystemPort);
             CppToC(data.m_upstreamConfigurations, m_upstreamConfigurations);
             CppToC(data.m_downstreamConfigurations, m_downstreamConfigurations);
         }
@@ -246,6 +255,7 @@ namespace Hermes
     {
         SetConfigurationData result;
         CToCpp(data.m_machineId, result.m_machineId);
+        CToCpp(data.m_pOptionalSupervisorySystemPort, result.m_optionalSupervisorySystemPort);
         CToCpp(data.m_upstreamConfigurations, result.m_upstreamConfigurations);
         CToCpp(data.m_downstreamConfigurations, result.m_downstreamConfigurations);
         return result;
@@ -262,6 +272,7 @@ namespace Hermes
         explicit CurrentConfigurationDataHolder(const CurrentConfigurationData& data)
         {
             CppToC(data.m_optionalMachineId, m_data.m_optionalMachineId);
+            CppToC(data.m_optionalSupervisorySystemPort, m_data.m_pOptionalSupervisorySystemPort);
             CppToC(data.m_upstreamConfigurations, m_upstreamConfigurations);
             CppToC(data.m_downstreamConfigurations, m_downstreamConfigurations);
         }
@@ -284,6 +295,7 @@ namespace Hermes
     {
         CurrentConfigurationData result;
         CToCpp(data.m_optionalMachineId, result.m_optionalMachineId);
+        CToCpp(data.m_pOptionalSupervisorySystemPort, result.m_optionalSupervisorySystemPort);
         CToCpp(data.m_upstreamConfigurations, result.m_upstreamConfigurations);
         CToCpp(data.m_downstreamConfigurations, result.m_downstreamConfigurations);
         return result;
@@ -413,6 +425,7 @@ namespace Hermes
             CppToC(data.m_optionalTopClearanceHeightInMM, m_data.m_pOptionalTopClearanceHeightInMM);
             CppToC(data.m_optionalBottomClearanceHeightInMM, m_data.m_pOptionalBottomClearanceHeightInMM);
             CppToC(data.m_optionalWeightInGrams, m_data.m_pOptionalWeightInGrams);
+            CppToC(data.m_optionalWorkOrderId, m_data.m_optionalWorkOrderId);
         }
 
 
@@ -448,6 +461,7 @@ namespace Hermes
         CToCpp(data.m_pOptionalTopClearanceHeightInMM, result.m_optionalTopClearanceHeightInMM);
         CToCpp(data.m_pOptionalBottomClearanceHeightInMM, result.m_optionalBottomClearanceHeightInMM);
         CToCpp(data.m_pOptionalWeightInGrams, result.m_optionalWeightInGrams);
+        CToCpp(data.m_optionalWorkOrderId, result.m_optionalWorkOrderId);
         return result;
     }
 
@@ -473,6 +487,7 @@ namespace Hermes
         CppToC(data.m_optionalTopClearanceHeightInMM, result.m_pOptionalTopClearanceHeightInMM);
         CppToC(data.m_optionalBottomClearanceHeightInMM, result.m_pOptionalBottomClearanceHeightInMM);
         CppToC(data.m_optionalWeightInGrams, result.m_pOptionalWeightInGrams);
+        CppToC(data.m_optionalWorkOrderId, result.m_optionalWorkOrderId);
         return result;
     }
     inline BoardAvailableData ToCpp(const HermesBoardAvailableData& data) 
@@ -492,6 +507,7 @@ namespace Hermes
         CToCpp(data.m_pOptionalTopClearanceHeightInMM, result.m_optionalTopClearanceHeightInMM);
         CToCpp(data.m_pOptionalBottomClearanceHeightInMM, result.m_optionalBottomClearanceHeightInMM);
         CToCpp(data.m_pOptionalWeightInGrams, result.m_optionalWeightInGrams);
+        CToCpp(data.m_optionalWorkOrderId, result.m_optionalWorkOrderId);
         return result;
     }
 
@@ -618,6 +634,7 @@ namespace Hermes
         CppToC(data.m_optionalTopClearanceHeightInMM, result.m_pOptionalTopClearanceHeightInMM);
         CppToC(data.m_optionalBottomClearanceHeightInMM, result.m_pOptionalBottomClearanceHeightInMM);
         CppToC(data.m_optionalWeightInGrams, result.m_pOptionalWeightInGrams);
+        CppToC(data.m_optionalWorkOrderId, result.m_optionalWorkOrderId);
         return result;
     }
     inline BoardForecastData ToCpp(const HermesBoardForecastData& data)
@@ -639,6 +656,7 @@ namespace Hermes
         CToCpp(data.m_pOptionalTopClearanceHeightInMM, result.m_optionalTopClearanceHeightInMM);
         CToCpp(data.m_pOptionalBottomClearanceHeightInMM, result.m_optionalBottomClearanceHeightInMM);
         CToCpp(data.m_pOptionalWeightInGrams, result.m_optionalWeightInGrams);
+        CToCpp(data.m_optionalWorkOrderId, result.m_optionalWorkOrderId);
         return result;
     }
 
@@ -679,6 +697,7 @@ namespace Hermes
             CppToC(data.m_optionalTopClearanceHeightInMM, m_data.m_pOptionalTopClearanceHeightInMM);
             CppToC(data.m_optionalBottomClearanceHeightInMM, m_data.m_pOptionalBottomClearanceHeightInMM);
             CppToC(data.m_optionalWeightInGrams, m_data.m_pOptionalWeightInGrams);
+            CppToC(data.m_optionalWorkOrderId, m_data.m_optionalWorkOrderId);
         }
 
 
@@ -702,6 +721,289 @@ namespace Hermes
     inline SendBoardInfoData ToCpp(const HermesSendBoardInfoData& data)
     {
         SendBoardInfoData result;
+        CToCpp(data.m_optionalBoardId, result.m_optionalBoardId);
+        CToCpp(data.m_optionalBoardIdCreatedBy, result.m_optionalBoardIdCreatedBy);
+        CToCpp(data.m_pOptionalFailedBoard, result.m_optionalFailedBoard);
+        CToCpp(data.m_optionalProductTypeId, result.m_optionalProductTypeId);
+        CToCpp(data.m_pOptionalFlippedBoard, result.m_optionalFlippedBoard);
+        CToCpp(data.m_optionalTopBarcode, result.m_optionalTopBarcode);
+        CToCpp(data.m_optionalBottomBarcode, result.m_optionalBottomBarcode);
+        CToCpp(data.m_pOptionalLengthInMM, result.m_optionalLengthInMM);
+        CToCpp(data.m_pOptionalWidthInMM, result.m_optionalWidthInMM);
+        CToCpp(data.m_pOptionalThicknessInMM, result.m_optionalThicknessInMM);
+        CToCpp(data.m_pOptionalConveyorSpeedInMMPerSecs, result.m_optionalConveyorSpeedInMMPerSecs);
+        CToCpp(data.m_pOptionalTopClearanceHeightInMM, result.m_optionalTopClearanceHeightInMM);
+        CToCpp(data.m_pOptionalBottomClearanceHeightInMM, result.m_optionalBottomClearanceHeightInMM);
+        CToCpp(data.m_pOptionalWeightInGrams, result.m_optionalWeightInGrams);
+        CToCpp(data.m_optionalWorkOrderId, result.m_optionalWorkOrderId);
+        return result;
+    }
+
+    // SupervisoryFeatures
+    inline void CppToC(const FeatureConfiguration&, HermesFeatureConfiguration&) {};
+    inline void CppToC(const FeatureBoardTracking&, HermesFeatureBoardTracking&) {};
+    inline void CppToC(const FeatureQueryWorkOrderInfo&, HermesFeatureQueryWorkOrderInfo&) {};
+    inline void CppToC(const FeatureSendWorkOrderInfo&, HermesFeatureSendWorkOrderInfo&) {};
+
+    inline void CToCpp(const HermesFeatureConfiguration&, FeatureConfiguration&) {};
+    inline void CToCpp(const HermesFeatureBoardTracking&, FeatureBoardTracking&) {};
+    inline void CToCpp(const HermesFeatureQueryWorkOrderInfo&, FeatureQueryWorkOrderInfo&) {};
+    inline void CToCpp(const HermesFeatureSendWorkOrderInfo&, FeatureSendWorkOrderInfo&) {};
+
+    // SupervisoryFeatures
+    struct SupervisoryFeaturesHolder
+    {
+        Optional<HermesFeatureConfiguration> m_optionalFeatureConfiguration{};
+        Optional<HermesFeatureCheckAliveResponse> m_optionalFeatureCheckAliveResponse{};
+        Optional<HermesFeatureBoardTracking> m_optionalFeatureBoardTracking{};
+        Optional<HermesFeatureQueryWorkOrderInfo> m_optionalFeatureQueryWorkOrderInfo{};
+        Optional<HermesFeatureSendWorkOrderInfo> m_optionalFeatureSendWorkOrderInfo{};
+        HermesSupervisoryFeatures m_data{};
+    };
+
+    inline void CppToC(const SupervisoryFeatures& data, SupervisoryFeaturesHolder& result)
+    {
+        CppToC(data.m_optionalFeatureConfiguration, result.m_optionalFeatureConfiguration);
+        CppToC(data.m_optionalFeatureCheckAliveResponse, result.m_optionalFeatureCheckAliveResponse);
+        CppToC(data.m_optionalFeatureBoardTracking, result.m_optionalFeatureBoardTracking);
+        CppToC(data.m_optionalFeatureQueryWorkOrderInfo, result.m_optionalFeatureQueryWorkOrderInfo);
+        CppToC(data.m_optionalFeatureSendWorkOrderInfo, result.m_optionalFeatureSendWorkOrderInfo);
+    }
+
+    inline void CToCpp(const HermesSupervisoryFeatures& data, SupervisoryFeatures& result)
+    {
+        CToCpp(data.m_pOptionalFeatureConfiguration, result.m_optionalFeatureConfiguration);
+        CToCpp(data.m_pOptionalFeatureCheckAliveResponse, result.m_optionalFeatureCheckAliveResponse);
+        CToCpp(data.m_pOptionalFeatureBoardTracking, result.m_optionalFeatureBoardTracking);
+        CToCpp(data.m_pOptionalFeatureQueryWorkOrderInfo, result.m_optionalFeatureQueryWorkOrderInfo);
+        CToCpp(data.m_pOptionalFeatureSendWorkOrderInfo, result.m_optionalFeatureSendWorkOrderInfo);
+    }
+
+    inline void Adjust(SupervisoryFeaturesHolder& data, const HermesSupervisoryFeatures*& pResult)
+    {
+        Adjust(data.m_optionalFeatureConfiguration, data.m_data.m_pOptionalFeatureConfiguration);
+        Adjust(data.m_optionalFeatureCheckAliveResponse, data.m_data.m_pOptionalFeatureCheckAliveResponse);
+        Adjust(data.m_optionalFeatureBoardTracking, data.m_data.m_pOptionalFeatureBoardTracking);
+        Adjust(data.m_optionalFeatureQueryWorkOrderInfo, data.m_data.m_pOptionalFeatureQueryWorkOrderInfo);
+        Adjust(data.m_optionalFeatureSendWorkOrderInfo, data.m_data.m_pOptionalFeatureSendWorkOrderInfo);
+        pResult = &data.m_data;
+    }
+
+    class SupervisoryServiceDescriptionDataHolder
+    {
+    public:
+        explicit SupervisoryServiceDescriptionDataHolder(const SupervisoryServiceDescriptionData& data)
+        {
+            CppToC(data.m_systemId, m_data.m_systemId);
+            CppToC(data.m_version, m_data.m_version);
+            CppToC(data.m_supportedFeatures, m_supervisoryFeatures);
+        }
+
+        const HermesSupervisoryServiceDescriptionData* operator&()
+        {
+            Adjust(m_supervisoryFeatures, m_data.m_pSupportedFeatures);
+            return &m_data;
+        }
+
+    private:
+        SupervisoryFeaturesHolder m_supervisoryFeatures;
+        HermesSupervisoryServiceDescriptionData m_data{};
+    };
+
+    // SupervisoryServiceDescriptionData
+    inline SupervisoryServiceDescriptionDataHolder ToC(const SupervisoryServiceDescriptionData& data)
+    {
+        return SupervisoryServiceDescriptionDataHolder(data);
+    }
+    inline SupervisoryServiceDescriptionData ToCpp(const HermesSupervisoryServiceDescriptionData& data)
+    {
+        SupervisoryServiceDescriptionData result;
+        CToCpp(data.m_systemId, result.m_systemId);
+        CToCpp(data.m_version, result.m_version);
+        CToCpp(data.m_pSupportedFeatures, result.m_supportedFeatures);
+        return result;
+    }
+
+    inline HermesBoardArrivedData ToC(const BoardArrivedData& data)
+    {
+        HermesBoardArrivedData result{};
+        CppToC(data.m_machineId, result.m_machineId);
+        CppToC(data.m_upstreamLaneId, result.m_upstreamLaneId);
+        CppToC(data.m_optionalUpstreamInterfaceId, result.m_optionalUpstreamInterfaceId);
+        CppToC(data.m_optionalMagazineId, result.m_optionalMagazineId);
+        CppToC(data.m_optionalSlotId, result.m_pOptionalSlotId);
+        CppToC(data.m_boardTransfer, result.m_boardTransfer);
+        CppToC(data.m_boardId, result.m_boardId);
+        CppToC(data.m_boardIdCreatedBy, result.m_boardIdCreatedBy);
+        CppToC(data.m_failedBoard, result.m_failedBoard);
+        CppToC(data.m_optionalProductTypeId, result.m_optionalProductTypeId);
+        CppToC(data.m_flippedBoard, result.m_flippedBoard);
+        CppToC(data.m_optionalTopBarcode, result.m_optionalTopBarcode);
+        CppToC(data.m_optionalBottomBarcode, result.m_optionalBottomBarcode);
+        CppToC(data.m_optionalLengthInMM, result.m_pOptionalLengthInMM);
+        CppToC(data.m_optionalWidthInMM, result.m_pOptionalWidthInMM);
+        CppToC(data.m_optionalThicknessInMM, result.m_pOptionalThicknessInMM);
+        CppToC(data.m_optionalConveyorSpeedInMMPerSecs, result.m_pOptionalConveyorSpeedInMMPerSecs);
+        CppToC(data.m_optionalTopClearanceHeightInMM, result.m_pOptionalTopClearanceHeightInMM);
+        CppToC(data.m_optionalBottomClearanceHeightInMM, result.m_pOptionalBottomClearanceHeightInMM);
+        CppToC(data.m_optionalWeightInGrams, result.m_pOptionalWeightInGrams);
+        CppToC(data.m_optionalWorkOrderId, result.m_optionalWorkOrderId);
+
+        return result;
+    }
+    inline BoardArrivedData ToCpp(const HermesBoardArrivedData& data)
+    {
+        BoardArrivedData result;
+
+        CToCpp(data.m_machineId, result.m_machineId);
+        CToCpp(data.m_upstreamLaneId, result.m_upstreamLaneId);
+        CToCpp(data.m_optionalUpstreamInterfaceId, result.m_optionalUpstreamInterfaceId);
+        CToCpp(data.m_optionalMagazineId, result.m_optionalMagazineId);
+        CToCpp(data.m_pOptionalSlotId, result.m_optionalSlotId);
+        CToCpp(data.m_boardTransfer, result.m_boardTransfer);
+        CToCpp(data.m_boardId, result.m_boardId);
+        CToCpp(data.m_boardIdCreatedBy, result.m_boardIdCreatedBy);
+        CToCpp(data.m_failedBoard, result.m_failedBoard);
+        CToCpp(data.m_optionalProductTypeId, result.m_optionalProductTypeId);
+        CToCpp(data.m_flippedBoard, result.m_flippedBoard);
+        CToCpp(data.m_optionalTopBarcode, result.m_optionalTopBarcode);
+        CToCpp(data.m_optionalBottomBarcode, result.m_optionalBottomBarcode);
+        CToCpp(data.m_pOptionalLengthInMM, result.m_optionalLengthInMM);
+        CToCpp(data.m_pOptionalWidthInMM, result.m_optionalWidthInMM);
+        CToCpp(data.m_pOptionalThicknessInMM, result.m_optionalThicknessInMM);
+        CToCpp(data.m_pOptionalConveyorSpeedInMMPerSecs, result.m_optionalConveyorSpeedInMMPerSecs);
+        CToCpp(data.m_pOptionalTopClearanceHeightInMM, result.m_optionalTopClearanceHeightInMM);
+        CToCpp(data.m_pOptionalBottomClearanceHeightInMM, result.m_optionalBottomClearanceHeightInMM);
+        CToCpp(data.m_pOptionalWeightInGrams, result.m_optionalWeightInGrams);
+        CToCpp(data.m_optionalWorkOrderId, result.m_optionalWorkOrderId);
+        return result;
+    }
+
+    inline HermesBoardDepartedData ToC(const BoardDepartedData& data)
+    {
+        HermesBoardDepartedData result{};
+        CppToC(data.m_machineId, result.m_machineId);
+        CppToC(data.m_downstreamLaneId, result.m_downstreamLaneId);
+        CppToC(data.m_optionalDownstreamInterfaceId, result.m_optionalDownstreamInterfaceId);
+        CppToC(data.m_optionalMagazineId, result.m_optionalMagazineId);
+        CppToC(data.m_optionalSlotId, result.m_pOptionalSlotId);
+        CppToC(data.m_boardTransfer, result.m_boardTransfer);
+        CppToC(data.m_boardId, result.m_boardId);
+        CppToC(data.m_boardIdCreatedBy, result.m_boardIdCreatedBy);
+        CppToC(data.m_failedBoard, result.m_failedBoard);
+        CppToC(data.m_optionalProductTypeId, result.m_optionalProductTypeId);
+        CppToC(data.m_flippedBoard, result.m_flippedBoard);
+        CppToC(data.m_optionalTopBarcode, result.m_optionalTopBarcode);
+        CppToC(data.m_optionalBottomBarcode, result.m_optionalBottomBarcode);
+        CppToC(data.m_optionalLengthInMM, result.m_pOptionalLengthInMM);
+        CppToC(data.m_optionalWidthInMM, result.m_pOptionalWidthInMM);
+        CppToC(data.m_optionalThicknessInMM, result.m_pOptionalThicknessInMM);
+        CppToC(data.m_optionalConveyorSpeedInMMPerSecs, result.m_pOptionalConveyorSpeedInMMPerSecs);
+        CppToC(data.m_optionalTopClearanceHeightInMM, result.m_pOptionalTopClearanceHeightInMM);
+        CppToC(data.m_optionalBottomClearanceHeightInMM, result.m_pOptionalBottomClearanceHeightInMM);
+        CppToC(data.m_optionalWeightInGrams, result.m_pOptionalWeightInGrams);
+        CppToC(data.m_optionalWorkOrderId, result.m_optionalWorkOrderId);
+
+        return result;
+    }
+    inline BoardDepartedData ToCpp(const HermesBoardDepartedData& data)
+    {
+        BoardDepartedData result;
+
+        CToCpp(data.m_machineId, result.m_machineId);
+        CToCpp(data.m_downstreamLaneId, result.m_downstreamLaneId);
+        CToCpp(data.m_optionalDownstreamInterfaceId, result.m_optionalDownstreamInterfaceId);
+        CToCpp(data.m_optionalMagazineId, result.m_optionalMagazineId);
+        CToCpp(data.m_pOptionalSlotId, result.m_optionalSlotId);
+        CToCpp(data.m_boardTransfer, result.m_boardTransfer);
+
+        CToCpp(data.m_boardId, result.m_boardId);
+        CToCpp(data.m_boardIdCreatedBy, result.m_boardIdCreatedBy);
+        CToCpp(data.m_failedBoard, result.m_failedBoard);
+        CToCpp(data.m_optionalProductTypeId, result.m_optionalProductTypeId);
+        CToCpp(data.m_flippedBoard, result.m_flippedBoard);
+        CToCpp(data.m_optionalTopBarcode, result.m_optionalTopBarcode);
+        CToCpp(data.m_optionalBottomBarcode, result.m_optionalBottomBarcode);
+        CToCpp(data.m_pOptionalLengthInMM, result.m_optionalLengthInMM);
+        CToCpp(data.m_pOptionalWidthInMM, result.m_optionalWidthInMM);
+        CToCpp(data.m_pOptionalThicknessInMM, result.m_optionalThicknessInMM);
+        CToCpp(data.m_pOptionalConveyorSpeedInMMPerSecs, result.m_optionalConveyorSpeedInMMPerSecs);
+        CToCpp(data.m_pOptionalTopClearanceHeightInMM, result.m_optionalTopClearanceHeightInMM);
+        CToCpp(data.m_pOptionalBottomClearanceHeightInMM, result.m_optionalBottomClearanceHeightInMM);
+        CToCpp(data.m_pOptionalWeightInGrams, result.m_optionalWeightInGrams);
+        CToCpp(data.m_optionalWorkOrderId, result.m_optionalWorkOrderId);
+        return result;
+    }
+
+    // QueryWorkOrderInfoData
+    inline HermesQueryWorkOrderInfoData ToC(const QueryWorkOrderInfoData& data)
+    {
+        HermesQueryWorkOrderInfoData result{};
+        CppToC(data.m_optionalQueryId, result.m_optionalQueryId);
+        CppToC(data.m_machineId, result.m_machineId);
+        CppToC(data.m_optionalMagazineId, result.m_optionalMagazineId);
+        CppToC(data.m_optionalSlotId, result.m_pOptionalSlotId);
+        CppToC(data.m_optionalBarcode, result.m_optionalBarcode);
+        return result;
+    }
+    inline QueryWorkOrderInfoData ToCpp(const HermesQueryWorkOrderInfoData& data)
+    {
+        QueryWorkOrderInfoData result;
+        CToCpp(data.m_optionalQueryId, result.m_optionalQueryId);
+        CToCpp(data.m_machineId, result.m_machineId);
+        CToCpp(data.m_optionalMagazineId, result.m_optionalMagazineId);
+        CToCpp(data.m_pOptionalSlotId, result.m_optionalSlotId);
+        CToCpp(data.m_optionalBarcode, result.m_optionalBarcode);
+        return result;
+    }
+
+    // SendWorkOrderInfo
+    class SendWorkOrderInfoDataHolder
+    {
+    public:
+        explicit SendWorkOrderInfoDataHolder(const SendWorkOrderInfoData& data)
+        {
+            CppToC(data.m_optionalQueryId, m_data.m_optionalQueryId);
+            CppToC(data.m_optionalWorkOrderId, m_data.m_optionalWorkOrderId);
+            CppToC(data.m_optionalBoardId, m_data.m_optionalBoardId);
+            CppToC(data.m_optionalBoardIdCreatedBy, m_data.m_optionalBoardIdCreatedBy);
+            CppToC(data.m_optionalFailedBoard, m_optionalFailedBoard);
+            CppToC(data.m_optionalProductTypeId, m_data.m_optionalProductTypeId);
+            CppToC(data.m_optionalFlippedBoard, m_optionalFlippedBoard);
+            CppToC(data.m_optionalTopBarcode, m_data.m_optionalTopBarcode);
+            CppToC(data.m_optionalBottomBarcode, m_data.m_optionalBottomBarcode);
+            CppToC(data.m_optionalLengthInMM, m_data.m_pOptionalLengthInMM);
+            CppToC(data.m_optionalWidthInMM, m_data.m_pOptionalWidthInMM);
+            CppToC(data.m_optionalThicknessInMM, m_data.m_pOptionalThicknessInMM);
+            CppToC(data.m_optionalConveyorSpeedInMMPerSecs, m_data.m_pOptionalConveyorSpeedInMMPerSecs);
+            CppToC(data.m_optionalTopClearanceHeightInMM, m_data.m_pOptionalTopClearanceHeightInMM);
+            CppToC(data.m_optionalBottomClearanceHeightInMM, m_data.m_pOptionalBottomClearanceHeightInMM);
+            CppToC(data.m_optionalWeightInGrams, m_data.m_pOptionalWeightInGrams);
+        }
+
+
+        const HermesSendWorkOrderInfoData* operator&()
+        {
+            Adjust(m_optionalFailedBoard, m_data.m_pOptionalFailedBoard);
+            Adjust(m_optionalFlippedBoard, m_data.m_pOptionalFlippedBoard);
+            return &m_data;
+        }
+
+    private:
+        Optional<EHermesBoardQuality> m_optionalFailedBoard;
+        Optional<EHermesFlippedBoard> m_optionalFlippedBoard;
+        HermesSendWorkOrderInfoData m_data{};
+    };
+
+    inline SendWorkOrderInfoDataHolder ToC(const SendWorkOrderInfoData& data)
+    {
+        return SendWorkOrderInfoDataHolder{data};
+    }
+    inline SendWorkOrderInfoData ToCpp(const HermesSendWorkOrderInfoData& data)
+    {
+        SendWorkOrderInfoData result;
+        CToCpp(data.m_optionalQueryId, result.m_optionalQueryId);
+        CToCpp(data.m_optionalWorkOrderId, result.m_optionalWorkOrderId);
         CToCpp(data.m_optionalBoardId, result.m_optionalBoardId);
         CToCpp(data.m_optionalBoardIdCreatedBy, result.m_optionalBoardIdCreatedBy);
         CToCpp(data.m_pOptionalFailedBoard, result.m_optionalFailedBoard);
@@ -784,6 +1086,52 @@ namespace Hermes
         ConfigurationServiceSettings result;
         CToCpp(data.m_port, result.m_port);
         CToCpp(data.m_reconnectWaitTimeInSeconds, result.m_reconnectWaitTimeInSeconds);
+        return result;
+    }
+
+    // VerticServiceSettings
+    inline HermesVerticalServiceSettings ToC(const VerticalServiceSettings& data)
+    {
+        HermesVerticalServiceSettings result{};
+        CppToC(data.m_systemId, result.m_systemId);
+        CppToC(data.m_port, result.m_port);
+        CppToC(data.m_reconnectWaitTimeInSeconds, result.m_reconnectWaitTimeInSeconds);
+        CppToC(data.m_checkAlivePeriodInSeconds, result.m_checkAlivePeriodInSeconds);
+        CppToC(data.m_checkAliveResponseMode, result.m_checkAliveResponseMode);
+        return result;
+    }
+    inline VerticalServiceSettings ToCpp(const HermesVerticalServiceSettings& data)
+    {
+        VerticalServiceSettings result;
+        CToCpp(data.m_systemId, result.m_systemId);
+        CToCpp(data.m_port, result.m_port);
+        CToCpp(data.m_reconnectWaitTimeInSeconds, result.m_reconnectWaitTimeInSeconds);
+        CToCpp(data.m_checkAlivePeriodInSeconds, result.m_checkAlivePeriodInSeconds);
+        CToCpp(data.m_checkAliveResponseMode, result.m_checkAliveResponseMode);
+        return result;
+    }
+
+    // VerticClientSettings
+    inline HermesVerticalClientSettings ToC(const VerticalClientSettings& data)
+    {
+        HermesVerticalClientSettings result{};
+        CppToC(data.m_systemId, result.m_systemId);
+        CppToC(data.m_hostAddress, result.m_hostAddress);
+        CppToC(data.m_port, result.m_port);
+        CppToC(data.m_reconnectWaitTimeInSeconds, result.m_reconnectWaitTimeInSeconds);
+        CppToC(data.m_checkAlivePeriodInSeconds, result.m_checkAlivePeriodInSeconds);
+        CppToC(data.m_checkAliveResponseMode, result.m_checkAliveResponseMode);
+        return result;
+    }
+    inline VerticalClientSettings ToCpp(const HermesVerticalClientSettings& data)
+    {
+        VerticalClientSettings result;
+        CToCpp(data.m_systemId, result.m_systemId);
+        CToCpp(data.m_hostAddress, result.m_hostAddress);
+        CToCpp(data.m_port, result.m_port);
+        CToCpp(data.m_reconnectWaitTimeInSeconds, result.m_reconnectWaitTimeInSeconds);
+        CToCpp(data.m_checkAlivePeriodInSeconds, result.m_checkAlivePeriodInSeconds);
+        CToCpp(data.m_checkAliveResponseMode, result.m_checkAliveResponseMode);
         return result;
     }
 

@@ -52,6 +52,11 @@ namespace Hermes
     inline std::string ToXml(const GetConfigurationData& data) { return SerializeToXml_(data, &::HermesSerializeGetConfiguration); }
     inline std::string ToXml(const SetConfigurationData& data) { return SerializeToXml_(data, &::HermesSerializeSetConfiguration); }
     inline std::string ToXml(const CurrentConfigurationData& data) { return SerializeToXml_(data, &::HermesSerializeCurrentConfiguration); }
+    inline std::string ToXml(const SupervisoryServiceDescriptionData& data) { return SerializeToXml_(data, &::HermesSerializeSupervisoryServiceDescription); }
+    inline std::string ToXml(const BoardArrivedData& data) { return SerializeToXml_(data, &::HermesSerializeBoardArrived); }
+    inline std::string ToXml(const BoardDepartedData& data) { return SerializeToXml_(data, &::HermesSerializeBoardDeparted); }
+    inline std::string ToXml(const QueryWorkOrderInfoData& data) { return SerializeToXml_(data, &::HermesSerializeQueryWorkOrderInfo); }
+    inline std::string ToXml(const SendWorkOrderInfoData& data) { return SerializeToXml_(data, &::HermesSerializeSendWorkOrderInfo); }
 
 
     template<class DataT>
@@ -199,6 +204,51 @@ namespace Hermes
         callbacks.m_currentConfigurationCallback.m_pCall = [](void* pOptionalData, const HermesCurrentConfigurationData* pData)
         {
             *static_cast<Optional<CurrentConfigurationData>*>(pOptionalData) = Hermes::ToCpp(*pData);
+        };
+    }
+    template<>
+    inline void SetDeserializationCallback_(Optional<SupervisoryServiceDescriptionData>& optionalData, HermesDeserializationCallbacks& callbacks)
+    {
+        callbacks.m_supervisoryServiceDescriptionCallback.m_pData = &optionalData;
+        callbacks.m_supervisoryServiceDescriptionCallback.m_pCall = [](void* pOptionalData, const HermesSupervisoryServiceDescriptionData* pData)
+        {
+            *static_cast<Optional<SupervisoryServiceDescriptionData>*>(pOptionalData) = Hermes::ToCpp(*pData);
+        };
+    }
+    template<>
+    inline void SetDeserializationCallback_(Optional<BoardArrivedData>& optionalData, HermesDeserializationCallbacks& callbacks)
+    {
+        callbacks.m_boardArrivedCallback.m_pData = &optionalData;
+        callbacks.m_boardArrivedCallback.m_pCall = [](void* pOptionalData, const HermesBoardArrivedData* pData)
+        {
+            *static_cast<Optional<BoardArrivedData>*>(pOptionalData) = Hermes::ToCpp(*pData);
+        };
+    }
+    template<>
+    inline void SetDeserializationCallback_(Optional<BoardDepartedData>& optionalData, HermesDeserializationCallbacks& callbacks)
+    {
+        callbacks.m_boardDepartedCallback.m_pData = &optionalData;
+        callbacks.m_boardDepartedCallback.m_pCall = [](void* pOptionalData, const HermesBoardDepartedData* pData)
+        {
+            *static_cast<Optional<BoardDepartedData>*>(pOptionalData) = Hermes::ToCpp(*pData);
+        };
+    }
+    template<>
+    inline void SetDeserializationCallback_(Optional<QueryWorkOrderInfoData>& optionalData, HermesDeserializationCallbacks& callbacks)
+    {
+        callbacks.m_queryWorkOrderInfoCallback.m_pData = &optionalData;
+        callbacks.m_queryWorkOrderInfoCallback.m_pCall = [](void* pOptionalData, const HermesQueryWorkOrderInfoData* pData)
+        {
+            *static_cast<Optional<QueryWorkOrderInfoData>*>(pOptionalData) = Hermes::ToCpp(*pData);
+        };
+    }
+    template<>
+    inline void SetDeserializationCallback_(Optional<SendWorkOrderInfoData>& optionalData, HermesDeserializationCallbacks& callbacks)
+    {
+        callbacks.m_sendWorkOrderInfoCallback.m_pData = &optionalData;
+        callbacks.m_sendWorkOrderInfoCallback.m_pCall = [](void* pOptionalData, const HermesSendWorkOrderInfoData* pData)
+        {
+            *static_cast<Optional<SendWorkOrderInfoData>*>(pOptionalData) = Hermes::ToCpp(*pData);
         };
     }
 

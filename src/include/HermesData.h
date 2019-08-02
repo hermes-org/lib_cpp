@@ -72,6 +72,24 @@ extern "C" {
         cHERMES_TRANSFER_STATE_ENUM_SIZE = 4
     };
 
+/* The Hermes Standard 3.23 */
+enum EHermesBoardArrivedTransfer
+{
+    eHERMES_BOARD_ARRIVED_TRANSFER_TRANSFERRED,
+    eHERMES_BOARD_ARRIVED_TRANSFER_LOADED,
+    eHERMES_BOARD_ARRIVED_TRANSFER_INSERTED,
+    cHERMES_BOARD_ARRIVED_TRANSFER_ENUM_SIZE = 3
+};
+
+/* The Hermes Standard 3.24 */
+enum EHermesBoardDepartedTransfer
+{
+    eHERMES_BOARD_DEPARTED_TRANSFER_TRANSFERRED,
+    eHERMES_BOARD_DEPARTED_TRANSFER_UNLOADED,
+    eHERMES_BOARD_DEPARTED_TRANSFER_REMOVED,
+    cHERMES_BOARD_DEPARTED_TRANSFER_ENUM_SIZE = 3
+};
+
     /* The Hermes Standard chapter 2.6 */
     enum EHermesState
     {
@@ -129,6 +147,17 @@ extern "C" {
         cHERMES_ERROR_CODE_ENUM_SIZE = 6
     };
 
+/* The Hermes Standard chapter 2.5.3 */
+enum EHermesVerticalState
+{
+    eHERMES_VERTICAL_STATE_NOT_CONNECTED,
+    eHERMES_VERTICAL_STATE_SOCKET_CONNECTED,
+    eHERMES_VERTICAL_STATE_SUPERVISORY_SERVICE_DESCRIPTION,
+    eHERMES_VERTICAL_STATE_CONNECTED,
+    eHERMES_VERTICAL_STATE_DISCONNECTED,
+    cHERMES_VERTICAL_STATE_ENUM_SIZE = 5
+};
+
     /* CheckAlive, The Hermes Standard 3.3 */
     struct HermesCheckAliveData
     {
@@ -158,8 +187,7 @@ extern "C" {
         const HermesFeatureBoardForecast* m_pOptionalFeatureBoardForecast;
         const HermesFeatureCheckAliveResponse* m_pOptionalFeatureCheckAliveResponse;
         const HermesFeatureQueryBoardInfo* m_pOptionalFeatureQueryBoardInfo;
-        const HermesFeatureSendBoardInfo* m_pOptionalFeatureSendBoardInfo;
-    };
+    const HermesFeatureSendBoardInfo* m_pOptionalFeatureSendBoardInfo;};
 
     /* ServiceDescription, The Hermes Standard 3.4 */
     struct HermesServiceDescriptionData
@@ -196,11 +224,13 @@ extern "C" {
         const double* m_pOptionalTopClearanceHeightInMM;
         const double* m_pOptionalBottomClearanceHeightInMM;
         const double* m_pOptionalWeightInGrams;
+    HermesStringView m_optionalWorkOrderId;
     };
 
     /* RevokeBoardAvailable, The Hermes Standard 3.7 */
     struct HermesRevokeBoardAvailableData
-    {};
+{
+};
 
     /* MachineReady, The Hermes Standard 3.8 */
     struct HermesMachineReadyData
@@ -219,11 +249,13 @@ extern "C" {
         const double* m_pOptionalTopClearanceHeightInMM;
         const double* m_pOptionalBottomClearanceHeightInMM;
         const double* m_pOptionalWeightInGrams;
+    HermesStringView m_optionalWorkOrderId;
     };
 
     /* RevokeMachineReady, The Hermes Standard 3.9 */
     struct HermesRevokeMachineReadyData
-    {};
+{
+};
 
     /* StartTransport, The Hermes Standard 3.10 */
     struct HermesStartTransportData
@@ -252,8 +284,7 @@ extern "C" {
         uint32_t m_upstreamLaneId;
         HermesStringView m_optionalUpstreamInterfaceId;
         HermesStringView m_hostAddress;
-        uint16_t m_port;
-    };
+    uint16_t m_port;};
 
     /* The Hermes Standard 3.13 */
     struct HermesUpstreamConfigurations
@@ -268,8 +299,7 @@ extern "C" {
         uint32_t m_downstreamLaneId;
         HermesStringView m_optionalDownstreamInterfaceId;
         HermesStringView m_optionalClientAddress;
-        uint16_t m_port;
-    };
+    uint16_t m_port;};
 
     /* The Hermes Standard 3.13 */
     struct HermesDownstreamConfigurations
@@ -282,18 +312,21 @@ extern "C" {
     struct HermesSetConfigurationData
     {
         HermesStringView m_machineId;
+    const uint16_t* m_pOptionalSupervisorySystemPort;
         HermesUpstreamConfigurations m_upstreamConfigurations;
         HermesDownstreamConfigurations m_downstreamConfigurations;
     };
 
     /* GetConfiguration, The Hermes Standard 3.14 */
     struct HermesGetConfigurationData
-    {};
+{
+};
 
     /* CurrentConfiguration, The Hermes Standard 3.15 */
     struct HermesCurrentConfigurationData
     {
         HermesStringView m_optionalMachineId;
+    const uint16_t* m_pOptionalSupervisorySystemPort;
         HermesUpstreamConfigurations m_upstreamConfigurations;
         HermesDownstreamConfigurations m_downstreamConfigurations;
     };
@@ -317,6 +350,7 @@ extern "C" {
         const double* m_pOptionalTopClearanceHeightInMM;
         const double* m_pOptionalBottomClearanceHeightInMM;
         const double* m_pOptionalWeightInGrams;
+    HermesStringView m_optionalWorkOrderId;
     };
 
     /* QueryBoardInfo, The Hermes Standard 3.17 */
@@ -343,6 +377,123 @@ extern "C" {
         const double* m_pOptionalTopClearanceHeightInMM;
         const double* m_pOptionalBottomClearanceHeightInMM;
         const double* m_pOptionalWeightInGrams;
+    HermesStringView m_optionalWorkOrderId;
+};
+
+/* FeatureConfiguration, The Hermes Standard 3.22 */
+struct HermesFeatureConfiguration
+{};
+
+/* FeatureBoardTracking, The Hermes Standard 3.22 */
+struct HermesFeatureBoardTracking
+{};
+
+/* FeatureQueryWorkOrderInfo, The Hermes Standard 3.22 */
+struct HermesFeatureQueryWorkOrderInfo
+{};
+
+/* FeatureSendWorkOrderInfo, The Hermes Standard 3.22 */
+struct HermesFeatureSendWorkOrderInfo
+{};
+
+/* SupervisoryFeatures, The Hermes Standard 3.22 */
+struct HermesSupervisoryFeatures
+{
+    const HermesFeatureConfiguration* m_pOptionalFeatureConfiguration;
+    const HermesFeatureCheckAliveResponse* m_pOptionalFeatureCheckAliveResponse;
+    const HermesFeatureBoardTracking* m_pOptionalFeatureBoardTracking;
+    const HermesFeatureQueryWorkOrderInfo* m_pOptionalFeatureQueryWorkOrderInfo;
+    const HermesFeatureSendWorkOrderInfo* m_pOptionalFeatureSendWorkOrderInfo;};
+
+/* SupervisoryServiceDescription, The Hermes Standard 3.22 */
+struct HermesSupervisoryServiceDescriptionData
+{
+    HermesStringView m_systemId;
+    HermesStringView m_version;
+    const HermesSupervisoryFeatures* m_pSupportedFeatures;
+};
+
+/* BoardArrived, The Hermes Standard 3.23 */
+struct HermesBoardArrivedData
+{
+    HermesStringView m_machineId;
+    uint32_t m_upstreamLaneId;
+    HermesStringView m_optionalUpstreamInterfaceId;
+    HermesStringView m_optionalMagazineId;
+    const uint32_t* m_pOptionalSlotId;
+    EHermesBoardArrivedTransfer m_boardTransfer;
+    HermesStringView m_boardId;
+    HermesStringView m_boardIdCreatedBy;
+    EHermesBoardQuality m_failedBoard;
+    HermesStringView m_optionalProductTypeId;
+    EHermesFlippedBoard m_flippedBoard;
+    HermesStringView m_optionalTopBarcode;
+    HermesStringView m_optionalBottomBarcode;
+    const double* m_pOptionalLengthInMM;
+    const double* m_pOptionalWidthInMM;
+    const double* m_pOptionalThicknessInMM;
+    const double* m_pOptionalConveyorSpeedInMMPerSecs;
+    const double* m_pOptionalTopClearanceHeightInMM;
+    const double* m_pOptionalBottomClearanceHeightInMM;
+    const double* m_pOptionalWeightInGrams;
+    HermesStringView m_optionalWorkOrderId;
+};
+
+/* BoardDeparted, The Hermes Standard 3.24 */
+struct HermesBoardDepartedData
+{
+    HermesStringView m_machineId;
+    uint32_t m_downstreamLaneId;
+    HermesStringView m_optionalDownstreamInterfaceId;
+    HermesStringView m_optionalMagazineId;
+    const uint32_t* m_pOptionalSlotId;
+    EHermesBoardDepartedTransfer m_boardTransfer;
+    HermesStringView m_boardId;
+    HermesStringView m_boardIdCreatedBy;
+    EHermesBoardQuality m_failedBoard;
+    HermesStringView m_optionalProductTypeId;
+    EHermesFlippedBoard m_flippedBoard;
+    HermesStringView m_optionalTopBarcode;
+    HermesStringView m_optionalBottomBarcode;
+    const double* m_pOptionalLengthInMM;
+    const double* m_pOptionalWidthInMM;
+    const double* m_pOptionalThicknessInMM;
+    const double* m_pOptionalConveyorSpeedInMMPerSecs;
+    const double* m_pOptionalTopClearanceHeightInMM;
+    const double* m_pOptionalBottomClearanceHeightInMM;
+    const double* m_pOptionalWeightInGrams;
+    HermesStringView m_optionalWorkOrderId;
+};
+
+/* QueryWorkOrderInfo, The Hermes Standard 3.25 */
+struct HermesQueryWorkOrderInfoData
+{
+    HermesStringView m_optionalQueryId;
+    HermesStringView m_machineId;
+    HermesStringView m_optionalMagazineId;
+    const uint32_t* m_pOptionalSlotId;
+    HermesStringView m_optionalBarcode;
+};
+
+/* SendWorkOrderInfo, The Hermes Standard 3.26 */
+struct HermesSendWorkOrderInfoData
+{
+    HermesStringView m_optionalQueryId;
+    HermesStringView m_optionalWorkOrderId;
+    HermesStringView m_optionalBoardId;
+    HermesStringView m_optionalBoardIdCreatedBy;
+    const EHermesBoardQuality* m_pOptionalFailedBoard;
+    HermesStringView m_optionalProductTypeId;
+    const EHermesFlippedBoard* m_pOptionalFlippedBoard;
+    HermesStringView m_optionalTopBarcode;
+    HermesStringView m_optionalBottomBarcode;
+    const double* m_pOptionalLengthInMM;
+    const double* m_pOptionalWidthInMM;
+    const double* m_pOptionalThicknessInMM;
+    const double* m_pOptionalConveyorSpeedInMMPerSecs;
+    const double* m_pOptionalTopClearanceHeightInMM;
+    const double* m_pOptionalBottomClearanceHeightInMM;
+    const double* m_pOptionalWeightInGrams;
     };
 
     /* UpstreamSettings, Configuration of upstream interface (not part of The Hermes Standard) */
@@ -354,8 +505,7 @@ extern "C" {
         double m_checkAlivePeriodInSeconds;
         double m_reconnectWaitTimeInSeconds;
         EHermesCheckAliveResponseMode m_checkAliveResponseMode;
-        EHermesCheckState m_checkState;
-    };
+    EHermesCheckState m_checkState;};
 
     /* DownstreamSettings, Configuration of downstream interface (not part of The Hermes Standard) */
     struct HermesDownstreamSettings
@@ -366,30 +516,45 @@ extern "C" {
         double m_checkAlivePeriodInSeconds;
         double m_reconnectWaitTimeInSeconds;
         EHermesCheckAliveResponseMode m_checkAliveResponseMode;
-        EHermesCheckState m_checkState;
-    };
+    EHermesCheckState m_checkState;};
 
     /* ConfigurationServiceSettings, Configuration of configuration service interface (not part of The Hermes Standard) */
     struct HermesConfigurationServiceSettings
     {
         uint16_t m_port;
+    double m_reconnectWaitTimeInSeconds;};
+
+/* VerticalServiceSettings, Configuration of vertical service interface (not part of The Hermes Standard) */
+struct HermesVerticalServiceSettings
+{
+    HermesStringView m_systemId;
+    uint16_t m_port;
         double m_reconnectWaitTimeInSeconds;
-    };
+    double m_checkAlivePeriodInSeconds;
+    EHermesCheckAliveResponseMode m_checkAliveResponseMode;};
+
+/* VerticalClientSettings, Configuration of vertical client interface (not part of The Hermes Standard) */
+struct HermesVerticalClientSettings
+{
+    HermesStringView m_systemId;
+    HermesStringView m_hostAddress;
+    uint16_t m_port;
+    double m_reconnectWaitTimeInSeconds;
+    double m_checkAlivePeriodInSeconds;
+    EHermesCheckAliveResponseMode m_checkAliveResponseMode;};
 
     /* Error, Error object (not part of The Hermes Standard) */
     struct HermesError
     {
         EHermesErrorCode m_code;
-        HermesStringView m_text;
-    };
+    HermesStringView m_text;};
 
     /* ConnectionInfo, Attributes for the established connection (not part of The Hermes Standard) */
     struct HermesConnectionInfo
     {
         HermesStringView m_address;
         uint16_t m_port;
-        HermesStringView m_hostName;
-    };
+    HermesStringView m_hostName;};
 
 #ifdef __cplusplus
 }
