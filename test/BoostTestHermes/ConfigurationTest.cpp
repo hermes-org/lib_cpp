@@ -1,5 +1,5 @@
 /***********************************************************************
-Copyright 2018 ASM Assembly Systems GmbH & Co. KG
+Copyright ASM Assembly Systems GmbH & Co. KG
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -153,7 +153,7 @@ BOOST_AUTO_TEST_CASE(SetHermesConfigurationTest)
     sentConfig.m_machineId = "TX_5";
 
     sentConfig.m_downstreamConfigurations.emplace_back(1U, 0); // on lane 1, take default port
-    sentConfig.m_downstreamConfigurations.emplace_back(2U, "localhost", 50101);
+    sentConfig.m_downstreamConfigurations.emplace_back(2U, 50101);
 
     sentConfig.m_upstreamConfigurations.emplace_back(1U, "localhost", 50101);
     sentConfig.m_upstreamConfigurations.emplace_back(2U, "127.0.0.1", 50102);

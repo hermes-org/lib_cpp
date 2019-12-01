@@ -64,7 +64,7 @@ namespace Hermes
         void swap(Optional& rhs)
         {
             using std::swap;
-            swap(m_hasValue, rhs.m_value);
+            swap(m_hasValue, rhs.m_hasValue);
             swap(m_value, rhs.m_value);
         }
         friend void swap(Optional& lhs, Optional& rhs) { lhs.swap(rhs); }

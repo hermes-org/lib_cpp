@@ -52,8 +52,9 @@ namespace Hermes
         void Signal(unsigned sessionId, const CheckAliveData&);
         void Reset(const NotificationData&);
 
-        void Signal(unsigned sessionId, StringView);
-        void Reset(StringView);
+        // raw XML for testing
+        void Signal(unsigned sessionId, StringView rawXml);
+        void Reset(StringView rawXml);
 
         void Disable(const NotificationData&);
         void Stop();
@@ -113,8 +114,9 @@ namespace Hermes
         void Signal(unsigned sessionId, const CheckAliveData&);
         void Reset(const NotificationData&);
 
-        void Signal(unsigned sessionId, StringView);
-        void Reset(StringView);
+        // raw XML for testing
+        void Signal(unsigned sessionId, StringView rawXml);
+        void Reset(StringView rawXml);
 
         void Disable(const NotificationData&);
         void Stop();
@@ -288,6 +290,10 @@ namespace Hermes
         void Signal(unsigned sessionId, const NotificationData&);
         void Signal(unsigned sessionId, const CheckAliveData&);
         void Reset(const NotificationData&);
+
+        // raw XML for testing
+        void Signal(unsigned sessionId, StringView rawXml);
+        void Reset(StringView rawXml);
 
         void Disable(const NotificationData&);
         void Stop();
@@ -1234,6 +1240,16 @@ namespace Hermes
     {
         auto apiData = ToC(data);
         ::ResetHermesVerticalClient(m_pImpl, &apiData);
+    }
+
+    inline void VerticalClient::Signal(unsigned sessionId, StringView rawXml)
+    {
+        ::SignalHermesVerticalClientRawXml(m_pImpl, sessionId, ToC(rawXml));
+    }
+
+    inline void VerticalClient::Reset(StringView rawXml)
+    {
+        ::ResetHermesVerticalClientRawXml(m_pImpl, ToC(rawXml));
     }
 
     inline void VerticalClient::Disable(const NotificationData& data)

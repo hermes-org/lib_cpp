@@ -98,7 +98,7 @@ namespace Hermes
         }
 
         if (xmlData.size() > cMAX_MESSAGE_SIZE)
-            return{EErrorCode::ePEER_ERROR, "Maximum message size exceeded"};
+            return{EErrorCode::ePEER_ERROR, ": Maximum message size exceeded"};
 
         // do the housekeeping for the buffer and the view into it:
         if (xmlData.empty())

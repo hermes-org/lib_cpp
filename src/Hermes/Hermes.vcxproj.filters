@@ -36,12 +36,6 @@
     <Filter Include="Configuration">
       <UniqueIdentifier>{4035d6a8-f053-4d09-92f9-856f89ef72d0}</UniqueIdentifier>
     </Filter>
-    <Filter Include="VerticalService">
-      <UniqueIdentifier>{b1011605-5304-4521-bc19-57db95f24442}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="VerticalClient">
-      <UniqueIdentifier>{3a3fc53b-b1ec-4d42-9082-17db5afd9423}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -146,18 +140,6 @@
     <ClInclude Include="MessageDispatcher.h">
       <Filter>Serialization</Filter>
     </ClInclude>
-    <ClInclude Include="VerticalServiceSerializer.h">
-      <Filter>VerticalService</Filter>
-    </ClInclude>
-    <ClInclude Include="VerticalServiceSession.h">
-      <Filter>VerticalService</Filter>
-    </ClInclude>
-    <ClInclude Include="VerticalClientSerializer.h">
-      <Filter>VerticalClient</Filter>
-    </ClInclude>
-    <ClInclude Include="VerticalClientSession.h">
-      <Filter>VerticalClient</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -211,6 +193,9 @@
     <ClCompile Include="Serialization.cpp">
       <Filter>Serialization</Filter>
     </ClCompile>
+    <ClCompile Include="GeneratedHermesGuid.cpp">
+      <Filter>Infra</Filter>
+    </ClCompile>
     <ClCompile Include="MessageSerialization.cpp">
       <Filter>Serialization</Filter>
     </ClCompile>
@@ -222,24 +207,6 @@
     </ClCompile>
     <ClCompile Include="MessageDispatcher.cpp">
       <Filter>Serialization</Filter>
-    </ClCompile>
-    <ClCompile Include="VerticalServiceSerializer.cpp">
-      <Filter>VerticalService</Filter>
-    </ClCompile>
-    <ClCompile Include="VerticalServiceSession.cpp">
-      <Filter>VerticalService</Filter>
-    </ClCompile>
-    <ClCompile Include="VerticalService.cpp">
-      <Filter>VerticalService</Filter>
-    </ClCompile>
-    <ClCompile Include="VerticalClientSerializer.cpp">
-      <Filter>VerticalClient</Filter>
-    </ClCompile>
-    <ClCompile Include="VerticalClientSession.cpp">
-      <Filter>VerticalClient</Filter>
-    </ClCompile>
-    <ClCompile Include="VerticalClient.cpp">
-      <Filter>VerticalClient</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

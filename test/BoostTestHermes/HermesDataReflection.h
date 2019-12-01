@@ -1,20 +1,33 @@
-// Copyright (c) ASM Assembly Systems GmbH & Co. KG
+/***********************************************************************
+Copyright ASM Assembly Systems GmbH & Co. KG
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+************************************************************************/
+
 #pragma once
 
 #include <HermesData.hpp>
 
 #include <boost/fusion/include/adapt_struct.hpp>
-#include <boost/mpl/vector.hpp>
+#include <boost/mpl/vector/vector30.hpp>
 
-using HermesDataTypes = boost::mpl::vector<
-    //Hermes::CheckAliveData,
-    Hermes::UpstreamConfiguration,
-    Hermes::DownstreamConfiguration,
+using HermesDataTypes = boost::mpl::vector22<
+    Hermes::CheckAliveData,
     //Hermes::GetConfigurationData,
     Hermes::SetConfigurationData,
     Hermes::CurrentConfigurationData,
     Hermes::ConnectionInfo,
-    Hermes::ServiceDescription,
+    Hermes::ServiceDescriptionData,
     Hermes::MachineReadyData,
     //Hermes::RevokeMachineReadyData,
     Hermes::BoardAvailableData,
@@ -23,28 +36,44 @@ using HermesDataTypes = boost::mpl::vector<
     Hermes::StopTransportData,
     Hermes::TransportFinishedData,
     Hermes::NotificationData,
+    Hermes::BoardForecastData,
+    Hermes::QueryBoardInfoData,
+    Hermes::SendBoardInfoData,
     Hermes::UpstreamSettings,
     Hermes::DownstreamSettings,
-    Hermes::ConfigurationServiceSettings
+    Hermes::ConfigurationServiceSettings,
+    Hermes::SupervisoryServiceDescriptionData,
+    Hermes::BoardArrivedData,
+    Hermes::BoardDepartedData,
+    Hermes::QueryWorkOrderInfoData,
+    Hermes::SendWorkOrderInfoData
 >;
 
 BOOST_FUSION_ADAPT_STRUCT(Hermes::UpstreamConfiguration,
     m_upstreamLaneId,
+    m_optionalUpstreamInterfaceId,
     m_hostAddress,
     m_port
 )
 BOOST_FUSION_ADAPT_STRUCT(Hermes::DownstreamConfiguration,
     m_downstreamLaneId,
+    m_optionalDownstreamInterfaceId,
     m_optionalClientAddress,
     m_port
 )
+BOOST_FUSION_ADAPT_STRUCT(Hermes::CheckAliveData,
+    m_optionalType,
+    m_optionalId
+)
 BOOST_FUSION_ADAPT_STRUCT(Hermes::SetConfigurationData,
     m_machineId,
+    m_optionalSupervisorySystemPort,
     m_upstreamConfigurations,
     m_downstreamConfigurations
 )
 BOOST_FUSION_ADAPT_STRUCT(Hermes::CurrentConfigurationData,
     m_optionalMachineId,
+    m_optionalSupervisorySystemPort,
     m_upstreamConfigurations,
     m_downstreamConfigurations
 )
@@ -53,13 +82,36 @@ BOOST_FUSION_ADAPT_STRUCT(Hermes::ConnectionInfo,
     m_address,
     m_port
 )
-BOOST_FUSION_ADAPT_STRUCT(Hermes::ServiceDescription,
-    m_laneId,
+BOOST_FUSION_ADAPT_STRUCT(Hermes::SupportedFeatures,
+    m_optionalFeatureBoardForecast,
+    m_optionalFeatureCheckAliveResponse,
+    m_optionalFeatureQueryBoardInfo,
+    m_optionalFeatureSendBoardInfo
+)
+
+BOOST_FUSION_ADAPT_STRUCT(Hermes::ServiceDescriptionData,
     m_machineId,
-    m_version
+    m_laneId,
+    m_optionalInterfaceId,
+    m_version,
+    m_supportedFeatures
 )
 BOOST_FUSION_ADAPT_STRUCT(Hermes::MachineReadyData,
-    m_failedBoard
+    m_failedBoard,
+    m_optionalForecastId,
+    m_optionalBoardId,
+    m_optionalProductTypeId,
+    m_optionalFlippedBoard,
+    m_optionalTopBarcode,
+    m_optionalBottomBarcode,
+    m_optionalLengthInMM,
+    m_optionalWidthInMM,
+    m_optionalThicknessInMM,
+    m_optionalConveyorSpeedInMMPerSecs,
+    m_optionalTopClearanceHeightInMM,
+    m_optionalBottomClearanceHeightInMM,
+    m_optionalWeightInGrams,
+    m_optionalWorkOrderId
 )
 //BOOST_FUSION_ADAPT_STRUCT(Hermes::RevokeMachineReadyData)
 BOOST_FUSION_ADAPT_STRUCT(Hermes::BoardAvailableData,
@@ -75,7 +127,9 @@ BOOST_FUSION_ADAPT_STRUCT(Hermes::BoardAvailableData,
     m_optionalThicknessInMM,
     m_optionalConveyorSpeedInMMPerSecs,
     m_optionalTopClearanceHeightInMM,
-    m_optionalBottomClearanceHeightInMM
+    m_optionalBottomClearanceHeightInMM,
+    m_optionalWeightInGrams,
+    m_optionalWorkOrderId
 )
 //BOOST_FUSION_ADAPT_STRUCT(Hermes::RevokeBoardAvailableData)
 BOOST_FUSION_ADAPT_STRUCT(Hermes::StartTransportData,
@@ -95,12 +149,136 @@ BOOST_FUSION_ADAPT_STRUCT(Hermes::NotificationData,
     m_severity,
     m_description
 )
+BOOST_FUSION_ADAPT_STRUCT(Hermes::BoardForecastData,
+    m_optionalForecastId,
+    m_optionalTimeUntilAvailableInSeconds,
+    m_optionalBoardId,
+    m_optionalBoardIdCreatedBy,
+    m_failedBoard,
+    m_optionalProductTypeId,
+    m_flippedBoard,
+    m_optionalTopBarcode,
+    m_optionalBottomBarcode,
+    m_optionalLengthInMM,
+    m_optionalWidthInMM,
+    m_optionalThicknessInMM,
+    m_optionalConveyorSpeedInMMPerSecs,
+    m_optionalTopClearanceHeightInMM,
+    m_optionalBottomClearanceHeightInMM,
+    m_optionalWeightInGrams,
+    m_optionalWorkOrderId
+)
+BOOST_FUSION_ADAPT_STRUCT(Hermes::QueryBoardInfoData,
+    m_optionalTopBarcode,
+    m_optionalBottomBarcode
+)
+BOOST_FUSION_ADAPT_STRUCT(Hermes::SendBoardInfoData,
+    m_optionalBoardId,
+    m_optionalBoardIdCreatedBy,
+    m_optionalFailedBoard,
+    m_optionalProductTypeId,
+    m_optionalFlippedBoard,
+    m_optionalTopBarcode,
+    m_optionalBottomBarcode,
+    m_optionalLengthInMM,
+    m_optionalWidthInMM,
+    m_optionalThicknessInMM,
+    m_optionalConveyorSpeedInMMPerSecs,
+    m_optionalTopClearanceHeightInMM,
+    m_optionalBottomClearanceHeightInMM,
+    m_optionalWeightInGrams,
+    m_optionalWorkOrderId
+)
+BOOST_FUSION_ADAPT_STRUCT(Hermes::SupervisoryFeatures,
+    m_optionalFeatureConfiguration,
+    m_optionalFeatureCheckAliveResponse,
+    m_optionalFeatureBoardTracking,
+    m_optionalFeatureQueryWorkOrderInfo,
+    m_optionalFeatureSendWorkOrderInfo
+)
+BOOST_FUSION_ADAPT_STRUCT(Hermes::SupervisoryServiceDescriptionData,
+    m_systemId,
+    m_version,
+    m_supportedFeatures
+)
+BOOST_FUSION_ADAPT_STRUCT(Hermes::BoardArrivedData,
+    m_machineId,
+    m_upstreamLaneId,
+    m_optionalUpstreamInterfaceId,
+    m_optionalMagazineId,
+    m_optionalSlotId,
+    m_boardTransfer,
+    m_boardId,
+    m_boardIdCreatedBy,
+    m_failedBoard,
+    m_optionalProductTypeId,
+    m_flippedBoard,
+    m_optionalTopBarcode,
+    m_optionalBottomBarcode,
+    m_optionalLengthInMM,
+    m_optionalWidthInMM,
+    m_optionalThicknessInMM,
+    m_optionalConveyorSpeedInMMPerSecs,
+    m_optionalTopClearanceHeightInMM,
+    m_optionalBottomClearanceHeightInMM,
+    m_optionalWeightInGrams,
+    m_optionalWorkOrderId
+)
+BOOST_FUSION_ADAPT_STRUCT(Hermes::BoardDepartedData,
+    m_machineId,
+    m_downstreamLaneId,
+    m_optionalDownstreamInterfaceId,
+    m_optionalMagazineId,
+    m_optionalSlotId,
+    m_boardTransfer,
+    m_boardId,
+    m_boardIdCreatedBy,
+    m_failedBoard,
+    m_optionalProductTypeId,
+    m_flippedBoard,
+    m_optionalTopBarcode,
+    m_optionalBottomBarcode,
+    m_optionalLengthInMM,
+    m_optionalWidthInMM,
+    m_optionalThicknessInMM,
+    m_optionalConveyorSpeedInMMPerSecs,
+    m_optionalTopClearanceHeightInMM,
+    m_optionalBottomClearanceHeightInMM,
+    m_optionalWeightInGrams,
+    m_optionalWorkOrderId
+)
+BOOST_FUSION_ADAPT_STRUCT(Hermes::QueryWorkOrderInfoData,
+    m_optionalQueryId,
+    m_machineId,
+    m_optionalMagazineId,
+    m_optionalSlotId,
+    m_optionalBarcode
+)
+BOOST_FUSION_ADAPT_STRUCT(Hermes::SendWorkOrderInfoData,
+    m_optionalQueryId,
+    m_optionalWorkOrderId,
+    m_optionalBoardId,
+    m_optionalBoardIdCreatedBy,
+    m_optionalFailedBoard,
+    m_optionalProductTypeId,
+    m_optionalFlippedBoard,
+    m_optionalTopBarcode,
+    m_optionalBottomBarcode,
+    m_optionalLengthInMM,
+    m_optionalWidthInMM,
+    m_optionalThicknessInMM,
+    m_optionalConveyorSpeedInMMPerSecs,
+    m_optionalTopClearanceHeightInMM,
+    m_optionalBottomClearanceHeightInMM,
+    m_optionalWeightInGrams
+)
 BOOST_FUSION_ADAPT_STRUCT(Hermes::UpstreamSettings,
     m_machineId,
     m_hostAddress,
     m_port,
     m_checkAlivePeriodInSeconds,
     m_reconnectWaitTimeInSeconds,
+    m_checkAliveResponseMode,
     m_checkState
 )
 BOOST_FUSION_ADAPT_STRUCT(Hermes::DownstreamSettings,
@@ -109,6 +287,7 @@ BOOST_FUSION_ADAPT_STRUCT(Hermes::DownstreamSettings,
     m_port,
     m_checkAlivePeriodInSeconds,
     m_reconnectWaitTimeInSeconds,
+    m_checkAliveResponseMode,
     m_checkState
 )
 BOOST_FUSION_ADAPT_STRUCT(Hermes::ConfigurationServiceSettings,

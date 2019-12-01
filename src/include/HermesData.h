@@ -167,19 +167,23 @@ enum EHermesVerticalState
 
     /* FeatureBoardForecast, The Hermes Standard 3.4 */
     struct HermesFeatureBoardForecast
-    {};
+{
+};
 
     /* FeatureCheckAliveResponse, The Hermes Standard 3.4 */
     struct HermesFeatureCheckAliveResponse
-    {};
+{
+};
 
     /* FeatureQueryBoardInfo, The Hermes Standard 3.4 */
     struct HermesFeatureQueryBoardInfo
-    {};
+{
+};
 
     /* FeatureSendBoardInfo, The Hermes Standard 3.4 */
     struct HermesFeatureSendBoardInfo
-    {};
+{
+};
 
     /* SupportedFeatures, The Hermes Standard 3.4 */
     struct HermesSupportedFeatures
@@ -187,7 +191,8 @@ enum EHermesVerticalState
         const HermesFeatureBoardForecast* m_pOptionalFeatureBoardForecast;
         const HermesFeatureCheckAliveResponse* m_pOptionalFeatureCheckAliveResponse;
         const HermesFeatureQueryBoardInfo* m_pOptionalFeatureQueryBoardInfo;
-    const HermesFeatureSendBoardInfo* m_pOptionalFeatureSendBoardInfo;};
+        const HermesFeatureSendBoardInfo* m_pOptionalFeatureSendBoardInfo;
+    };
 
     /* ServiceDescription, The Hermes Standard 3.4 */
     struct HermesServiceDescriptionData
@@ -284,7 +289,8 @@ enum EHermesVerticalState
         uint32_t m_upstreamLaneId;
         HermesStringView m_optionalUpstreamInterfaceId;
         HermesStringView m_hostAddress;
-    uint16_t m_port;};
+        uint16_t m_port;
+    };
 
     /* The Hermes Standard 3.13 */
     struct HermesUpstreamConfigurations
@@ -299,7 +305,8 @@ enum EHermesVerticalState
         uint32_t m_downstreamLaneId;
         HermesStringView m_optionalDownstreamInterfaceId;
         HermesStringView m_optionalClientAddress;
-    uint16_t m_port;};
+        uint16_t m_port;
+    };
 
     /* The Hermes Standard 3.13 */
     struct HermesDownstreamConfigurations
@@ -382,19 +389,23 @@ enum EHermesVerticalState
 
 /* FeatureConfiguration, The Hermes Standard 3.22 */
 struct HermesFeatureConfiguration
-{};
+{
+};
 
 /* FeatureBoardTracking, The Hermes Standard 3.22 */
 struct HermesFeatureBoardTracking
-{};
+{
+};
 
 /* FeatureQueryWorkOrderInfo, The Hermes Standard 3.22 */
 struct HermesFeatureQueryWorkOrderInfo
-{};
+{
+};
 
 /* FeatureSendWorkOrderInfo, The Hermes Standard 3.22 */
 struct HermesFeatureSendWorkOrderInfo
-{};
+{
+};
 
 /* SupervisoryFeatures, The Hermes Standard 3.22 */
 struct HermesSupervisoryFeatures
@@ -403,7 +414,8 @@ struct HermesSupervisoryFeatures
     const HermesFeatureCheckAliveResponse* m_pOptionalFeatureCheckAliveResponse;
     const HermesFeatureBoardTracking* m_pOptionalFeatureBoardTracking;
     const HermesFeatureQueryWorkOrderInfo* m_pOptionalFeatureQueryWorkOrderInfo;
-    const HermesFeatureSendWorkOrderInfo* m_pOptionalFeatureSendWorkOrderInfo;};
+    const HermesFeatureSendWorkOrderInfo* m_pOptionalFeatureSendWorkOrderInfo;
+};
 
 /* SupervisoryServiceDescription, The Hermes Standard 3.22 */
 struct HermesSupervisoryServiceDescriptionData
@@ -505,7 +517,8 @@ struct HermesSendWorkOrderInfoData
         double m_checkAlivePeriodInSeconds;
         double m_reconnectWaitTimeInSeconds;
         EHermesCheckAliveResponseMode m_checkAliveResponseMode;
-    EHermesCheckState m_checkState;};
+        EHermesCheckState m_checkState;
+    };
 
     /* DownstreamSettings, Configuration of downstream interface (not part of The Hermes Standard) */
     struct HermesDownstreamSettings
@@ -516,22 +529,25 @@ struct HermesSendWorkOrderInfoData
         double m_checkAlivePeriodInSeconds;
         double m_reconnectWaitTimeInSeconds;
         EHermesCheckAliveResponseMode m_checkAliveResponseMode;
-    EHermesCheckState m_checkState;};
+        EHermesCheckState m_checkState;
+    };
 
     /* ConfigurationServiceSettings, Configuration of configuration service interface (not part of The Hermes Standard) */
     struct HermesConfigurationServiceSettings
     {
         uint16_t m_port;
-    double m_reconnectWaitTimeInSeconds;};
+        double m_reconnectWaitTimeInSeconds;
+    };
 
 /* VerticalServiceSettings, Configuration of vertical service interface (not part of The Hermes Standard) */
 struct HermesVerticalServiceSettings
 {
     HermesStringView m_systemId;
     uint16_t m_port;
-        double m_reconnectWaitTimeInSeconds;
+    double m_reconnectWaitTimeInSeconds;
     double m_checkAlivePeriodInSeconds;
-    EHermesCheckAliveResponseMode m_checkAliveResponseMode;};
+    EHermesCheckAliveResponseMode m_checkAliveResponseMode;
+};
 
 /* VerticalClientSettings, Configuration of vertical client interface (not part of The Hermes Standard) */
 struct HermesVerticalClientSettings
@@ -541,20 +557,23 @@ struct HermesVerticalClientSettings
     uint16_t m_port;
     double m_reconnectWaitTimeInSeconds;
     double m_checkAlivePeriodInSeconds;
-    EHermesCheckAliveResponseMode m_checkAliveResponseMode;};
+    EHermesCheckAliveResponseMode m_checkAliveResponseMode;
+};
 
     /* Error, Error object (not part of The Hermes Standard) */
     struct HermesError
     {
         EHermesErrorCode m_code;
-    HermesStringView m_text;};
+        HermesStringView m_text;
+    };
 
     /* ConnectionInfo, Attributes for the established connection (not part of The Hermes Standard) */
     struct HermesConnectionInfo
     {
         HermesStringView m_address;
         uint16_t m_port;
-    HermesStringView m_hostName;};
+        HermesStringView m_hostName;
+    };
 
 #ifdef __cplusplus
 }

@@ -451,6 +451,10 @@ extern "C" {
     
     HERMESPROTOCOL_API void ResetHermesVerticalClient(HermesVerticalClient*, const HermesNotificationData*);
 
+    // interface for testing with raw xml:
+    HERMESPROTOCOL_API void SignalHermesVerticalClientRawXml(HermesVerticalClient*, uint32_t sessionId, HermesStringView);
+    HERMESPROTOCOL_API void ResetHermesVerticalClientRawXml(HermesVerticalClient*, HermesStringView);
+
     HERMESPROTOCOL_API void DisableHermesVerticalClient(HermesVerticalClient*, const HermesNotificationData*);
     HERMESPROTOCOL_API void StopHermesVerticalClient(HermesVerticalClient*);
     HERMESPROTOCOL_API void DeleteHermesVerticalClient(HermesVerticalClient*);

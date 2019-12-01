@@ -1,4 +1,19 @@
-// Copyright (c) ASM Assembly Systems GmbH & Co. KG
+/***********************************************************************
+Copyright ASM Assembly Systems GmbH & Co. KG
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+************************************************************************/
+
 #pragma once
 
 #include <HermesData.hpp>
@@ -20,14 +35,22 @@ struct SimpleSampleGenerator;
 template<>
 struct SimpleSampleGenerator<std::string>
 {
-    static std::vector<std::string> Generate()
+    static std::vector<std::string> Generate(const std::string& default)
     {
+        if (default == std::string{"00000000-0000-0000-0000-000000000000"})
+            return
+        {
+            std::string{"00000000-0000-0000-0000-000000000000"},
+            std::string{"90abb804-ef8d-11e7-8c3f-9a214cf093ae"},
+            std::string{"0e4c18f9-5f69-4dbe-9b1c-e705bf7d680f"}
+        };
         return
         {
             std::string(),
             std::string("A"),
             std::string("Hello, world"),
-            std::string(10000, 'X')
+            std::string(10000, 'X'),
+            std::string("\x48\xE2\x82\xAC\x72\xC2\xB5\x65\xC3\x9F")
         };
     }
 };
@@ -35,7 +58,7 @@ struct SimpleSampleGenerator<std::string>
 template<class E>
 struct SimpleSampleGenerator<E, std::enable_if_t<std::is_enum<E>::value>>
 {
-    static std::vector<E> Generate()
+    static std::vector<E> Generate(E)
     {
         std::vector<E> result;
         result.reserve(size(E()));
@@ -47,12 +70,39 @@ struct SimpleSampleGenerator<E, std::enable_if_t<std::is_enum<E>::value>>
     }
 };
 
+template<>
+struct SimpleSampleGenerator<Hermes::ETransferState>
+{
+    static std::vector<Hermes::ETransferState> Generate(Hermes::ETransferState)
+    {
+        return{Hermes::ETransferState::eNOT_STARTED, Hermes::ETransferState::eINCOMPLETE, Hermes::ETransferState::eCOMPLETE};
+    }
+};
+
+template<>
+struct SimpleSampleGenerator<Hermes::ESeverity>
+{
+    static std::vector<Hermes::ESeverity> Generate(Hermes::ESeverity)
+    {
+        return{Hermes::ESeverity::eFATAL, Hermes::ESeverity::eERROR, Hermes::ESeverity::eWARNING, Hermes::ESeverity::eINFO};
+    }
+};
+
+template<class T>
+struct SimpleSampleGenerator<T, std::enable_if_t<std::is_empty<T>::value>>
+{
+    static std::vector<T> Generate(const T&)
+    {
+        return{T{}};
+    }
+};
+
 template<class T>
 struct SimpleSampleGenerator<Hermes::Optional<T>>
 {
-    static std::vector<Hermes::Optional<T>> Generate()
+    static std::vector<Hermes::Optional<T>> Generate(const Hermes::Optional<T>&)
     {
-        auto values = SimpleSampleGenerator<T>::Generate();
+        auto values = SimpleSampleGenerator<T>::Generate(T());
         return{values.begin(), values.end()};
     }
 };
@@ -60,7 +110,7 @@ struct SimpleSampleGenerator<Hermes::Optional<T>>
 template<class T>
 struct SimpleSampleGenerator<T, std::enable_if_t<boost::fusion::traits::is_sequence<T>::value>>
 {
-    static std::vector<T> Generate()
+    static std::vector<T> Generate(const T&)
     {
         return GenerateSamples<T>();
     }
@@ -69,16 +119,16 @@ struct SimpleSampleGenerator<T, std::enable_if_t<boost::fusion::traits::is_seque
 template<class T>
 struct SimpleSampleGenerator<std::vector<T>>
 {
-    static std::vector<std::vector<T>> Generate()
+    static std::vector<std::vector<T>> Generate(const std::vector<T>&)
     {
-        return{SimpleSampleGenerator<T>::Generate()};
+        return{SimpleSampleGenerator<T>::Generate(T())};
     }
 };
 
 template<class I>
 struct SimpleSampleGenerator<I, std::enable_if_t<std::is_signed<I>::value && std::is_integral<I>::value>>
 {
-    static std::vector<I> Generate()
+    static std::vector<I> Generate(I)
     {
         return{std::numeric_limits<I>::min(), -1, 0, 1, std::numeric_limits<I>::max()};
     }
@@ -87,25 +137,34 @@ struct SimpleSampleGenerator<I, std::enable_if_t<std::is_signed<I>::value && std
 template<class U>
 struct SimpleSampleGenerator<U, std::enable_if_t<std::is_unsigned<U>::value && std::is_integral<U>::value>>
 {
-    static std::vector<U> Generate()
+    static std::vector<U> Generate(U default)
     {
-        return{0, 1, std::numeric_limits<U>::max()};
+        return{default, default + 1U, std::numeric_limits<U>::max()};
+    }
+};
+
+template<>
+struct SimpleSampleGenerator<unsigned>
+{
+    static std::vector<unsigned> Generate(unsigned default)
+    {
+        return{default, default + 1, static_cast<unsigned>(std::numeric_limits<int>::max())};
     }
 };
 
 template<>
 struct SimpleSampleGenerator<double>
 {
-    static std::vector<double> Generate()
+    static std::vector<double> Generate(double)
     {
-        return{-10000.0, -1.0, 0.0, 1.0, 10000.0};
+        return{0.0, 0.125, 1.0, 10000.0};
     };
 };
 
 template<>
 struct SimpleSampleGenerator<bool>
 {
-    static std::list<bool> Generate()
+    static std::list<bool> Generate(bool)
     {
         return{false, true};
     };
@@ -135,10 +194,10 @@ struct MemberTraits<MemberT ClassT::*>
     using Member = MemberT;
 };
 
-//inline std::vector<Hermes::ServiceDescription> GenerateNonDefaultServiceDescription()
+//inline std::vector<Hermes::ServiceDescriptionData> GenerateNonDefaultServiceDescriptionData()
 //{
-//    std::vector<Hermes::ServiceDescription> result;
-//    AddNonDefaultSamples<Hermes::ServiceDescription, std::string, &Hermes::ServiceDescription::m_machineId>(result);
+//    std::vector<Hermes::ServiceDescriptionData> result;
+//    AddNonDefaultSamples<Hermes::ServiceDescriptionData, std::string, &Hermes::ServiceDescriptionData::m_machineId>(result);
 //        
 //    return result;
 //}
@@ -158,10 +217,10 @@ struct MemberTraits<MemberT ClassT::*>
 //    HERMES_TEST_ADD_NON_DEFAULT_SAMPLES(samples, &Hermes::MachineReadyData::m_boardQuality);
 //}
 //
-//void AddAllNonDefaultSamples(std::vector<Hermes::ServiceDescription>& samples)
+//void AddAllNonDefaultSamples(std::vector<Hermes::ServiceDescriptionData>& samples)
 //{
-//    HERMES_TEST_ADD_NON_DEFAULT_SAMPLES(samples, &Hermes::ServiceDescription::m_laneId);
-//    HERMES_TEST_ADD_NON_DEFAULT_SAMPLES(samples, &Hermes::ServiceDescription::m_machineId);
+//    HERMES_TEST_ADD_NON_DEFAULT_SAMPLES(samples, &Hermes::ServiceDescriptionData::m_laneId);
+//    HERMES_TEST_ADD_NON_DEFAULT_SAMPLES(samples, &Hermes::ServiceDescriptionData::m_machineId);
 //}
 
 //HERMES_ADD_SAMPLES(Hermes::MachineReadyData, (m_boardQuality))
@@ -174,7 +233,7 @@ std::vector<T> GenerateNonDefaultSamples()
     {
         using MemberType = std::remove_reference_t<decltype(member)>;
         auto defaultValue = member;
-        for (const auto& sampleValue : SimpleSampleGenerator<MemberType>::Generate())
+        for (const auto& sampleValue : SimpleSampleGenerator<MemberType>::Generate(defaultValue))
         {
             if (defaultValue == sampleValue)
                 continue; // no defaults
@@ -196,7 +255,7 @@ std::vector<T> GenerateSamples()
     {
         using MemberType = std::remove_reference_t<decltype(member)>;
         auto defaultValue = member;
-        for (const auto& sampleValue : SimpleSampleGenerator<MemberType>::Generate())
+        for (const auto& sampleValue : SimpleSampleGenerator<MemberType>::Generate(defaultValue))
         {
             if (defaultValue == sampleValue)
                 continue; // no defaults

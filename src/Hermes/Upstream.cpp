@@ -464,6 +464,7 @@ void SignalHermesUpstreamRawXml(HermesUpstream* pUpstream, uint32_t sessionId, H
         dispatcher.Add<RevokeMachineReadyData>([&](const auto& data) { wasDispatched = true; pUpstream->Signal(sessionId, data, xmlData); });
         dispatcher.Add<StartTransportData>([&](const auto& data) { wasDispatched = true; pUpstream->Signal(sessionId, data, xmlData); });
         dispatcher.Add<StopTransportData>([&](const auto& data) { wasDispatched = true; pUpstream->Signal(sessionId, data, xmlData); });
+        dispatcher.Add<QueryBoardInfoData>([&](const auto& data) { wasDispatched = true; pUpstream->Signal(sessionId, data, xmlData); });
         dispatcher.Add<NotificationData>([&](const auto& data) { wasDispatched = true; pUpstream->Signal(sessionId, data, xmlData); });
         dispatcher.Add<CheckAliveData>([&](const auto& data) { wasDispatched = true; pUpstream->Signal(sessionId, data, xmlData); });
 

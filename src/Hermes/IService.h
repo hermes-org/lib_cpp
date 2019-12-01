@@ -27,7 +27,7 @@ limitations under the License.
 
 #include <boost/asio.hpp>
 
-/*namespace boost
+/*namespace boost causes compile errors with Linux -> remove or encapsulate with #ifdef _WINDOWS?
 {
     namespace asio { class io_context; using io_service = io_context; }
 }*/

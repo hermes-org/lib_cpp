@@ -169,7 +169,7 @@ namespace
                     return;
 
                 m_receiving = false;
-                GenerateError(EErrorCode::eTIMEOUT, "asio::receive", ec.message());
+                GenerateError(EErrorCode::eTIMEOUT, "asio::receive: ", ec.message());
             });
 
             while (m_receiving)
@@ -191,7 +191,7 @@ namespace
             if (ecReceive)
             {
                 m_receiving = false;
-                return GenerateError(EErrorCode::eNETWORK_ERROR, "asio::async_receive", ecReceive.message());
+                return GenerateError(EErrorCode::eNETWORK_ERROR, "asio::async_receive: ", ecReceive.message());
             }
 
             m_service.Trace(ETraceType::eRECEIVED, 0U, StringView{&m_receivedData[0], size});
@@ -199,7 +199,7 @@ namespace
             if (auto error = m_dispatcher.Dispatch(StringSpan{&m_receivedData[0], size}))
             {
                 m_receiving = false;
-                GenerateError(EErrorCode::ePEER_ERROR, m_traceName, "Maximum message size exceeded");
+                m_service.Alarm(0U, EErrorCode::ePEER_ERROR, error.m_text);
             }
         }
     };
