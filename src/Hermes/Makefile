@@ -3,7 +3,7 @@ ifeq ($(DEBUG),1)
 DBGFLAGS = -O0 -g3 -D_DEBUG
 endif
 
-VERSION= 2:1
+VERSION= 3:1
 CFLAGS = -std=c++17
 LFLAGS = -lpugixml
 

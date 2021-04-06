@@ -73,7 +73,7 @@ struct HermesDownstream : IAcceptorCallback, ISessionCallback
         m_service.Inform(0U, "Created");
     }
 
-    ~HermesDownstream()
+    virtual ~HermesDownstream()
     {
         m_service.Inform(0U, "Deleted");
     }

@@ -98,15 +98,15 @@ struct HermesVerticalClient : ISessionCallback
     }
 
     template<class DataT>
-    void Signal(unsigned sessionId, const DataT& data)
+    void Signal(unsigned sessionId, const DataT& data, StringView rawXml)
     {
-        m_service.Log(sessionId, "Signal(", data, ')');
+        m_service.Log(sessionId, "Signal(", data, ',', rawXml, ')');
 
         auto pSession = Session_(sessionId);
         if (!pSession)
             return;
 
-        pSession->Signal(data);
+        pSession->Signal(data, rawXml);
     }
 
     void Stop()
@@ -203,7 +203,7 @@ struct HermesVerticalClient : ISessionCallback
         {
             CheckAliveData data{ in_data };
             data.m_optionalType = ECheckAliveType::ePONG;
-            m_service.Post([this, sessionId, data = std::move(data)]() { Signal(sessionId, data); });
+            m_service.Post([this, sessionId, data = std::move(data)]() { Signal(sessionId, data, Serialize(data)); });
         }
         auto apiData = ToC(in_data);
         m_checkAliveCallback(sessionId, &apiData);
@@ -264,7 +264,7 @@ struct HermesVerticalClient : ISessionCallback
         if (!m_upSession)
             return;
 
-        m_upSession->Signal(data);
+        m_upSession->Signal(data, Serialize(data));
         RemoveSession_();
     }
 
@@ -343,7 +343,7 @@ void SignalHermesVerticalClientDescription(HermesVerticalClient* pVerticalClient
     pVerticalClient->m_service.Log(sessionId, "SignalHermesVerticalClientDescription");
     pVerticalClient->m_service.Post([pVerticalClient, sessionId, data = ToCpp(*pData)]()
     {
-        pVerticalClient->Signal(sessionId, data);
+        pVerticalClient->Signal(sessionId, data, Serialize(data));
     });
 }
 
@@ -352,7 +352,7 @@ void SignalHermesSendWorkOrderInfo(HermesVerticalClient* pVerticalClient, uint32
     pVerticalClient->m_service.Log(sessionId, "SignalHermesSendWorkOrderInfo");
     pVerticalClient->m_service.Post([pVerticalClient, sessionId, data = ToCpp(*pData)]()
     {
-        pVerticalClient->Signal(sessionId, data);
+        pVerticalClient->Signal(sessionId, data, Serialize(data));
     });
 }
 
@@ -361,7 +361,7 @@ void SignalHermesVerticalGetConfiguration(HermesVerticalClient* pVerticalClient,
     pVerticalClient->m_service.Log(sessionId, "SignalHermesVerticalGetConfiguration");
     pVerticalClient->m_service.Post([pVerticalClient, sessionId, data = ToCpp(*pData)]()
     {
-        pVerticalClient->Signal(sessionId, data);
+        pVerticalClient->Signal(sessionId, data, Serialize(data));
     });
 }
 
@@ -370,7 +370,7 @@ void SignalHermesVerticalSetConfiguration(HermesVerticalClient* pVerticalClient,
     pVerticalClient->m_service.Log(sessionId, "SignalHermesVerticalSetConfiguration");
     pVerticalClient->m_service.Post([pVerticalClient, sessionId, data = ToCpp(*pData)]()
     {
-        pVerticalClient->Signal(sessionId, data);
+        pVerticalClient->Signal(sessionId, data, Serialize(data));
     });
 }
 
@@ -380,7 +380,7 @@ void SignalHermesVerticalClientNotification(HermesVerticalClient* pVerticalClien
 
     pVerticalClient->m_service.Post([pVerticalClient, sessionId, data = ToCpp(*pData)]()
     {
-        pVerticalClient->Signal(sessionId, data);
+        pVerticalClient->Signal(sessionId, data, Serialize(data));
     });
 }
 
@@ -390,7 +390,7 @@ void SignalHermesVerticalClientCheckAlive(HermesVerticalClient* pVerticalClient,
 
     pVerticalClient->m_service.Post([pVerticalClient, sessionId, data = ToCpp(*pData)]()
     {
-        pVerticalClient->Signal(sessionId, data);
+        pVerticalClient->Signal(sessionId, data, Serialize(data));
     });
 }
 
@@ -434,4 +434,42 @@ void DeleteHermesVerticalClient(HermesVerticalClient* pVerticalClient)
 
     pVerticalClient->m_service.Stop();
     delete pVerticalClient;
+}
+
+void SignalHermesVerticalClientRawXml(HermesVerticalClient* pVerticalClient, uint32_t sessionId, HermesStringView rawXml)
+{
+    pVerticalClient->m_service.Log(sessionId, "SignalHermesVerticalClientRawXml");
+    pVerticalClient->m_service.Post([pVerticalClient, sessionId, xmlData = std::string(rawXml.m_pData, rawXml.m_size)]() mutable
+    {
+        MessageDispatcher dispatcher{ sessionId, pVerticalClient->m_service };
+        auto parseData = xmlData;
+
+        bool wasDispatched = false;
+        dispatcher.Add<SupervisoryServiceDescriptionData>([&](const auto& data) { wasDispatched = true; pVerticalClient->Signal(sessionId, data, xmlData); });
+        dispatcher.Add<SendWorkOrderInfoData>([&](const auto& data) { wasDispatched = true; pVerticalClient->Signal(sessionId, data, xmlData); });
+        dispatcher.Add<GetConfigurationData>([&](const auto& data) { wasDispatched = true; pVerticalClient->Signal(sessionId, data, xmlData); });
+        dispatcher.Add<SetConfigurationData>([&](const auto& data) { wasDispatched = true; pVerticalClient->Signal(sessionId, data, xmlData); });
+        dispatcher.Add<NotificationData>([&](const auto& data) { wasDispatched = true; pVerticalClient->Signal(sessionId, data, xmlData); });
+        dispatcher.Add<CheckAliveData>([&](const auto& data) { wasDispatched = true; pVerticalClient->Signal(sessionId, data, xmlData); });
+
+        dispatcher.Dispatch(parseData);
+        if (wasDispatched)
+            return;
+
+        pVerticalClient->Signal(sessionId, NotificationData{}, xmlData);
+    });
+}
+
+void ResetHermesVerticalClientRawXml(HermesVerticalClient* pVerticalClient, HermesStringView rawXml)
+{
+    pVerticalClient->m_service.Log(0U, "ResetHermesVerticalClientRawXml");
+    pVerticalClient->m_service.Post([pVerticalClient, data = std::string(rawXml.m_pData, rawXml.m_size)]()
+    {
+        if (!data.empty() && pVerticalClient->m_upSession)
+        {
+            pVerticalClient->m_upSession->Signal(NotificationData(), data);
+        }
+        pVerticalClient->RemoveSession_();
+        pVerticalClient->DelayCreateNewSession_(1.0);
+    });
 }

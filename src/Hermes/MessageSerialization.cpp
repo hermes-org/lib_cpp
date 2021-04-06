@@ -233,6 +233,7 @@ std::string Hermes::Serialize(const BoardAvailableData& data)
     Serialize(envelope.DataNode(), "BottomClearanceHeight", data.m_optionalBottomClearanceHeightInMM);
     Serialize(envelope.DataNode(), "Weight", data.m_optionalWeightInGrams);
     Serialize(envelope.DataNode(), "WorkOrderId", data.m_optionalWorkOrderId);
+    Serialize(envelope.DataNode(), "BatchId", data.m_optionalBatchId);
     return envelope.ToXmlString();
 }
 
@@ -260,6 +261,7 @@ std::string Hermes::Serialize(const MachineReadyData& data)
     Serialize(envelope.DataNode(), "BottomClearanceHeight", data.m_optionalBottomClearanceHeightInMM);
     Serialize(envelope.DataNode(), "Weight", data.m_optionalWeightInGrams);
     Serialize(envelope.DataNode(), "WorkOrderId", data.m_optionalWorkOrderId);
+    Serialize(envelope.DataNode(), "BatchId", data.m_optionalBatchId);
     return envelope.ToXmlString();
 }
 
@@ -356,6 +358,7 @@ std::string Hermes::Serialize(const BoardForecastData& data)
     Serialize(envelope.DataNode(), "BottomClearanceHeight", data.m_optionalBottomClearanceHeightInMM);
     Serialize(envelope.DataNode(), "Weight", data.m_optionalWeightInGrams);
     Serialize(envelope.DataNode(), "WorkOrderId", data.m_optionalWorkOrderId);
+    Serialize(envelope.DataNode(), "BatchId", data.m_optionalBatchId);
     return envelope.ToXmlString();
 }
 
@@ -385,6 +388,7 @@ std::string Hermes::Serialize(const SendBoardInfoData& data)
     Serialize(envelope.DataNode(), "BottomClearanceHeight", data.m_optionalBottomClearanceHeightInMM);
     Serialize(envelope.DataNode(), "Weight", data.m_optionalWeightInGrams);
     Serialize(envelope.DataNode(), "WorkOrderId", data.m_optionalWorkOrderId);
+    Serialize(envelope.DataNode(), "BatchId", data.m_optionalBatchId);
     return envelope.ToXmlString();
 }
 
@@ -421,6 +425,7 @@ std::string Hermes::Serialize(const BoardArrivedData& data)
     Serialize(envelope.DataNode(), "BottomClearanceHeight", data.m_optionalBottomClearanceHeightInMM);
     Serialize(envelope.DataNode(), "Weight", data.m_optionalWeightInGrams);
     Serialize(envelope.DataNode(), "WorkOrderId", data.m_optionalWorkOrderId);
+    Serialize(envelope.DataNode(), "BatchId", data.m_optionalBatchId);
     return envelope.ToXmlString();
 }
 
@@ -448,6 +453,7 @@ std::string Hermes::Serialize(const BoardDepartedData& data)
     Serialize(envelope.DataNode(), "BottomClearanceHeight", data.m_optionalBottomClearanceHeightInMM);
     Serialize(envelope.DataNode(), "Weight", data.m_optionalWeightInGrams);
     Serialize(envelope.DataNode(), "WorkOrderId", data.m_optionalWorkOrderId);
+    Serialize(envelope.DataNode(), "BatchId", data.m_optionalBatchId);
     return envelope.ToXmlString();
 }
 
@@ -467,6 +473,7 @@ std::string Hermes::Serialize(const SendWorkOrderInfoData& data)
     SenderEnvelope envelope(Hermes::SerializationTraits<SendWorkOrderInfoData>::cTAG_VIEW);
     Serialize(envelope.DataNode(), "QueryId", data.m_optionalQueryId);
     Serialize(envelope.DataNode(), "WorkOrderId", data.m_optionalWorkOrderId);
+    Serialize(envelope.DataNode(), "BatchId", data.m_optionalBatchId);
     Serialize(envelope.DataNode(), "BoardId", data.m_optionalBoardId);
     Serialize(envelope.DataNode(), "BoardIdCreatedBy", data.m_optionalBoardIdCreatedBy);
     Serialize(envelope.DataNode(), "FailedBoard", data.m_optionalFailedBoard);
@@ -513,6 +520,7 @@ Hermes::Error Hermes::Deserialize(pugi::xml_node xmlNode, BoardAvailableData& da
     Deserialize(xmlNode, "BottomClearanceHeight", error, data.m_optionalBottomClearanceHeightInMM);
     Deserialize(xmlNode, "Weight", error, data.m_optionalWeightInGrams);
     Deserialize(xmlNode, "WorkOrderId", error, data.m_optionalWorkOrderId);
+    Deserialize(xmlNode, "BatchId", error, data.m_optionalBatchId);
     return error;
 }
 
@@ -540,6 +548,7 @@ Hermes::Error Hermes::Deserialize(pugi::xml_node xmlNode, MachineReadyData& data
     Deserialize(xmlNode, "BottomClearanceHeight", error, data.m_optionalBottomClearanceHeightInMM);
     Deserialize(xmlNode, "Weight", error, data.m_optionalWeightInGrams);
     Deserialize(xmlNode, "WorkOrderId", error, data.m_optionalWorkOrderId);
+    Deserialize(xmlNode, "BatchId", error, data.m_optionalBatchId);
     return error;
 }
 
@@ -636,6 +645,7 @@ Hermes::Error Hermes::Deserialize(pugi::xml_node xmlNode, BoardForecastData& dat
     Deserialize(xmlNode, "BottomClearanceHeight", error, data.m_optionalBottomClearanceHeightInMM);
     Deserialize(xmlNode, "Weight", error, data.m_optionalWeightInGrams);
     Deserialize(xmlNode, "WorkOrderId", error, data.m_optionalWorkOrderId);
+    Deserialize(xmlNode, "BatchId", error, data.m_optionalBatchId);
     return error;
 }
 
@@ -665,6 +675,7 @@ Hermes::Error Hermes::Deserialize(pugi::xml_node xmlNode, SendBoardInfoData& dat
     Deserialize(xmlNode, "BottomClearanceHeight", error, data.m_optionalBottomClearanceHeightInMM);
     Deserialize(xmlNode, "Weight", error, data.m_optionalWeightInGrams);
     Deserialize(xmlNode, "WorkOrderId", error, data.m_optionalWorkOrderId);
+    Deserialize(xmlNode, "BatchId", error, data.m_optionalBatchId);
     return error;
 }
 
@@ -701,6 +712,7 @@ Hermes::Error Hermes::Deserialize(pugi::xml_node xmlNode, BoardArrivedData& data
     Deserialize(xmlNode, "BottomClearanceHeight", error, data.m_optionalBottomClearanceHeightInMM);
     Deserialize(xmlNode, "Weight", error, data.m_optionalWeightInGrams);
     Deserialize(xmlNode, "WorkOrderId", error, data.m_optionalWorkOrderId);
+    Deserialize(xmlNode, "BatchId", error, data.m_optionalBatchId);
     return error;
 }
 
@@ -728,6 +740,7 @@ Hermes::Error Hermes::Deserialize(pugi::xml_node xmlNode, BoardDepartedData& dat
     Deserialize(xmlNode, "BottomClearanceHeight", error, data.m_optionalBottomClearanceHeightInMM);
     Deserialize(xmlNode, "Weight", error, data.m_optionalWeightInGrams);
     Deserialize(xmlNode, "WorkOrderId", error, data.m_optionalWorkOrderId);
+    Deserialize(xmlNode, "BatchId", error, data.m_optionalBatchId);
     return error;
 }
 
@@ -747,6 +760,7 @@ Hermes::Error Hermes::Deserialize(pugi::xml_node xmlNode, SendWorkOrderInfoData&
     Error error;
     Deserialize(xmlNode, "QueryId", error, data.m_optionalQueryId);
     Deserialize(xmlNode, "WorkOrderId", error, data.m_optionalWorkOrderId);
+    Deserialize(xmlNode, "BatchId", error, data.m_optionalBatchId);
     Deserialize(xmlNode, "BoardId", error, data.m_optionalBoardId);
     Deserialize(xmlNode, "BoardIdCreatedBy", error, data.m_optionalBoardIdCreatedBy);
     Deserialize(xmlNode, "FailedBoard", error, data.m_optionalFailedBoard);

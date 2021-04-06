@@ -566,3 +566,16 @@ __pycache__/
 /References/boost/callable_traits
 /References/boost/beast.hpp
 /References/boost/beast
+/src/include/HermesStringView.hpp.bak
+/src/include/HermesDataConversion.hpp.bak
+/src/include/HermesData.hpp.bak
+/src/include/HermesData.h.bak
+/src/include/Hermes.hpp.bak
+/src/Hermes/VerticalService.cpp.bak
+/src/Hermes/VerticalClientSession.h.bak
+/src/Hermes/VerticalClientSession.cpp.bak
+/src/Hermes/VerticalClient.cpp.bak
+/src/Hermes/SenderEnvelope.cpp.bak
+/src/Hermes/MessageSerialization.cpp.bak
+/src/Hermes/Downstream.cpp.bak
+/src/Hermes/Makefile.bak

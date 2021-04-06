@@ -758,7 +758,7 @@ namespace Hermes
     inline ConfigurationService::ConfigurationService(IConfigurationServiceCallback& callback):
         m_callback(callback)
     {
-        HermesConfigurationServiceCallbacks callbacks;
+        HermesConfigurationServiceCallbacks callbacks{};
         callbacks.m_connectedCallback.m_pData = this;
         callbacks.m_connectedCallback.m_pCall = [](void* pVoid, uint32_t sessionId, EHermesState, const HermesConnectionInfo* pInfo) 
         {

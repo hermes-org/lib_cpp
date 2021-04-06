@@ -217,27 +217,27 @@ namespace Hermes
             m_spImpl->m_upSerializer->Connect(m_spImpl, *m_spImpl);
         }
 
-        void Session::Signal(const SupervisoryServiceDescriptionData& data)
+        void Session::Signal(const SupervisoryServiceDescriptionData&, StringView rawXml)
         {
             switch (m_spImpl->m_state)
             {
             case EVerticalState::eSOCKET_CONNECTED:
                 m_spImpl->m_state = EVerticalState::eSUPERVISORY_SERVICE_DESCRIPTION;
-                m_spImpl->m_upSerializer->Signal(Serialize(data));
+                m_spImpl->m_upSerializer->Signal(rawXml);
                 return;
 
             default:
                 if (m_spImpl->DisconnectedDueToIllegalClientEvent_("ServiceDescription"))
                     return;
-                m_spImpl->m_upSerializer->Signal(Serialize(data));
+                m_spImpl->m_upSerializer->Signal(rawXml);
             }
         }
 
-        void Session::Signal(const SendWorkOrderInfoData& data) { m_spImpl->Signal_(Serialize(data)); }
-        void Session::Signal(const SetConfigurationData& data) { m_spImpl->Signal_(Serialize(data)); }
-        void Session::Signal(const GetConfigurationData& data) { m_spImpl->Signal_(Serialize(data)); }
-        void Session::Signal(const NotificationData& data) { m_spImpl->Signal_(Serialize(data)); }
-        void Session::Signal(const CheckAliveData& data) { m_spImpl->Signal_(Serialize(data)); }
+        void Session::Signal(const SendWorkOrderInfoData&, StringView rawXml) { m_spImpl->Signal_(rawXml); }
+        void Session::Signal(const SetConfigurationData&, StringView rawXml) { m_spImpl->Signal_(rawXml); }
+        void Session::Signal(const GetConfigurationData&, StringView rawXml) { m_spImpl->Signal_(rawXml); }
+        void Session::Signal(const NotificationData&, StringView rawXml) { m_spImpl->Signal_(rawXml); }
+        void Session::Signal(const CheckAliveData&, StringView rawXml) { m_spImpl->Signal_(rawXml); }
 
         void Session::Disconnect()
         {

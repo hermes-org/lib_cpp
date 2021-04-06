@@ -26,7 +26,7 @@ namespace Hermes
             std::ostringstream oss;
             oss << std::put_time(&local_tm, "%Y-%m-%dT%H:%M:%S.");
             auto milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(fraction);
-            oss << milliseconds.count();
+            oss << std::setw(3) << std::setfill('0') << milliseconds.count();
             return oss.str();
         }
     }

@@ -18,8 +18,10 @@ limitations under the License.
 #pragma once
 
 #include <algorithm>
-#include <string>
 #include <cstring>
+#include <ostream>
+#include <string>
+
 // while we have not got std::string_view at our disposal, we make our own:
 
 namespace Hermes

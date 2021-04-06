@@ -426,6 +426,7 @@ namespace Hermes
             CppToC(data.m_optionalBottomClearanceHeightInMM, m_data.m_pOptionalBottomClearanceHeightInMM);
             CppToC(data.m_optionalWeightInGrams, m_data.m_pOptionalWeightInGrams);
             CppToC(data.m_optionalWorkOrderId, m_data.m_optionalWorkOrderId);
+            CppToC(data.m_optionalBatchId, m_data.m_optionalBatchId);
         }
 
 
@@ -462,6 +463,7 @@ namespace Hermes
         CToCpp(data.m_pOptionalBottomClearanceHeightInMM, result.m_optionalBottomClearanceHeightInMM);
         CToCpp(data.m_pOptionalWeightInGrams, result.m_optionalWeightInGrams);
         CToCpp(data.m_optionalWorkOrderId, result.m_optionalWorkOrderId);
+        CToCpp(data.m_optionalBatchId, result.m_optionalBatchId);
         return result;
     }
 
@@ -488,6 +490,7 @@ namespace Hermes
         CppToC(data.m_optionalBottomClearanceHeightInMM, result.m_pOptionalBottomClearanceHeightInMM);
         CppToC(data.m_optionalWeightInGrams, result.m_pOptionalWeightInGrams);
         CppToC(data.m_optionalWorkOrderId, result.m_optionalWorkOrderId);
+        CppToC(data.m_optionalBatchId, result.m_optionalBatchId);
         return result;
     }
     inline BoardAvailableData ToCpp(const HermesBoardAvailableData& data) 
@@ -508,6 +511,7 @@ namespace Hermes
         CToCpp(data.m_pOptionalBottomClearanceHeightInMM, result.m_optionalBottomClearanceHeightInMM);
         CToCpp(data.m_pOptionalWeightInGrams, result.m_optionalWeightInGrams);
         CToCpp(data.m_optionalWorkOrderId, result.m_optionalWorkOrderId);
+        CToCpp(data.m_optionalBatchId, result.m_optionalBatchId);
         return result;
     }
 
@@ -635,6 +639,7 @@ namespace Hermes
         CppToC(data.m_optionalBottomClearanceHeightInMM, result.m_pOptionalBottomClearanceHeightInMM);
         CppToC(data.m_optionalWeightInGrams, result.m_pOptionalWeightInGrams);
         CppToC(data.m_optionalWorkOrderId, result.m_optionalWorkOrderId);
+        CppToC(data.m_optionalBatchId, result.m_optionalBatchId);
         return result;
     }
     inline BoardForecastData ToCpp(const HermesBoardForecastData& data)
@@ -657,6 +662,7 @@ namespace Hermes
         CToCpp(data.m_pOptionalBottomClearanceHeightInMM, result.m_optionalBottomClearanceHeightInMM);
         CToCpp(data.m_pOptionalWeightInGrams, result.m_optionalWeightInGrams);
         CToCpp(data.m_optionalWorkOrderId, result.m_optionalWorkOrderId);
+        CToCpp(data.m_optionalBatchId, result.m_optionalBatchId);
         return result;
     }
 
@@ -698,6 +704,7 @@ namespace Hermes
             CppToC(data.m_optionalBottomClearanceHeightInMM, m_data.m_pOptionalBottomClearanceHeightInMM);
             CppToC(data.m_optionalWeightInGrams, m_data.m_pOptionalWeightInGrams);
             CppToC(data.m_optionalWorkOrderId, m_data.m_optionalWorkOrderId);
+            CppToC(data.m_optionalBatchId, m_data.m_optionalBatchId);
         }
 
 
@@ -736,6 +743,7 @@ namespace Hermes
         CToCpp(data.m_pOptionalBottomClearanceHeightInMM, result.m_optionalBottomClearanceHeightInMM);
         CToCpp(data.m_pOptionalWeightInGrams, result.m_optionalWeightInGrams);
         CToCpp(data.m_optionalWorkOrderId, result.m_optionalWorkOrderId);
+        CToCpp(data.m_optionalBatchId, result.m_optionalBatchId);
         return result;
     }
 
@@ -848,6 +856,7 @@ namespace Hermes
         CppToC(data.m_optionalBottomClearanceHeightInMM, result.m_pOptionalBottomClearanceHeightInMM);
         CppToC(data.m_optionalWeightInGrams, result.m_pOptionalWeightInGrams);
         CppToC(data.m_optionalWorkOrderId, result.m_optionalWorkOrderId);
+        CppToC(data.m_optionalBatchId, result.m_optionalBatchId);
 
         return result;
     }
@@ -876,6 +885,7 @@ namespace Hermes
         CToCpp(data.m_pOptionalBottomClearanceHeightInMM, result.m_optionalBottomClearanceHeightInMM);
         CToCpp(data.m_pOptionalWeightInGrams, result.m_optionalWeightInGrams);
         CToCpp(data.m_optionalWorkOrderId, result.m_optionalWorkOrderId);
+        CToCpp(data.m_optionalBatchId, result.m_optionalBatchId);
         return result;
     }
 
@@ -903,7 +913,7 @@ namespace Hermes
         CppToC(data.m_optionalBottomClearanceHeightInMM, result.m_pOptionalBottomClearanceHeightInMM);
         CppToC(data.m_optionalWeightInGrams, result.m_pOptionalWeightInGrams);
         CppToC(data.m_optionalWorkOrderId, result.m_optionalWorkOrderId);
-
+        CppToC(data.m_optionalBatchId, result.m_optionalBatchId);
         return result;
     }
     inline BoardDepartedData ToCpp(const HermesBoardDepartedData& data)
@@ -932,6 +942,7 @@ namespace Hermes
         CToCpp(data.m_pOptionalBottomClearanceHeightInMM, result.m_optionalBottomClearanceHeightInMM);
         CToCpp(data.m_pOptionalWeightInGrams, result.m_optionalWeightInGrams);
         CToCpp(data.m_optionalWorkOrderId, result.m_optionalWorkOrderId);
+        CToCpp(data.m_optionalBatchId, result.m_optionalBatchId);
         return result;
     }
 
@@ -965,6 +976,7 @@ namespace Hermes
         {
             CppToC(data.m_optionalQueryId, m_data.m_optionalQueryId);
             CppToC(data.m_optionalWorkOrderId, m_data.m_optionalWorkOrderId);
+            CppToC(data.m_optionalBatchId, m_data.m_optionalBatchId);
             CppToC(data.m_optionalBoardId, m_data.m_optionalBoardId);
             CppToC(data.m_optionalBoardIdCreatedBy, m_data.m_optionalBoardIdCreatedBy);
             CppToC(data.m_optionalFailedBoard, m_optionalFailedBoard);
@@ -1004,6 +1016,7 @@ namespace Hermes
         SendWorkOrderInfoData result;
         CToCpp(data.m_optionalQueryId, result.m_optionalQueryId);
         CToCpp(data.m_optionalWorkOrderId, result.m_optionalWorkOrderId);
+        CToCpp(data.m_optionalBatchId, result.m_optionalBatchId);
         CToCpp(data.m_optionalBoardId, result.m_optionalBoardId);
         CToCpp(data.m_optionalBoardIdCreatedBy, result.m_optionalBoardIdCreatedBy);
         CToCpp(data.m_pOptionalFailedBoard, result.m_optionalFailedBoard);

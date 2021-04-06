@@ -150,7 +150,7 @@ struct HermesVerticalService : IAcceptorCallback, ISessionCallback
         auto itFound = m_sessionMap.find(id);
         if (itFound == m_sessionMap.end())
         {
-            m_service.Warn(id, "Session ID no longer");
+            m_service.Warn(id, "Session ID no longer valid");
             return nullptr;
         }
 

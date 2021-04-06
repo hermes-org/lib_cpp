@@ -447,7 +447,7 @@ inline constexpr std::size_t size(EVerticalState) { return 5; }
         std::string m_machineId;
         unsigned m_laneId{0};
         Optional<std::string> m_optionalInterfaceId;
-    std::string m_version{"1.2"};
+    std::string m_version{"1.3"};
         SupportedFeatures m_supportedFeatures;
 
         ServiceDescriptionData() = default;
@@ -533,6 +533,7 @@ inline constexpr std::size_t size(EVerticalState) { return 5; }
         Optional<double> m_optionalBottomClearanceHeightInMM;
         Optional<double> m_optionalWeightInGrams;
     Optional<std::string> m_optionalWorkOrderId;
+    Optional<std::string> m_optionalBatchId;
 
         BoardAvailableData() = default;
         BoardAvailableData(StringView boardId,
@@ -561,7 +562,8 @@ inline constexpr std::size_t size(EVerticalState) { return 5; }
                 && lhs.m_optionalTopClearanceHeightInMM == rhs.m_optionalTopClearanceHeightInMM
                 && lhs.m_optionalBottomClearanceHeightInMM == rhs.m_optionalBottomClearanceHeightInMM
             && lhs.m_optionalWeightInGrams == rhs.m_optionalWeightInGrams
-            && lhs.m_optionalWorkOrderId == rhs.m_optionalWorkOrderId;
+            && lhs.m_optionalWorkOrderId == rhs.m_optionalWorkOrderId
+            && lhs.m_optionalBatchId == rhs.m_optionalBatchId;
         }
         friend bool operator!=(const BoardAvailableData& lhs, const BoardAvailableData& rhs) { return !operator==(lhs, rhs); }
 
@@ -583,6 +585,7 @@ inline constexpr std::size_t size(EVerticalState) { return 5; }
             if (data.m_optionalBottomClearanceHeightInMM) { s << " BottomClearanceHeight=" << *data.m_optionalBottomClearanceHeightInMM; }
             if (data.m_optionalWeightInGrams) { s << " Weight=" << *data.m_optionalWeightInGrams; }
         if (data.m_optionalWorkOrderId) { s << " WorkOrderId=" << *data.m_optionalWorkOrderId; }
+        if (data.m_optionalBatchId) { s << " BatchId=" << *data.m_optionalBatchId; }
             s << " }";
             return s;
         }
@@ -614,6 +617,7 @@ inline constexpr std::size_t size(EVerticalState) { return 5; }
         Optional<double> m_optionalBottomClearanceHeightInMM;
         Optional<double> m_optionalWeightInGrams;
     Optional<std::string> m_optionalWorkOrderId;
+    Optional<std::string> m_optionalBatchId;
 
         MachineReadyData() = default;
         explicit MachineReadyData(EBoardQuality failedBoard) :
@@ -636,7 +640,8 @@ inline constexpr std::size_t size(EVerticalState) { return 5; }
                 && lhs.m_optionalTopClearanceHeightInMM == rhs.m_optionalTopClearanceHeightInMM
                 && lhs.m_optionalBottomClearanceHeightInMM == rhs.m_optionalBottomClearanceHeightInMM
             && lhs.m_optionalWeightInGrams == rhs.m_optionalWeightInGrams
-            && lhs.m_optionalWorkOrderId == rhs.m_optionalWorkOrderId;
+            && lhs.m_optionalWorkOrderId == rhs.m_optionalWorkOrderId
+            && lhs.m_optionalBatchId == rhs.m_optionalBatchId;
         }
         friend bool operator!=(const MachineReadyData& lhs, const MachineReadyData& rhs) { return !operator==(lhs, rhs); }
 
@@ -658,6 +663,7 @@ inline constexpr std::size_t size(EVerticalState) { return 5; }
             if (data.m_optionalBottomClearanceHeightInMM) { s << " BottomClearanceHeight=" << *data.m_optionalBottomClearanceHeightInMM; }
             if (data.m_optionalWeightInGrams) { s << " Weight=" << *data.m_optionalWeightInGrams; }
         if (data.m_optionalWorkOrderId) { s << " WorkOrderId=" << *data.m_optionalWorkOrderId; }
+        if (data.m_optionalBatchId) { s << " BatchId=" << *data.m_optionalBatchId; }
             s << " }";
             return s;
         }
@@ -952,6 +958,7 @@ inline constexpr std::size_t size(EVerticalState) { return 5; }
         Optional<double> m_optionalBottomClearanceHeightInMM;
         Optional<double> m_optionalWeightInGrams;
     Optional<std::string> m_optionalWorkOrderId;
+    Optional<std::string> m_optionalBatchId;
 
         BoardForecastData() = default;
         BoardForecastData(EBoardQuality failedBoard,
@@ -978,7 +985,8 @@ inline constexpr std::size_t size(EVerticalState) { return 5; }
                 && lhs.m_optionalTopClearanceHeightInMM == rhs.m_optionalTopClearanceHeightInMM
                 && lhs.m_optionalBottomClearanceHeightInMM == rhs.m_optionalBottomClearanceHeightInMM
             && lhs.m_optionalWeightInGrams == rhs.m_optionalWeightInGrams
-            && lhs.m_optionalWorkOrderId == rhs.m_optionalWorkOrderId;
+            && lhs.m_optionalWorkOrderId == rhs.m_optionalWorkOrderId
+            && lhs.m_optionalBatchId == rhs.m_optionalBatchId;
         }
         friend bool operator!=(const BoardForecastData& lhs, const BoardForecastData& rhs) { return !operator==(lhs, rhs); }
 
@@ -1002,6 +1010,7 @@ inline constexpr std::size_t size(EVerticalState) { return 5; }
             if (data.m_optionalBottomClearanceHeightInMM) { s << " BottomClearanceHeight=" << *data.m_optionalBottomClearanceHeightInMM; }
             if (data.m_optionalWeightInGrams) { s << " Weight=" << *data.m_optionalWeightInGrams; }
         if (data.m_optionalWorkOrderId) { s << " WorkOrderId=" << *data.m_optionalWorkOrderId; }
+        if (data.m_optionalBatchId) { s << " BatchId=" << *data.m_optionalBatchId; }
             s << " }";
             return s;
         }
@@ -1048,6 +1057,7 @@ inline constexpr std::size_t size(EVerticalState) { return 5; }
         Optional<double> m_optionalBottomClearanceHeightInMM;
         Optional<double> m_optionalWeightInGrams;
     Optional<std::string> m_optionalWorkOrderId;
+    Optional<std::string> m_optionalBatchId;
 
         friend bool operator==(const SendBoardInfoData& lhs, const SendBoardInfoData& rhs)
         {
@@ -1065,7 +1075,8 @@ inline constexpr std::size_t size(EVerticalState) { return 5; }
                 && lhs.m_optionalTopClearanceHeightInMM == rhs.m_optionalTopClearanceHeightInMM
                 && lhs.m_optionalBottomClearanceHeightInMM == rhs.m_optionalBottomClearanceHeightInMM
             && lhs.m_optionalWeightInGrams == rhs.m_optionalWeightInGrams
-            && lhs.m_optionalWorkOrderId == rhs.m_optionalWorkOrderId;
+            && lhs.m_optionalWorkOrderId == rhs.m_optionalWorkOrderId
+            && lhs.m_optionalBatchId == rhs.m_optionalBatchId;
         }
         friend bool operator!=(const SendBoardInfoData& lhs, const SendBoardInfoData& rhs) { return !operator==(lhs, rhs); }
 
@@ -1087,6 +1098,7 @@ inline constexpr std::size_t size(EVerticalState) { return 5; }
             if (data.m_optionalBottomClearanceHeightInMM) { s << " BottomClearanceHeight=" << *data.m_optionalBottomClearanceHeightInMM; }
             if (data.m_optionalWeightInGrams) { s << " Weight=" << *data.m_optionalWeightInGrams; }
         if (data.m_optionalWorkOrderId) { s << " WorkOrderId=" << *data.m_optionalWorkOrderId; }
+        if (data.m_optionalBatchId) { s << " BatchId=" << *data.m_optionalBatchId; }
         s << " }";
         return s;
     }
@@ -1160,7 +1172,7 @@ struct SupervisoryFeatures
 struct SupervisoryServiceDescriptionData
 {
     std::string m_systemId;
-    std::string m_version{"1.2"};
+    std::string m_version{"1.3"};
     SupervisoryFeatures m_supportedFeatures;
 
     SupervisoryServiceDescriptionData() = default;
@@ -1211,6 +1223,7 @@ struct BoardArrivedData
     Optional<double> m_optionalBottomClearanceHeightInMM;
     Optional<double> m_optionalWeightInGrams;
     Optional<std::string> m_optionalWorkOrderId;
+    Optional<std::string> m_optionalBatchId;
 
     BoardArrivedData() = default;
     BoardArrivedData(StringView machineId,
@@ -1251,7 +1264,8 @@ struct BoardArrivedData
             && lhs.m_optionalTopClearanceHeightInMM == rhs.m_optionalTopClearanceHeightInMM
             && lhs.m_optionalBottomClearanceHeightInMM == rhs.m_optionalBottomClearanceHeightInMM
             && lhs.m_optionalWeightInGrams == rhs.m_optionalWeightInGrams
-            && lhs.m_optionalWorkOrderId == rhs.m_optionalWorkOrderId;
+            && lhs.m_optionalWorkOrderId == rhs.m_optionalWorkOrderId
+            && lhs.m_optionalBatchId == rhs.m_optionalBatchId;
     }
     friend bool operator!=(const BoardArrivedData& lhs, const BoardArrivedData& rhs) { return !operator==(lhs, rhs); }
 
@@ -1279,6 +1293,7 @@ struct BoardArrivedData
         if (data.m_optionalBottomClearanceHeightInMM) { s << " BottomClearanceHeight=" << *data.m_optionalBottomClearanceHeightInMM; }
         if (data.m_optionalWeightInGrams) { s << " Weight=" << *data.m_optionalWeightInGrams; }
         if (data.m_optionalWorkOrderId) { s << " WorkOrderId=" << *data.m_optionalWorkOrderId; }
+        if (data.m_optionalBatchId) { s << " BatchId=" << *data.m_optionalBatchId; }
         s << " }";
         return s;
     }
@@ -1308,6 +1323,7 @@ struct BoardDepartedData
     Optional<double> m_optionalBottomClearanceHeightInMM;
     Optional<double> m_optionalWeightInGrams;
     Optional<std::string> m_optionalWorkOrderId;
+    Optional<std::string> m_optionalBatchId;
 
     BoardDepartedData() = default;
     BoardDepartedData(StringView machineId,
@@ -1348,7 +1364,8 @@ struct BoardDepartedData
             && lhs.m_optionalTopClearanceHeightInMM == rhs.m_optionalTopClearanceHeightInMM
             && lhs.m_optionalBottomClearanceHeightInMM == rhs.m_optionalBottomClearanceHeightInMM
             && lhs.m_optionalWeightInGrams == rhs.m_optionalWeightInGrams
-            && lhs.m_optionalWorkOrderId == rhs.m_optionalWorkOrderId;
+            && lhs.m_optionalWorkOrderId == rhs.m_optionalWorkOrderId
+            && lhs.m_optionalBatchId == rhs.m_optionalBatchId;
     }
     friend bool operator!=(const BoardDepartedData& lhs, const BoardDepartedData& rhs) { return !operator==(lhs, rhs); }
 
@@ -1376,6 +1393,7 @@ struct BoardDepartedData
         if (data.m_optionalBottomClearanceHeightInMM) { s << " BottomClearanceHeight=" << *data.m_optionalBottomClearanceHeightInMM; }
         if (data.m_optionalWeightInGrams) { s << " Weight=" << *data.m_optionalWeightInGrams; }
         if (data.m_optionalWorkOrderId) { s << " WorkOrderId=" << *data.m_optionalWorkOrderId; }
+        if (data.m_optionalBatchId) { s << " BatchId=" << *data.m_optionalBatchId; }
         s << " }";
         return s;
     }
@@ -1423,6 +1441,7 @@ struct SendWorkOrderInfoData
 {
     Optional<std::string> m_optionalQueryId;
     Optional<std::string> m_optionalWorkOrderId;
+    Optional<std::string> m_optionalBatchId;
     Optional<std::string> m_optionalBoardId;
     Optional<std::string> m_optionalBoardIdCreatedBy;
     Optional<EBoardQuality> m_optionalFailedBoard;
@@ -1442,6 +1461,7 @@ struct SendWorkOrderInfoData
     {
         return lhs.m_optionalQueryId == rhs.m_optionalQueryId
             && lhs.m_optionalWorkOrderId == rhs.m_optionalWorkOrderId
+            && lhs.m_optionalBatchId == rhs.m_optionalBatchId
             && lhs.m_optionalBoardId == rhs.m_optionalBoardId
             && lhs.m_optionalBoardIdCreatedBy == rhs.m_optionalBoardIdCreatedBy
             && lhs.m_optionalFailedBoard == rhs.m_optionalFailedBoard
@@ -1464,6 +1484,7 @@ struct SendWorkOrderInfoData
         s << '{';
         if (data.m_optionalQueryId) { s << " QueryId=" << *data.m_optionalQueryId; }
         if (data.m_optionalWorkOrderId) { s << " WorkOrderId=" << *data.m_optionalWorkOrderId; }
+        if (data.m_optionalBatchId) { s << " BatchId=" << *data.m_optionalBatchId; }
         if (data.m_optionalBoardId) { s << " BoardId=" << *data.m_optionalBoardId; }
         if (data.m_optionalBoardIdCreatedBy) { s << " BoardIdCreatedBy=" << *data.m_optionalBoardIdCreatedBy; }
         if (data.m_optionalFailedBoard) { s << " FailedBoard=" << *data.m_optionalFailedBoard; }

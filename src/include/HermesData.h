@@ -230,6 +230,7 @@ enum EHermesVerticalState
         const double* m_pOptionalBottomClearanceHeightInMM;
         const double* m_pOptionalWeightInGrams;
     HermesStringView m_optionalWorkOrderId;
+    HermesStringView m_optionalBatchId;
     };
 
     /* RevokeBoardAvailable, The Hermes Standard 3.7 */
@@ -255,6 +256,7 @@ enum EHermesVerticalState
         const double* m_pOptionalBottomClearanceHeightInMM;
         const double* m_pOptionalWeightInGrams;
     HermesStringView m_optionalWorkOrderId;
+    HermesStringView m_optionalBatchId;
     };
 
     /* RevokeMachineReady, The Hermes Standard 3.9 */
@@ -358,6 +360,7 @@ enum EHermesVerticalState
         const double* m_pOptionalBottomClearanceHeightInMM;
         const double* m_pOptionalWeightInGrams;
     HermesStringView m_optionalWorkOrderId;
+    HermesStringView m_optionalBatchId;
     };
 
     /* QueryBoardInfo, The Hermes Standard 3.17 */
@@ -385,6 +388,7 @@ enum EHermesVerticalState
         const double* m_pOptionalBottomClearanceHeightInMM;
         const double* m_pOptionalWeightInGrams;
     HermesStringView m_optionalWorkOrderId;
+    HermesStringView m_optionalBatchId;
 };
 
 /* FeatureConfiguration, The Hermes Standard 3.22 */
@@ -449,6 +453,7 @@ struct HermesBoardArrivedData
     const double* m_pOptionalBottomClearanceHeightInMM;
     const double* m_pOptionalWeightInGrams;
     HermesStringView m_optionalWorkOrderId;
+    HermesStringView m_optionalBatchId;
 };
 
 /* BoardDeparted, The Hermes Standard 3.24 */
@@ -475,6 +480,7 @@ struct HermesBoardDepartedData
     const double* m_pOptionalBottomClearanceHeightInMM;
     const double* m_pOptionalWeightInGrams;
     HermesStringView m_optionalWorkOrderId;
+    HermesStringView m_optionalBatchId;
 };
 
 /* QueryWorkOrderInfo, The Hermes Standard 3.25 */
@@ -492,6 +498,7 @@ struct HermesSendWorkOrderInfoData
 {
     HermesStringView m_optionalQueryId;
     HermesStringView m_optionalWorkOrderId;
+    HermesStringView m_optionalBatchId;
     HermesStringView m_optionalBoardId;
     HermesStringView m_optionalBoardIdCreatedBy;
     const EHermesBoardQuality* m_pOptionalFailedBoard;
