@@ -63,5 +63,20 @@
     <ClCompile Include="CApiTest.cpp">
       <Filter>Tests</Filter>
     </ClCompile>
+    <ClCompile Include="BoardForecastTest.cpp">
+      <Filter>Tests</Filter>
+    </ClCompile>
+    <ClCompile Include="CheckAliveTest.cpp">
+      <Filter>Tests</Filter>
+    </ClCompile>
+    <ClCompile Include="QueryAndSendBoardInfoTest.cpp">
+      <Filter>Tests</Filter>
+    </ClCompile>
+    <ClCompile Include="RawXmlTest.cpp">
+      <Filter>Tests</Filter>
+    </ClCompile>
+    <ClCompile Include="VerticalTest.cpp">
+      <Filter>Tests</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

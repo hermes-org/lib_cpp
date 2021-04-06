@@ -140,6 +140,18 @@
     <ClInclude Include="MessageDispatcher.h">
       <Filter>Serialization</Filter>
     </ClInclude>
+    <ClInclude Include="VerticalClientSerializer.h">
+      <Filter>Service</Filter>
+    </ClInclude>
+    <ClInclude Include="VerticalClientSession.h">
+      <Filter>Service</Filter>
+    </ClInclude>
+    <ClInclude Include="VerticalServiceSerializer.h">
+      <Filter>Service</Filter>
+    </ClInclude>
+    <ClInclude Include="VerticalServiceSession.h">
+      <Filter>Service</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -193,9 +205,6 @@
     <ClCompile Include="Serialization.cpp">
       <Filter>Serialization</Filter>
     </ClCompile>
-    <ClCompile Include="GeneratedHermesGuid.cpp">
-      <Filter>Infra</Filter>
-    </ClCompile>
     <ClCompile Include="MessageSerialization.cpp">
       <Filter>Serialization</Filter>
     </ClCompile>
@@ -208,6 +217,12 @@
     <ClCompile Include="MessageDispatcher.cpp">
       <Filter>Serialization</Filter>
     </ClCompile>
+    <ClCompile Include="VerticalClient.cpp" />
+    <ClCompile Include="VerticalClientSerializer.cpp" />
+    <ClCompile Include="VerticalClientSession.cpp" />
+    <ClCompile Include="VerticalService.cpp" />
+    <ClCompile Include="VerticalServiceSerializer.cpp" />
+    <ClCompile Include="VerticalServiceSession.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="..\..\version\Version.rc">
