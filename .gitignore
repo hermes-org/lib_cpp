@@ -579,3 +579,9 @@ __pycache__/
 /src/Hermes/MessageSerialization.cpp.bak
 /src/Hermes/Downstream.cpp.bak
 /src/Hermes/Makefile.bak
+/References/boost
+/src/Hermes/pugixml
+/version
+/tmp/Hermes_Debug_x64
+/src/Hermes/pugixml.notUse
+/tmp
