@@ -39,6 +39,12 @@ namespace Hermes
         return service.Alarm(sessionId, EErrorCode::eNETWORK_ERROR, trace..., ": ", ec.message(), '(', ec.value(), ')');
     }
 
+    template<class... Ts>
+    void Info(IAsioService& service, unsigned sessionId, const boost::system::error_code& ec, const Ts&... trace)
+    {
+        service.Inform(sessionId, trace..., ": ", ec.message(), '(', ec.value(), ')');
+    }
+
     struct AsioSocket
     {
         unsigned m_sessionId;
@@ -106,6 +112,13 @@ namespace Hermes
             return Hermes::Alarm(m_service, m_sessionId, ec, trace...);
         }
 
+        template<class... Ts>
+        Error Info(const boost::system::error_code& ec, const Ts&... trace)
+        {
+            Hermes::Info(m_service, m_sessionId, ec, trace...);
+            return Error{};
+        }
+
     private:
 
         template<class... Ts>
@@ -116,7 +129,7 @@ namespace Hermes
             
             // consider closed connections not to be an error:
             bool isError = (asio::error::eof != ec) && (asio::error::connection_reset != ec);
-            auto error = isError ? Alarm(ec, trace...) : Error();
+            auto error = isError ? Alarm(ec, trace...) : Info(ec, trace...);
 
             auto* pCallback = Close_();
             if (!pCallback)

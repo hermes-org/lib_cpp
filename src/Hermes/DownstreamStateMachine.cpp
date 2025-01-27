@@ -191,24 +191,20 @@ namespace Hermes
                 }
             }
 
+            // Board forecast is suppressed if we are not in a valid state for it.
+            // This is different from other calls from client side in an illegal state
+            // because from client perspective, it is very hand to handle it correctly.
             void Signal(const BoardForecastData&, StringView rawXml) override
             {
                 switch (m_state)
                 {
                 case EState::eNOT_AVAILABLE_NOT_READY:
-                    m_forward.Signal(rawXml);
-                    return;
-
                 case EState::eMACHINE_READY:
                     m_forward.Signal(rawXml);
                     return;
 
-                case EState::eTRANSPORTING:
-                case EState::eTRANSPORT_STOPPED:
-                    return;
-
                 default:
-                    if (DisconnectedDueToIllegalClientEvent_("BoardForecast"))
+                    if (m_checkState == ECheckState::eSEND_AND_RECEIVE)
                         return;
                     m_forward.Signal(rawXml);
                 }
@@ -229,6 +225,20 @@ namespace Hermes
             }
 
             void Signal(const NotificationData&, StringView rawXml) override
+            {
+                switch (m_state)
+                {
+                case EState::eNOT_CONNECTED:
+                case EState::eDISCONNECTED:
+                    return;
+
+                default:
+                    m_forward.Signal(rawXml);
+                    return;
+                }
+            }
+
+            void Signal(const CommandData&, StringView rawXml) override
             {
                 switch (m_state)
                 {
@@ -389,11 +399,10 @@ namespace Hermes
                 {
                 case EState::eNOT_CONNECTED:
                 case EState::eDISCONNECTED:
-                    return OnUnexpectedPeerEvent_("QueryBoardInfo");
+                    return;
 
                 default:
                     m_pCallback->On(m_state, data);
-                    return;
                 }
             }
 
@@ -403,11 +412,23 @@ namespace Hermes
                 {
                 case EState::eNOT_CONNECTED:
                 case EState::eDISCONNECTED:
-                    return OnUnexpectedPeerEvent_("Notification");
+                    return;
 
                 default:
                     m_pCallback->On(m_state, data);
+                }
+            }
+
+            void On(const CommandData& data) override
+            {
+                switch (m_state)
+                {
+                case EState::eNOT_CONNECTED:
+                case EState::eDISCONNECTED:
                     return;
+
+                default:
+                    m_pCallback->On(m_state, data);
                 }
             }
 
@@ -417,11 +438,10 @@ namespace Hermes
                 {
                 case EState::eNOT_CONNECTED:
                 case EState::eDISCONNECTED:
-                    return OnUnexpectedPeerEvent_("Notification");
+                    return;
 
                 default:
                     m_pCallback->On(m_state, data);
-                    return;
                 }
             }
 

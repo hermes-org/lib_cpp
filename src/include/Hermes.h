@@ -82,6 +82,13 @@ extern "C" {
         void* m_pData;
     };
 
+    // Command received:
+    struct HermesCommandCallback
+    {
+        void(*m_pCall)(void* /*m_pData*/, uint32_t /*sessionId*/, const HermesCommandData*);
+        void* m_pData;
+    };
+
     // The remote host has sent its service description
     struct HermesServiceDescriptionCallback
     {
@@ -187,6 +194,7 @@ extern "C" {
         HermesNotificationCallback m_notificationCallback;
         HermesStateCallback m_stateCallback;
         HermesCheckAliveCallback m_checkAliveCallback;
+        HermesCommandCallback m_commandCallback;
         HermesDisconnectedCallback m_disconnectedCallback;
         HermesTraceCallback m_traceCallback;
     };
@@ -213,6 +221,7 @@ extern "C" {
     HERMESPROTOCOL_API void SignalHermesSendBoardInfo(HermesDownstream*, uint32_t sessionId, const HermesSendBoardInfoData*);
     HERMESPROTOCOL_API void SignalHermesDownstreamNotification(HermesDownstream*, uint32_t sessionId, const HermesNotificationData*);
     HERMESPROTOCOL_API void SignalHermesDownstreamCheckAlive(HermesDownstream*, uint32_t sessionId, const HermesCheckAliveData*);
+    HERMESPROTOCOL_API void SignalHermesDownstreamCommand(HermesDownstream*, uint32_t sessionId, const HermesCommandData*);
     HERMESPROTOCOL_API void ResetHermesDownstream(HermesDownstream*, const HermesNotificationData*);
 
     HERMESPROTOCOL_API void DisableHermesDownstream(HermesDownstream*, const HermesNotificationData*);
@@ -238,6 +247,7 @@ extern "C" {
         HermesNotificationCallback m_notificationCallback;
         HermesStateCallback m_stateCallback;
         HermesCheckAliveCallback m_checkAliveCallback;
+        HermesCommandCallback m_commandCallback;
         HermesDisconnectedCallback m_disconnectedCallback;
         HermesTraceCallback m_traceCallback;
     };
@@ -257,6 +267,7 @@ extern "C" {
     HERMESPROTOCOL_API void SignalHermesQueryBoardInfo(HermesUpstream*, uint32_t sessionId, const HermesQueryBoardInfoData*);
     HERMESPROTOCOL_API void SignalHermesUpstreamNotification(HermesUpstream*, uint32_t sessionId, const HermesNotificationData*);
     HERMESPROTOCOL_API void SignalHermesUpstreamCheckAlive(HermesUpstream*, uint32_t sessionId, const HermesCheckAliveData*);
+    HERMESPROTOCOL_API void SignalHermesUpstreamCommand(HermesUpstream*, uint32_t sessionId, const HermesCommandData*);
     HERMESPROTOCOL_API void ResetHermesUpstream(HermesUpstream*, const HermesNotificationData*);
 
     HERMESPROTOCOL_API void DisableHermesUpstream(HermesUpstream*, const HermesNotificationData*);
@@ -360,6 +371,12 @@ extern "C" {
         void* m_pData;
     };
 
+    struct HermesQueryHermesCapabilitiesCallback
+    {
+        void(*m_pCall)(void* /*m_pData*/, uint32_t /*sessionId*/, const HermesQueryHermesCapabilitiesData*);
+        void* m_pData;
+    };
+
     struct HermesVerticalDisconnectedCallback
     {
         void(*m_pCall)(void* /*m_pData*/, uint32_t /*sessionId*/, EHermesVerticalState, const HermesError*);
@@ -375,6 +392,7 @@ extern "C" {
         HermesCheckAliveCallback m_checkAliveCallback;
         HermesGetConfigurationCallback m_getConfigurationCallback;
         HermesSetConfigurationCallback m_setConfigurationCallback;
+        HermesQueryHermesCapabilitiesCallback m_queryHermesCapabilitiesCallback;
         HermesVerticalDisconnectedCallback m_disconnectedCallback;
         HermesTraceCallback m_traceCallback;
     };
@@ -388,9 +406,11 @@ extern "C" {
 
     HERMESPROTOCOL_API void SignalHermesVerticalServiceDescription(HermesVerticalService*, uint32_t sessionId, const HermesSupervisoryServiceDescriptionData*);
     HERMESPROTOCOL_API void SignalHermesQueryWorkOrderInfo(HermesVerticalService*, uint32_t sessionId, const HermesQueryWorkOrderInfoData*);
+    HERMESPROTOCOL_API void SignalHermesReplyWorkOrderInfo(HermesVerticalService*, uint32_t sessionId, const HermesReplyWorkOrderInfoData*);
     HERMESPROTOCOL_API void SignalHermesVerticalServiceNotification(HermesVerticalService*, uint32_t sessionId, const HermesNotificationData*);
     HERMESPROTOCOL_API void SignalHermesVerticalServiceCheckAlive(HermesVerticalService*, uint32_t sessionId, const HermesCheckAliveData*);
     HERMESPROTOCOL_API void SignalHermesVerticalCurrentConfiguration(HermesVerticalService*, uint32_t sessionId, const HermesCurrentConfigurationData*);
+    HERMESPROTOCOL_API void SignalHermesSendHermesCapabilities(HermesVerticalService*, uint32_t sessionId, const HermesSendHermesCapabilitiesData*);
 
     // if sessionId == 0, then the following two are propagated to all clients that have specified FeatureBoardTracking
     HERMESPROTOCOL_API void SignalHermesBoardArrived(HermesVerticalService*, uint32_t sessionId, const HermesBoardArrivedData*);
@@ -408,6 +428,12 @@ extern "C" {
         void* m_pData;
     };
 
+    struct HermesReplyWorkOrderInfoCallback
+    {
+        void(*m_pCall)(void* /*m_pData*/, uint32_t /*sessionId*/, const HermesReplyWorkOrderInfoData*);
+        void* m_pData;
+    };
+
     struct HermesBoardArrivedCallback
     {
         void(*m_pCall)(void* /*m_pData*/, uint32_t /*sessionId*/, const HermesBoardArrivedData*);
@@ -419,14 +445,22 @@ extern "C" {
         void(*m_pCall)(void* /*m_pData*/, uint32_t /*sessionId*/, const HermesBoardDepartedData*);
         void* m_pData;
     };
-
+    
+    struct HermesSendHermesCapabilitiesCallback
+    {
+        void(*m_pCall)(void* /*m_pData*/, uint32_t /*sessionId*/, const HermesSendHermesCapabilitiesData*);
+        void* m_pData;
+    };
+    
     struct HermesVerticalClientCallbacks
     {
         HermesVerticalConnectedCallback m_connectedCallback;
         HermesSupervisoryServiceDescriptionCallback m_serviceDescriptionCallback;
         HermesBoardArrivedCallback m_boardArrivedCallback;
         HermesBoardDepartedCallback m_boardDepartedCallback;
+        HermesSendHermesCapabilitiesCallback m_sendHermesCapabilitiesCallback;
         HermesQueryWorkOrderInfoCallback m_queryWorkOrderInfoCallback;
+        HermesReplyWorkOrderInfoCallback m_replyWorkOrderInfoCallback;
         HermesNotificationCallback m_notificationCallback;
         HermesCurrentConfigurationCallback m_currentConfigurationCallback;
         HermesCheckAliveCallback m_checkAliveCallback;
@@ -446,6 +480,8 @@ extern "C" {
     HERMESPROTOCOL_API void SignalHermesSendWorkOrderInfo(HermesVerticalClient*, uint32_t sessionId, const HermesSendWorkOrderInfoData*);
     HERMESPROTOCOL_API void SignalHermesVerticalGetConfiguration(HermesVerticalClient*, uint32_t sessionId, const HermesGetConfigurationData*);
     HERMESPROTOCOL_API void SignalHermesVerticalSetConfiguration(HermesVerticalClient*, uint32_t sessionId, const HermesSetConfigurationData*);
+    HERMESPROTOCOL_API void SignalHermesVerticalQueryHermesCapabilities(HermesVerticalClient*, uint32_t sessionId, const HermesQueryHermesCapabilitiesData*);
+    
     HERMESPROTOCOL_API void SignalHermesVerticalClientNotification(HermesVerticalClient*, uint32_t sessionId, const HermesNotificationData*);
     HERMESPROTOCOL_API void SignalHermesVerticalClientCheckAlive(HermesVerticalClient*, uint32_t sessionId, const HermesCheckAliveData*);
     

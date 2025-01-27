@@ -159,30 +159,30 @@ struct HermesConfigurationService : IAcceptorCallback, IConfigurationServiceSess
     }
 
     //================= IConfigurationServiceSessionCallback =========================
-    void OnSocketConnected(unsigned sessionId, const ConnectionInfo& connectionInfo) override
+    void OnSocketConnected(unsigned sessionId, const ConnectionInfo& data) override
     {
-        auto apiConnectionInfo = ToC(connectionInfo);
-        m_connectedCallback(sessionId, eHERMES_STATE_SOCKET_CONNECTED, &apiConnectionInfo);
+        const Converter2C<ConnectionInfo> converter(data);
+        m_connectedCallback(sessionId, eHERMES_STATE_SOCKET_CONNECTED, converter.CPointer());
     }
 
     virtual void OnGet(unsigned sessionId, const ConnectionInfo& connectionInfo,
         const GetConfigurationData& data, IGetConfigurationResponse& responder) override
     {
-        HermesConnectionInfo apiConnectionInfo = ToC(connectionInfo);
-        HermesGetConfigurationData apiData = ToC(data);
+        const Converter2C<ConnectionInfo> connectionConverter(connectionInfo);
+        const Converter2C<GetConfigurationData> dataConverter(data);
 
         CallbackScope<IGetConfigurationResponse> scope(m_pGetConfigurationResponder, responder);
-        m_getConfigurationCallback(sessionId, &apiData, &apiConnectionInfo);
+        m_getConfigurationCallback(sessionId, dataConverter.CPointer(), connectionConverter.CPointer());
     }
 
     virtual void OnSet(unsigned sessionId, const ConnectionInfo& connectionInfo,
-        const SetConfigurationData& configuration, ISetConfigurationResponse& responder) override
+        const SetConfigurationData& data, ISetConfigurationResponse& responder) override
     {
-        auto apiConnectionInfo = ToC(connectionInfo);
-        auto apiConfiguration = ToC(configuration);
+        const Converter2C<ConnectionInfo> connectionConverter(connectionInfo);
+        const Converter2C<SetConfigurationData> dataConverter(data);
 
         CallbackScope<ISetConfigurationResponse> scope(m_pSetConfigurationResponder, responder);
-        m_setConfigurationCallback(sessionId, &apiConfiguration, &apiConnectionInfo);
+        m_setConfigurationCallback(sessionId, dataConverter.CPointer(), connectionConverter.CPointer());
     }
 
     virtual void OnDisconnected(unsigned sessionId, const Error& error) override
@@ -191,8 +191,8 @@ struct HermesConfigurationService : IAcceptorCallback, IConfigurationServiceSess
         if (!m_sessionMap.erase(sessionId))
             return;
 
-        auto apiError = ToC(error);
-        m_disconnectedCallback(sessionId, eHERMES_STATE_DISCONNECTED, &apiError);
+        const Converter2C<Error> converter(error);
+        m_disconnectedCallback(sessionId, eHERMES_STATE_DISCONNECTED, converter.CPointer());
     }
 };
 

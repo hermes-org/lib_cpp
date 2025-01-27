@@ -42,6 +42,7 @@ namespace Hermes
                 m_dispatcher.Add<ServiceDescriptionData>([this](const auto& data) { m_pCallback->On(data); });
                 m_dispatcher.Add<CheckAliveData>([this](const auto& data) { m_pCallback->On(data); });
                 m_dispatcher.Add<NotificationData>([this](const auto& data) { m_pCallback->On(data); });
+                m_dispatcher.Add<CommandData>([this](const auto& data) { m_pCallback->On(data); });
                 m_dispatcher.Add<BoardAvailableData>([this](const auto& data) { m_pCallback->On(data); });
                 m_dispatcher.Add<RevokeBoardAvailableData>([this](const auto& data) { m_pCallback->On(data); });
                 m_dispatcher.Add<TransportFinishedData>([this](const auto& data) { m_pCallback->On(data); });

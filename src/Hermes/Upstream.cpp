@@ -46,6 +46,7 @@ struct HermesUpstream : ISessionCallback
     ApiCallback<HermesBoardForecastCallback> m_boardForecastCallback;
     ApiCallback<HermesSendBoardInfoCallback> m_sendBoardInfoCallback;
     ApiCallback<HermesNotificationCallback> m_notificationCallback;
+    ApiCallback<HermesCommandCallback> m_commandCallback;
     ApiCallback<HermesCheckAliveCallback> m_checkAliveCallback;
     ApiCallback<HermesStateCallback> m_stateCallback;
     ApiCallback<HermesDisconnectedCallback> m_disconnectedCallback;
@@ -65,6 +66,7 @@ struct HermesUpstream : ISessionCallback
         m_boardForecastCallback(callbacks.m_boardForecastCallback),
         m_sendBoardInfoCallback(callbacks.m_sendBoardInfoCallback),
         m_notificationCallback(callbacks.m_notificationCallback),
+        m_commandCallback(callbacks.m_commandCallback),
         m_checkAliveCallback(callbacks.m_checkAliveCallback),
         m_stateCallback(callbacks.m_stateCallback),
         m_disconnectedCallback(callbacks.m_disconnectedCallback)
@@ -108,7 +110,7 @@ struct HermesUpstream : ISessionCallback
     {
         m_service.Log(sessionId, "Signal(", data, ',', rawXml, ')');
 
-        auto pSession = Session_(sessionId);
+        auto* pSession = Session_(sessionId);
         if (!pSession)
             return;
 
@@ -125,90 +127,100 @@ struct HermesUpstream : ISessionCallback
     }
 
     //================= ISessionCallback =========================
-    void OnSocketConnected(unsigned sessionId, EState state, const ConnectionInfo& connectionInfo) override
+    void OnSocketConnected(unsigned sessionId, EState state, const ConnectionInfo& in_data) override
     {
-        auto* pSession = Session_(sessionId);
+        const auto* pSession = Session_(sessionId);
         if (!pSession)
             return;
 
         m_connectedSessionId = pSession->Id();
-        auto apiConnectionInfo = ToC(connectionInfo);
-        m_connectedCallback(pSession->Id(), ToC(state), &apiConnectionInfo);
+        const Converter2C<ConnectionInfo> converter(in_data);
+        m_connectedCallback(pSession->Id(), ToC(state), converter.CPointer());
     }
 
-    void On(unsigned sessionId, EState state, const ServiceDescriptionData& serviceDescription) override
+    void On(unsigned sessionId, EState state, const ServiceDescriptionData& in_data) override
     {
-        auto* pSession = Session_(sessionId);
+        const auto* pSession = Session_(sessionId);
         if (!pSession)
             return;
 
-        auto apiServiceDescriptionData = ToC(serviceDescription);
-        m_serviceDescriptionCallback(pSession->Id(), ToC(state), &apiServiceDescriptionData);
+        const Converter2C<ServiceDescriptionData> converter(in_data);
+        m_serviceDescriptionCallback(pSession->Id(), ToC(state), converter.CPointer());
     }
 
     void On(unsigned sessionId, EState state, const BoardAvailableData& in_data) override
     {
-        auto* pSession = Session_(sessionId);
+        const auto* pSession = Session_(sessionId);
         if (!pSession)
             return;
 
-        auto apiData = ToC(in_data);
-        m_boardAvailableCallback(sessionId, ToC(state), &apiData);
+        const Converter2C<BoardAvailableData> converter(in_data);
+        m_boardAvailableCallback(sessionId, ToC(state), converter.CPointer());
     }
 
-    void On(unsigned sessionId, EState state, const RevokeBoardAvailableData& data) override
+    void On(unsigned sessionId, EState state, const RevokeBoardAvailableData& in_data) override
     {
-        auto* pSession = Session_(sessionId);
+        const auto* pSession = Session_(sessionId);
         if (!pSession)
             return;
 
-        auto apiData = ToC(data);
-        m_revokeBoardAvailableCallback(sessionId, ToC(state), &apiData);
+        const Converter2C<RevokeBoardAvailableData> converter(in_data);
+        m_revokeBoardAvailableCallback(sessionId, ToC(state), converter.CPointer());
     }
 
-    void On(unsigned sessionId, EState state, const TransportFinishedData& data) override
+    void On(unsigned sessionId, EState state, const TransportFinishedData& in_data) override
     {
-        auto* pSession = Session_(sessionId);
+        const auto* pSession = Session_(sessionId);
         if (!pSession)
             return;
 
-        auto apiData = ToC(data);
-        m_transportFinishedCallback(sessionId, ToC(state), &apiData);
+        const Converter2C<TransportFinishedData> converter(in_data);
+        m_transportFinishedCallback(sessionId, ToC(state), converter.CPointer());
     }
 
-    void On(unsigned sessionId, EState state, const BoardForecastData& data) override
+    void On(unsigned sessionId, EState state, const BoardForecastData& in_data) override
     {
-        auto* pSession = Session_(sessionId);
+        const auto* pSession = Session_(sessionId);
         if (!pSession)
             return;
 
-        auto apiData = ToC(data);
-        m_boardForecastCallback(sessionId, ToC(state), &apiData);
+        const Converter2C<BoardForecastData> converter(in_data);
+        m_boardForecastCallback(sessionId, ToC(state), converter.CPointer());
     }
 
-    void On(unsigned sessionId, EState, const SendBoardInfoData& data) override
+    void On(unsigned sessionId, EState, const SendBoardInfoData& in_data) override
     {
-        auto* pSession = Session_(sessionId);
+        const auto* pSession = Session_(sessionId);
         if (!pSession)
             return;
 
-        auto apiData = ToC(data);
-        m_sendBoardInfoCallback(sessionId, &apiData);
+        const Converter2C<SendBoardInfoData> converter(in_data);
+        m_sendBoardInfoCallback(sessionId, converter.CPointer());
     }
 
-    void On(unsigned sessionId, EState, const NotificationData& data) override
+    void On(unsigned sessionId, EState, const NotificationData& in_data) override
     {
-        auto* pSession = Session_(sessionId);
+        const auto* pSession = Session_(sessionId);
         if (!pSession)
             return;
 
-        auto apiData = ToC(data);
-        m_notificationCallback(sessionId, &apiData);
+        const Converter2C<NotificationData> converter(in_data);
+        m_notificationCallback(sessionId, converter.CPointer());
+    }
+
+    void On(unsigned sessionId, EState, const CommandData& in_data) override
+    {
+        const auto* pSession = Session_(sessionId);
+        if (!pSession)
+            return;
+
+        const Converter2C<CommandData> converter(in_data);
+        m_commandCallback(sessionId, converter.CPointer());
     }
 
     void On(unsigned sessionId, EState, const CheckAliveData& in_data) override
     {
-        auto pSession = Session_(sessionId);
+        const auto* pSession = Session_(sessionId);
         if (!pSession)
             return;
 
@@ -220,22 +232,22 @@ struct HermesUpstream : ISessionCallback
             data.m_optionalType = ECheckAliveType::ePONG;
             m_service.Post([this, sessionId, data = std::move(data)]() { Signal(sessionId, data, Serialize(data)); });
         }
-        auto apiData = ToC(in_data);
-        m_checkAliveCallback(sessionId, &apiData);
+        const Converter2C<CheckAliveData> converter(in_data);
+        m_checkAliveCallback(sessionId, converter.CPointer());
     }
 
     void OnState(unsigned sessionId, EState state) override
     {
-        auto* pSession = Session_(sessionId);
+        const auto* pSession = Session_(sessionId);
         if (!pSession)
             return;
 
         m_stateCallback(sessionId, ToC(state));
     }
 
-    void OnDisconnected(unsigned sessionId, EState state, const Error& error) override
+    void OnDisconnected(unsigned sessionId, EState state, const Error& in_data) override
     {
-        auto* pSession = Session_(sessionId);
+        const auto* pSession = Session_(sessionId);
         if (!pSession)
             return;
 
@@ -249,8 +261,8 @@ struct HermesUpstream : ISessionCallback
         }
 
         m_upSession.reset();
-        auto apiError = ToC(error);
-        m_disconnectedCallback(sessionId, ToC(state), &apiError);
+        const Converter2C<Error> converter(in_data);
+        m_disconnectedCallback(sessionId, ToC(state), converter.CPointer());
     }
 
     //============ internal impplementation ==============
@@ -279,8 +291,8 @@ struct HermesUpstream : ISessionCallback
 
         m_connectedSessionId = 0U;
         Error error;
-        auto apiError = ToC(error);
-        m_disconnectedCallback(sessionId, eHERMES_STATE_DISCONNECTED, &apiError);
+        const Converter2C<Error> converter(error);
+        m_disconnectedCallback(sessionId, eHERMES_STATE_DISCONNECTED, converter.CPointer());
     }
 
     void RemoveSession_(const NotificationData& data)
@@ -422,6 +434,16 @@ void SignalHermesStopTransport(HermesUpstream* pUpstream, uint32_t sessionId, co
 void SignalHermesUpstreamNotification(HermesUpstream* pUpstream, uint32_t sessionId, const HermesNotificationData* pData)
 {
     pUpstream->m_service.Log(0U, "SignalHermesUpstreamNotification");
+
+    pUpstream->m_service.Post([pUpstream, sessionId, data = ToCpp(*pData)]()
+    {
+        pUpstream->Signal(sessionId, data, Serialize(data));
+    });
+}
+
+void SignalHermesUpstreamCommand(HermesUpstream* pUpstream, uint32_t sessionId, const HermesCommandData* pData)
+{
+    pUpstream->m_service.Log(0U, "SignalHermesUpstreamCommand");
 
     pUpstream->m_service.Post([pUpstream, sessionId, data = ToCpp(*pData)]()
     {

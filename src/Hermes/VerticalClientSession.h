@@ -51,6 +51,7 @@ namespace Hermes
             void Signal(const SetConfigurationData&, StringView rawXml);
             void Signal(const NotificationData&, StringView rawXml);
             void Signal(const CheckAliveData&, StringView rawXml);
+            void Signal(const QueryHermesCapabilitiesData&, StringView rawXml);
             void Disconnect();
 
         private:
@@ -67,11 +68,11 @@ namespace Hermes
             virtual void On(unsigned id, EVerticalState, const BoardArrivedData&) = 0;
             virtual void On(unsigned id, EVerticalState, const BoardDepartedData&) = 0;
             virtual void On(unsigned id, EVerticalState, const QueryWorkOrderInfoData&) = 0;
+            virtual void On(unsigned id, EVerticalState, const ReplyWorkOrderInfoData&) = 0;
+            virtual void On(unsigned id, EVerticalState, const SendHermesCapabilitiesData&) = 0;
             virtual void On(unsigned id, EVerticalState, const NotificationData&) = 0;
             virtual void On(unsigned id, EVerticalState, const CheckAliveData&) = 0;
             virtual void OnDisconnected(unsigned id, EVerticalState, const Error&) = 0;
         };
-
-
     }
 }

@@ -54,6 +54,10 @@ extern "C" {
     HERMESPROTOCOL_API void HermesSerializeBoardDeparted(const HermesBoardDepartedData*, HermesSerializationCallback);
     HERMESPROTOCOL_API void HermesSerializeQueryWorkOrderInfo(const HermesQueryWorkOrderInfoData*, HermesSerializationCallback);
     HERMESPROTOCOL_API void HermesSerializeSendWorkOrderInfo(const HermesSendWorkOrderInfoData*, HermesSerializationCallback);
+    HERMESPROTOCOL_API void HermesSerializeReplyWorkOrderInfo(const HermesReplyWorkOrderInfoData*, HermesSerializationCallback);
+    HERMESPROTOCOL_API void HermesSerializeCommand(const HermesCommandData*, HermesSerializationCallback);
+    HERMESPROTOCOL_API void HermesSerializeQueryHermesCapabilities(const HermesQueryHermesCapabilitiesData*, HermesSerializationCallback);
+    HERMESPROTOCOL_API void HermesSerializeSendHermesCapabilities(const HermesSendHermesCapabilitiesData*, HermesSerializationCallback);
 
     // Deserialize (just for unit testing)
     struct HermesDeserializationErrorCallback
@@ -166,6 +170,28 @@ extern "C" {
         void(*m_pCall)(void*, const HermesSendWorkOrderInfoData*);
         void* m_pData;
     };
+    struct HermesDeserializedReplyWorkOrderInfoCallback
+    {
+        void(*m_pCall)(void*, const HermesReplyWorkOrderInfoData*);
+        void* m_pData;
+    };
+    struct HermesDeserializedCommandCallback
+    {
+        void(*m_pCall)(void*, const HermesCommandData*);
+        void* m_pData;
+    };
+
+    struct HermesDeserializedQueryHermesCapabilitiesCallback
+    {
+        void(*m_pCall)(void*, const HermesQueryHermesCapabilitiesData*);
+        void* m_pData;
+    };
+
+    struct HermesDeserializedSendHermesCapabilitiesCallback
+    {
+        void(*m_pCall)(void*, const HermesSendHermesCapabilitiesData*);
+        void* m_pData;
+    };
 
     struct HermesDeserializationCallbacks
     {
@@ -191,7 +217,10 @@ extern "C" {
         HermesDeserializedBoardDepartedCallback m_boardDepartedCallback;
         HermesDeserializedQueryWorkOrderInfoCallback m_queryWorkOrderInfoCallback;
         HermesDeserializedSendWorkOrderInfoCallback m_sendWorkOrderInfoCallback;
-
+        HermesDeserializedReplyWorkOrderInfoCallback m_replyWorkOrderInfoCallback;
+        HermesDeserializedCommandCallback m_commandCallback;
+        HermesDeserializedQueryHermesCapabilitiesCallback m_queryHermesCapabilitiesCallback;
+        HermesDeserializedSendHermesCapabilitiesCallback m_sendHermesCapabilitiesCallback;
     };
     HERMESPROTOCOL_API void HermesDeserialize(HermesStringView, const HermesDeserializationCallbacks*);
 

@@ -93,6 +93,7 @@ namespace Hermes
             void On(EState state, const BoardForecastData& data) override { On_(state, data); }
             void On(EState state, const SendBoardInfoData& data) override { On_(state, data); }
             void On(EState state, const NotificationData& data) override { On_(state, data); }
+            void On(EState state, const CommandData& data) override { On_(state, data); }
             void On(EState state, const CheckAliveData& data) override { On_(state, data); }
 
             void OnState(EState state) override
@@ -153,6 +154,7 @@ namespace Hermes
         void Session::Signal(const StopTransportData& data, StringView rawXml) { m_spImpl->Signal_(data, rawXml); }
         void Session::Signal(const QueryBoardInfoData& data, StringView rawXml) { m_spImpl->Signal_(data, rawXml); }
         void Session::Signal(const NotificationData&  data, StringView rawXml) { m_spImpl->Signal_(data, rawXml); }
+        void Session::Signal(const CommandData&  data, StringView rawXml) { m_spImpl->Signal_(data, rawXml); }
         void Session::Signal(const CheckAliveData&  data, StringView rawXml) { m_spImpl->Signal_(data, rawXml); }
 
         void Session::Disconnect()

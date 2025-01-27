@@ -50,6 +50,7 @@ namespace Hermes
             void Signal(const StopTransportData&, StringView rawXml);
             void Signal(const QueryBoardInfoData&, StringView rawXml);
             void Signal(const NotificationData&, StringView rawXml);
+            void Signal(const CommandData&, StringView rawXml);
             void Signal(const CheckAliveData&, StringView rawXml);
             void Disconnect();
 
@@ -69,6 +70,7 @@ namespace Hermes
             virtual void On(unsigned id, EState, const BoardForecastData&) = 0;
             virtual void On(unsigned id, EState, const SendBoardInfoData&) = 0;
             virtual void On(unsigned id, EState, const NotificationData&) = 0;
+            virtual void On(unsigned id, EState, const CommandData&) = 0;
             virtual void On(unsigned id, EState, const CheckAliveData&) = 0;
             virtual void OnState(unsigned id, EState) = 0;
             virtual void OnDisconnected(unsigned id, EState, const Error&) = 0;

@@ -63,7 +63,7 @@
     <ClCompile Include="CApiTest.cpp">
       <Filter>Tests</Filter>
     </ClCompile>
-    <ClCompile Include="BoardForecastTest.cpp">
+    <ClCompile Include="RawXmlTest.cpp">
       <Filter>Tests</Filter>
     </ClCompile>
     <ClCompile Include="CheckAliveTest.cpp">
@@ -72,7 +72,7 @@
     <ClCompile Include="QueryAndSendBoardInfoTest.cpp">
       <Filter>Tests</Filter>
     </ClCompile>
-    <ClCompile Include="RawXmlTest.cpp">
+    <ClCompile Include="BoardForecastTest.cpp">
       <Filter>Tests</Filter>
     </ClCompile>
     <ClCompile Include="VerticalTest.cpp">

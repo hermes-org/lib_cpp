@@ -49,6 +49,7 @@ struct HermesDownstream : IAcceptorCallback, ISessionCallback
     ApiCallback<HermesStopTransportCallback> m_stopTransportCallback;
     ApiCallback<HermesQueryBoardInfoCallback> m_queryBoardInfoCallback;
     ApiCallback<HermesNotificationCallback> m_notificationCallback;
+    ApiCallback<HermesCommandCallback> m_commandCallback;
     ApiCallback<HermesStateCallback> m_stateCallback;
     ApiCallback<HermesCheckAliveCallback> m_checkAliveCallback;
     ApiCallback<HermesDisconnectedCallback> m_disconnectedCallback;
@@ -66,6 +67,7 @@ struct HermesDownstream : IAcceptorCallback, ISessionCallback
         m_stopTransportCallback(callbacks.m_stopTransportCallback),
         m_queryBoardInfoCallback(callbacks.m_queryBoardInfoCallback),
         m_notificationCallback(callbacks.m_notificationCallback),
+        m_commandCallback(callbacks.m_commandCallback),
         m_stateCallback(callbacks.m_stateCallback),
         m_checkAliveCallback(callbacks.m_checkAliveCallback),
         m_disconnectedCallback(callbacks.m_disconnectedCallback)
@@ -106,7 +108,7 @@ struct HermesDownstream : IAcceptorCallback, ISessionCallback
     {
         m_service.Log(sessionId, "Signal(", data, ',', rawXml, ')');
 
-        auto pSession = Session_(sessionId);
+        auto* pSession = Session_(sessionId);
         if (!pSession)
             return m_service.Log(sessionId, "No matching session");
 
@@ -137,7 +139,7 @@ struct HermesDownstream : IAcceptorCallback, ISessionCallback
     //================= IAcceptorCallback =========================
     void OnAccepted(std::unique_ptr<IServerSocket>&& upSocket) override
     {
-        auto newSessionId = upSocket->SessionId();
+        const auto newSessionId = upSocket->SessionId();
 
         // refuse connection if we have an active one:
         if (m_upSession)
@@ -145,10 +147,11 @@ struct HermesDownstream : IAcceptorCallback, ISessionCallback
             m_service.Warn(m_upSession->Id(), "Due to existing session, refusing to accept new session with id=", newSessionId);
 
             // assemble a notification
-            const auto& connectionInfo = m_upSession->PeerConnectionInfo();
             std::ostringstream oss;
-            oss << connectionInfo;
-            NotificationData notification(ENotificationCode::eCONNECTION_REFUSED_BECAUSE_OF_ESTABLISHED_CONNECTION, ESeverity::eWARNING
+            oss << "Refusing connection to " << upSocket->GetConnectionInfo()
+                << " due to established connection to " << m_upSession->PeerConnectionInfo();
+
+            NotificationData notification(ENotificationCode::eCONNECTION_REFUSED_BECAUSE_OF_ESTABLISHED_CONNECTION, ESeverity::eERROR
                 , oss.str());
             const auto& xmlString = Serialize(notification);
             upSocket->Send(xmlString);
@@ -159,95 +162,104 @@ struct HermesDownstream : IAcceptorCallback, ISessionCallback
             return;
         }
 
-        m_service.Log(newSessionId, "OnAccepted");
         m_upSession = std::make_unique<Session>(std::move(upSocket), m_service, m_settings);
         m_upSession->Connect(*this);
     }
 
     //================= ISessionCallback =========================
-    void OnSocketConnected(unsigned sessionId, EState state, const ConnectionInfo& connectionInfo) override
+    void OnSocketConnected(unsigned sessionId, EState state, const ConnectionInfo& in_data) override
     {
-        auto* pSession = Session_(sessionId);
+        const auto* pSession = Session_(sessionId);
         if (!pSession)
             return;
 
-        auto apiData = ToC(connectionInfo);
-        m_connectedCallback(sessionId, ToC(state), &apiData);
+        const Converter2C<ConnectionInfo> converter(in_data);
+        m_connectedCallback(sessionId, ToC(state), converter.CPointer());
     }
 
     void On(unsigned sessionId, EState state, const ServiceDescriptionData& in_data) override
     {
-        auto* pSession = Session_(sessionId);
+        const auto* pSession = Session_(sessionId);
         if (!pSession)
             return;
 
-        auto apiData = ToC(in_data);
-        m_serviceDescriptionCallback(sessionId, ToC(state), &apiData);
+        const Converter2C<ServiceDescriptionData> converter(in_data);
+        m_serviceDescriptionCallback(sessionId, ToC(state), converter.CPointer());
     }
 
     void On(unsigned sessionId, EState state, const MachineReadyData& in_data) override
     {
-        auto* pSession = Session_(sessionId);
+        const auto* pSession = Session_(sessionId);
         if (!pSession)
             return;
 
-        auto apiData = ToC(in_data);
-        m_machineReadyCallback(sessionId, ToC(state), &apiData);
+        const Converter2C<MachineReadyData> converter(in_data);
+        m_machineReadyCallback(sessionId, ToC(state), converter.CPointer());
     }
 
     void On(unsigned sessionId, EState state, const RevokeMachineReadyData& in_data) override
     {
-        auto pSession = Session_(sessionId);
+        const auto* pSession = Session_(sessionId);
         if (!pSession)
             return;
 
-        auto apiData = ToC(in_data);
-        m_revokeMachineReadyCallback(sessionId, ToC(state), &apiData);
+        const Converter2C<RevokeMachineReadyData> converter(in_data);
+        m_revokeMachineReadyCallback(sessionId, ToC(state), converter.CPointer());
     }
 
     void On(unsigned sessionId, EState state, const StartTransportData& in_data) override
     {
-        auto pSession = Session_(sessionId);
+        const auto* pSession = Session_(sessionId);
         if (!pSession)
             return;
 
-        auto apiData = ToC(in_data);
-        m_startTransportCallback(sessionId, ToC(state), &apiData);
+        const Converter2C<StartTransportData> converter(in_data);
+        m_startTransportCallback(sessionId, ToC(state), converter.CPointer());
     }
 
     void On(unsigned sessionId, EState state, const StopTransportData& in_data) override
     {
-        auto pSession = Session_(sessionId);
+        const auto* pSession = Session_(sessionId);
         if (!pSession)
             return;
 
-        auto apiData = ToC(in_data);
-        m_stopTransportCallback(sessionId, ToC(state), &apiData);
+        const Converter2C<StopTransportData> converter(in_data);
+        m_stopTransportCallback(sessionId, ToC(state), converter.CPointer());
     }
 
     void On(unsigned sessionId, EState, const QueryBoardInfoData& in_data) override
     {
-        auto pSession = Session_(sessionId);
+        const auto* pSession = Session_(sessionId);
         if (!pSession)
             return;
 
-        auto apiData = ToC(in_data);
-        m_queryBoardInfoCallback(sessionId, &apiData);
+        const Converter2C<QueryBoardInfoData> converter(in_data);
+        m_queryBoardInfoCallback(sessionId, converter.CPointer());
     }
 
     void On(unsigned sessionId, EState, const NotificationData& in_data) override
     {
-        auto pSession = Session_(sessionId);
+        const auto* pSession = Session_(sessionId);
         if (!pSession)
             return;
 
-        auto apiData = ToC(in_data);
-        m_notificationCallback(sessionId, &apiData);
+        const Converter2C<NotificationData> converter(in_data);
+        m_notificationCallback(sessionId, converter.CPointer());
+    }
+
+    void On(unsigned sessionId, EState, const CommandData& in_data) override
+    {
+        const auto* pSession = Session_(sessionId);
+        if (!pSession)
+            return;
+
+        const Converter2C<CommandData> converter(in_data);
+        m_commandCallback(sessionId, converter.CPointer());
     }
 
     void On(unsigned sessionId, EState, const CheckAliveData& in_data) override
     {
-        auto pSession = Session_(sessionId);
+        const auto* pSession = Session_(sessionId);
         if (!pSession)
             return;
 
@@ -259,13 +271,13 @@ struct HermesDownstream : IAcceptorCallback, ISessionCallback
             data.m_optionalType = ECheckAliveType::ePONG;
             m_service.Post([this, sessionId, data = std::move(data)]() { Signal(sessionId, data, Serialize(data)); });
         }
-        auto apiData = ToC(in_data);
-        m_checkAliveCallback(sessionId, &apiData);
+        const Converter2C<CheckAliveData> converter(in_data);
+        m_checkAliveCallback(sessionId, converter.CPointer());
     }
 
     void OnState(unsigned sessionId, EState state) override
     {
-        auto pSession = Session_(sessionId);
+        const auto* pSession = Session_(sessionId);
         if (!pSession)
             return;
 
@@ -274,13 +286,13 @@ struct HermesDownstream : IAcceptorCallback, ISessionCallback
 
     void OnDisconnected(unsigned sessionId, EState, const Error& error) override
     {
-        auto pSession = Session_(sessionId);
+        const auto* pSession = Session_(sessionId);
         if (!pSession)
             return;
         
         m_upSession.reset();
-        auto apiError = ToC(error);
-        m_disconnectedCallback(sessionId, eHERMES_STATE_DISCONNECTED, &apiError);
+        const Converter2C<Error> converter(error);
+        m_disconnectedCallback(sessionId, eHERMES_STATE_DISCONNECTED, converter.CPointer());
     }
 
     //=================== internal =========================
@@ -301,9 +313,9 @@ struct HermesDownstream : IAcceptorCallback, ISessionCallback
         auto sessionId = m_upSession->Id();
         m_service.Log(sessionId, "RemoveCurrentSession_()");
         m_upSession->Disconnect();
-        Error error;
-        auto apiError = ToC(error);
-        m_disconnectedCallback(sessionId, eHERMES_STATE_DISCONNECTED, &apiError);
+        const Error error;
+        const Converter2C<Error> converter(error);
+        m_disconnectedCallback(sessionId, eHERMES_STATE_DISCONNECTED, converter.CPointer());
         m_upSession.reset();
     }
 
@@ -411,6 +423,16 @@ void SignalHermesSendBoardInfo(HermesDownstream* pDownstream, uint32_t sessionId
 void SignalHermesDownstreamNotification(HermesDownstream* pDownstream, uint32_t sessionId, const HermesNotificationData* pData)
 {
     pDownstream->m_service.Log(0U, "SignalHermesDownstreamNotification");
+    pDownstream->m_service.Post([pDownstream, sessionId, data = ToCpp(*pData)]()
+    {
+        pDownstream->Signal(sessionId, data, Serialize(data));
+    });
+}
+
+void SignalHermesDownstreamCommand(HermesDownstream* pDownstream, uint32_t sessionId, const HermesCommandData* pData)
+{
+    pDownstream->m_service.Log(0U, "SignalHermesDownstreamCommand");
+
     pDownstream->m_service.Post([pDownstream, sessionId, data = ToCpp(*pData)]()
     {
         pDownstream->Signal(sessionId, data, Serialize(data));

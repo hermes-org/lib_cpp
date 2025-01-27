@@ -20,6 +20,7 @@ limitations under the License.
 #pragma once
 
 #include <cassert>
+#include <utility>
 
 namespace Hermes
 {

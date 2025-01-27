@@ -78,15 +78,15 @@ namespace
             m_dispatcher.Add<CurrentConfigurationData>([this](const auto& data) -> Error
             {
                 m_receiving = false;
-                auto apiData = ToC(data);
-                m_configurationCallback(0U, &apiData);
+                const Converter2C<CurrentConfigurationData> converter (data);
+                m_configurationCallback(0U, converter.CPointer());
                 return{};
 
             });
             m_dispatcher.Add<NotificationData>([this](const auto& data) -> Error
             {
-                auto apiData = ToC(data);
-                m_notificationCallback(0U, &apiData);
+                const Converter2C<NotificationData> converter(data);
+                m_notificationCallback(0U, converter.CPointer());
                 return{};
             });
         }
@@ -95,8 +95,8 @@ namespace
         void GenerateError(EErrorCode errorCode, const Ts&... params)
         {
             auto error = m_service.Alarm(0U, errorCode, params...);
-            auto apiError = ToC(error);
-            m_errorCallback(&apiError);
+            const Converter2C<Error> converter(error);
+            m_errorCallback(converter.CPointer());
         }
 
         bool Connect()

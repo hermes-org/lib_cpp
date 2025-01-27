@@ -19,10 +19,13 @@ EXECUTABLE=libhermes.la
 LINK=libtool --mode=link g++ -shared -rpath /usr/lib64 -version-info $(VERSION)
 #-fvisibility=hidden-export-symbols-regex 'Hermes'
 
-OBJECTS = ConfigurationClient.lo ConfigurationService.lo ConfigurationServiceSerializer.lo ConfigurationServiceSession.lo \
-	Downstream.lo DownstreamSerializer.lo DownstreamSession.lo DownstreamStateMachine.lo Serialization.lo Upstream.lo \
-	UpstreamSerializer.lo UpstreamSession.lo UpstreamStateMachine.lo AsioServer.lo AsioClient.lo DeserializationHelper.lo \
-	GeneratedHermesGuid.lo SenderEnvelope.lo
+OBJECTS = AsioClient.lo AsioServer.lo ConfigurationClient.lo ConfigurationService.lo ConfigurationServiceSerializer.lo \
+	ConfigurationServiceSession.lo DeserializationHelper.lo Downstream.lo DownstreamSerializer.lo DownstreamSession.lo DownstreamStateMachine.lo \
+	MessageDispatcher.lo MessageSerialization.lo SenderEnvelope.lo Serialization.lo Upstream.lo \
+	UpstreamSerializer.lo UpstreamSession.lo UpstreamStateMachine.lo \
+	VerticalClient.lo VerticalClientSerializer.lo VerticalClientSession.lo VerticalService.lo \
+	VerticalServiceSerializer.lo VerticalServiceSession.lo
+
 
 
 default: $(EXECUTABLE)

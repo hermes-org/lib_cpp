@@ -11,6 +11,52 @@
 
 namespace Hermes
 {
+    template<> struct PugiSerializer<SubBoard>
+    {
+        using AsElementTag = int;
+
+        static void WriteElement(pugi::xml_node parent, const SubBoard& data)
+        {
+            Serialize(parent, "Pos", data.m_pos);
+            Serialize(parent, "Bc", data.m_optionalBc);
+            Serialize(parent, "St", data.m_st);
+        }
+
+        static void ReadElement(pugi::xml_node parent, Error& error, SubBoard& data)
+        {
+            Deserialize(parent, "Pos", error, data.m_pos);
+            Deserialize(parent, "Bc", error, data.m_optionalBc);
+            Deserialize(parent, "St", error, data.m_st);
+        }
+    };
+
+    // SubBoards are special in that they are optional vectors
+    void Serialize(pugi::xml_node parent, const char* name, const SubBoards& subBoards)
+    {
+        if (subBoards.empty())
+            return;
+
+        auto subBoardsNode = parent.append_child(name);
+
+        for (const auto& item : subBoards)
+        {
+            Serialize(subBoardsNode, "SB", item);
+        }
+    }
+
+    void Deserialize(pugi::xml_node parent, const char* name, Error& error, SubBoards& subBoards)
+    {
+        const auto subBoardsNode = parent.child(name);
+        if (!subBoardsNode)
+            return;
+
+        for (const auto& node : subBoardsNode.children("SB"))
+        {
+            subBoards.emplace_back();
+            PugiSerializer<SubBoard>::ReadElement(node, error, subBoards.back());
+        }
+    }
+
     template<> struct PugiSerializer<FeatureBoardForecast>
     {
         using AsElementTag = int;
@@ -43,6 +89,14 @@ namespace Hermes
         static void ReadElement(pugi::xml_node, Error&, FeatureSendBoardInfo&) {}
     };
 
+    template<> struct PugiSerializer<FeatureCommand>
+    {
+        using AsElementTag = int;
+
+        static void WriteElement(pugi::xml_node, const FeatureCommand&) {}
+        static void ReadElement(pugi::xml_node, Error&, FeatureCommand&) {}
+    };
+
     template<> struct PugiSerializer<SupportedFeatures>
     {
         using AsElementTag = int;
@@ -53,6 +107,7 @@ namespace Hermes
             Serialize(parent, "FeatureCheckAliveResponse", data.m_optionalFeatureCheckAliveResponse);
             Serialize(parent, "FeatureQueryBoardInfo", data.m_optionalFeatureQueryBoardInfo);
             Serialize(parent, "FeatureSendBoardInfo", data.m_optionalFeatureSendBoardInfo);
+            Serialize(parent, "FeatureCommand", data.m_optionalFeatureCommand);
         }
 
         static void ReadElement(pugi::xml_node parent, Error& error, SupportedFeatures& data)
@@ -61,6 +116,7 @@ namespace Hermes
             Deserialize(parent, "FeatureCheckAliveResponse", error, data.m_optionalFeatureCheckAliveResponse);
             Deserialize(parent, "FeatureQueryBoardInfo", error, data.m_optionalFeatureQueryBoardInfo);
             Deserialize(parent, "FeatureSendBoardInfo", error, data.m_optionalFeatureSendBoardInfo);
+            Deserialize(parent, "FeatureCommand", error, data.m_optionalFeatureCommand);
         }
     };
 
@@ -180,6 +236,30 @@ namespace Hermes
         static void ReadElement(pugi::xml_node, Error&, FeatureSendWorkOrderInfo&) {}
     };
 
+    template<> struct PugiSerializer<FeatureReplyWorkOrderInfo>
+    {
+        using AsElementTag = int;
+
+        static void WriteElement(pugi::xml_node, const FeatureReplyWorkOrderInfo&) {}
+        static void ReadElement(pugi::xml_node, Error&, FeatureReplyWorkOrderInfo&) {}
+    };
+
+    template<> struct PugiSerializer<FeatureQueryHermesCapabilities>
+    {
+        using AsElementTag = int;
+
+        static void WriteElement(pugi::xml_node, const FeatureQueryHermesCapabilities&) {}
+        static void ReadElement(pugi::xml_node, Error&, FeatureQueryHermesCapabilities&) {}
+    };
+
+    template<> struct PugiSerializer<FeatureSendHermesCapabilities>
+    {
+        using AsElementTag = int;
+
+        static void WriteElement(pugi::xml_node, const FeatureSendHermesCapabilities&) {}
+        static void ReadElement(pugi::xml_node, Error&, FeatureSendHermesCapabilities&) {}
+    };
+
     template<> struct PugiSerializer<SupervisoryFeatures>
     {
         using AsElementTag = int;
@@ -191,6 +271,9 @@ namespace Hermes
             Serialize(parent, "FeatureBoardTracking", data.m_optionalFeatureBoardTracking);
             Serialize(parent, "FeatureQueryWorkOrderInfo", data.m_optionalFeatureQueryWorkOrderInfo);
             Serialize(parent, "FeatureSendWorkOrderInfo", data.m_optionalFeatureSendWorkOrderInfo);
+            Serialize(parent, "FeatureReplyWorkOrderInfo", data.m_optionalFeatureReplyWorkOrderInfo);
+            Serialize(parent, "FeatureQueryHermesCapabilities", data.m_optionalFeatureQueryHermesCapabilities);
+            Serialize(parent, "FeatureSendHermesCapabilities", data.m_optionalFeatureSendHermesCapabilities);
         }
 
         static void ReadElement(pugi::xml_node parent, Error& error, SupervisoryFeatures& data)
@@ -200,6 +283,154 @@ namespace Hermes
             Deserialize(parent, "FeatureBoardTracking", error, data.m_optionalFeatureBoardTracking);
             Deserialize(parent, "FeatureQueryWorkOrderInfo", error, data.m_optionalFeatureQueryWorkOrderInfo);
             Deserialize(parent, "FeatureSendWorkOrderInfo", error, data.m_optionalFeatureSendWorkOrderInfo);
+            Deserialize(parent, "FeatureReplyWorkOrderInfo", error, data.m_optionalFeatureReplyWorkOrderInfo);
+            Deserialize(parent, "FeatureQueryHermesCapabilities", error, data.m_optionalFeatureQueryHermesCapabilities);
+            Deserialize(parent, "FeatureSendHermesCapabilities", error, data.m_optionalFeatureSendHermesCapabilities);
+        }
+    };
+
+    template<> struct PugiSerializer<MessageCheckAliveResponse>
+    {
+        using AsElementTag = int;
+
+        static void WriteElement(pugi::xml_node, const MessageCheckAliveResponse&) {}
+        static void ReadElement(pugi::xml_node, Error&, MessageCheckAliveResponse&) {}
+    };
+
+    template<> struct PugiSerializer<MessageBoardForecast>
+    {
+        using AsElementTag = int;
+
+        static void WriteElement(pugi::xml_node, const MessageBoardForecast&) {}
+        static void ReadElement(pugi::xml_node, Error&, MessageBoardForecast&) {}
+    };
+
+    template<> struct PugiSerializer<MessageQueryBoardInfo>
+    {
+        using AsElementTag = int;
+
+        static void WriteElement(pugi::xml_node, const MessageQueryBoardInfo&) {}
+        static void ReadElement(pugi::xml_node, Error&, MessageQueryBoardInfo&) {}
+    };
+
+    template<> struct PugiSerializer<MessageSendBoardInfo>
+    {
+        using AsElementTag = int;
+
+        static void WriteElement(pugi::xml_node, const MessageSendBoardInfo&) {}
+        static void ReadElement(pugi::xml_node, Error&, MessageSendBoardInfo&) {}
+    };
+    template<> struct PugiSerializer<MessageBoardArrived>
+    {
+        using AsElementTag = int;
+
+        static void WriteElement(pugi::xml_node, const MessageBoardArrived&) {}
+        static void ReadElement(pugi::xml_node, Error&, MessageBoardArrived&) {}
+    };
+
+    template<> struct PugiSerializer<MessageBoardDeparted>
+    {
+        using AsElementTag = int;
+
+        static void WriteElement(pugi::xml_node, const MessageBoardDeparted&) {}
+        static void ReadElement(pugi::xml_node, Error&, MessageBoardDeparted&) {}
+    };
+
+    template<> struct PugiSerializer<MessageQueryWorkOrderInfo>
+    {
+        using AsElementTag = int;
+
+        static void WriteElement(pugi::xml_node, const MessageQueryWorkOrderInfo&) {}
+        static void ReadElement(pugi::xml_node, Error&, MessageQueryWorkOrderInfo&) {}
+    };
+
+    template<> struct PugiSerializer<MessageReplyWorkOrderInfo>
+    {
+        using AsElementTag = int;
+
+        static void WriteElement(pugi::xml_node, const MessageReplyWorkOrderInfo&) {}
+        static void ReadElement(pugi::xml_node, Error&, MessageReplyWorkOrderInfo&) {}
+    };
+
+    template<> struct PugiSerializer<MessageCommand>
+    {
+        using AsElementTag = int;
+
+        static void WriteElement(pugi::xml_node, const MessageCommand&) {}
+        static void ReadElement(pugi::xml_node, Error&, MessageCommand&) {}
+    };
+
+    template<> struct PugiSerializer<OptionalMessages>
+    {
+        using AsElementTag = int;
+
+        static void WriteElement(pugi::xml_node parent, const OptionalMessages& data)
+        {
+            Serialize(parent, "MessageCheckAliveResponse", data.m_optionalMessageCheckAliveResponse);
+            Serialize(parent, "MessageBoardForecast", data.m_optionalMessageBoardForecast);
+            Serialize(parent, "MessageQueryBoardInfo", data.m_optionalMessageQueryBoardInfo);
+            Serialize(parent, "MessageSendBoardInfo", data.m_optionalMessageSendBoardInfo);
+            Serialize(parent, "MessageBoardArrived", data.m_optionalMessageBoardArrived);
+            Serialize(parent, "MessageBoardDeparted", data.m_optionalMessageBoardDeparted);
+            Serialize(parent, "MessageQueryWorkOrderInfo", data.m_optionalMessageQueryWorkOrderInfo);
+            Serialize(parent, "MessageReplyWorkOrderInfo", data.m_optionalMessageReplyWorkOrderInfo);
+            Serialize(parent, "MessageCommand", data.m_optionalMessageCommand);
+        }
+
+        static void ReadElement(pugi::xml_node parent, Error& error, OptionalMessages& data)
+        {
+            Deserialize(parent, "MessageCheckAliveResponse", error, data.m_optionalMessageCheckAliveResponse);
+            Deserialize(parent, "MessageBoardForecast", error, data.m_optionalMessageBoardForecast);
+            Deserialize(parent, "MessageQueryBoardInfo", error, data.m_optionalMessageQueryBoardInfo);
+            Deserialize(parent, "MessageSendBoardInfo", error, data.m_optionalMessageSendBoardInfo);
+            Deserialize(parent, "MessageBoardArrived", error, data.m_optionalMessageBoardArrived);
+            Deserialize(parent, "MessageBoardDeparted", error, data.m_optionalMessageBoardDeparted);
+            Deserialize(parent, "MessageQueryWorkOrderInfo", error, data.m_optionalMessageQueryWorkOrderInfo);
+            Deserialize(parent, "MessageReplyWorkOrderInfo", error, data.m_optionalMessageReplyWorkOrderInfo);
+            Deserialize(parent, "MessageCommand", error, data.m_optionalMessageCommand);
+        }
+    };
+
+    template<> struct PugiSerializer<Attributes>
+    {
+        using AsElementTag = int;
+
+        static void WriteElement(pugi::xml_node parent, const Attributes& data)
+        {
+            Serialize(parent, "ProductTypeId", data.m_productTypeId);
+            Serialize(parent, "TopBarcode", data.m_topBarcode);
+            Serialize(parent, "BottomBarcode", data.m_bottomBarcode);
+            Serialize(parent, "Length", data.m_length);
+            Serialize(parent, "Width", data.m_width);
+            Serialize(parent, "Thickness", data.m_thickness);
+            Serialize(parent, "ConveyorSpeed", data.m_conveyorSpeed);
+            Serialize(parent, "TopClearanceHeight", data.m_topClearanceHeight);
+            Serialize(parent, "BottomClearanceHeight", data.m_bottomClearanceHeight);
+            Serialize(parent, "Weight", data.m_weight);
+            Serialize(parent, "WorkOrderId", data.m_workOrderId);
+            Serialize(parent, "BatchId", data.m_batchId);
+            Serialize(parent, "Route", data.m_route);
+            Serialize(parent, "Action", data.m_action);
+            Serialize(parent, "SubBoards", data.m_subBoards);
+        }
+
+        static void ReadElement(pugi::xml_node parent, Error& error, Attributes& data)
+        {
+            Deserialize(parent, "ProductTypeId", error, data.m_productTypeId);
+            Deserialize(parent, "TopBarcode", error, data.m_topBarcode);
+            Deserialize(parent, "BottomBarcode", error, data.m_bottomBarcode);
+            Deserialize(parent, "Length", error, data.m_length);
+            Deserialize(parent, "Width", error, data.m_width);
+            Deserialize(parent, "Thickness", error, data.m_thickness);
+            Deserialize(parent, "ConveyorSpeed", error, data.m_conveyorSpeed);
+            Deserialize(parent, "TopClearanceHeight", error, data.m_topClearanceHeight);
+            Deserialize(parent, "BottomClearanceHeight", error, data.m_bottomClearanceHeight);
+            Deserialize(parent, "Weight", error, data.m_weight);
+            Deserialize(parent, "WorkOrderId", error, data.m_workOrderId);
+            Deserialize(parent, "BatchId", error, data.m_batchId);
+            Deserialize(parent, "Route", error, data.m_route);
+            Deserialize(parent, "Action", error, data.m_action);
+            Deserialize(parent, "SubBoards", error, data.m_subBoards);
         }
     };
 }
@@ -215,8 +446,10 @@ std::string Hermes::Serialize(const ServiceDescriptionData& data)
     return envelope.ToXmlString();
 }
 
-std::string Hermes::Serialize(const BoardAvailableData& data)
+
+std::string Serialize_(const Hermes::BoardAvailableData& data, bool includeSubBoards)
 {
+    using namespace Hermes;
     SenderEnvelope envelope(Hermes::SerializationTraits<BoardAvailableData>::cTAG_VIEW);
     Serialize(envelope.DataNode(), "BoardId", data.m_boardId);
     Serialize(envelope.DataNode(), "BoardIdCreatedBy", data.m_boardIdCreatedBy);
@@ -234,7 +467,22 @@ std::string Hermes::Serialize(const BoardAvailableData& data)
     Serialize(envelope.DataNode(), "Weight", data.m_optionalWeightInGrams);
     Serialize(envelope.DataNode(), "WorkOrderId", data.m_optionalWorkOrderId);
     Serialize(envelope.DataNode(), "BatchId", data.m_optionalBatchId);
+    Serialize(envelope.DataNode(), "Route", data.m_optionalRoute);
+    Serialize(envelope.DataNode(), "Action", data.m_optionalAction);
+    if (includeSubBoards)
+    {
+        Serialize(envelope.DataNode(), "SubBoards", data.m_optionalSubBoards);
+    }
     return envelope.ToXmlString();
+}
+
+std::string Hermes::Serialize(const BoardAvailableData& data)
+{
+    auto str{ Serialize_(data, true) };
+    if (str.size() <= cMAX_MESSAGE_SIZE)
+        return str;
+
+    return Serialize_(data, false);
 }
 
 std::string Hermes::Serialize(const RevokeBoardAvailableData&)
@@ -370,8 +618,10 @@ std::string Hermes::Serialize(const QueryBoardInfoData& data)
     return envelope.ToXmlString();
 }
 
-std::string Hermes::Serialize(const SendBoardInfoData& data)
+std::string Serialize_(const Hermes::SendBoardInfoData& data, bool includeSubBoards)
 {
+    using namespace Hermes;
+
     SenderEnvelope envelope(Hermes::SerializationTraits<SendBoardInfoData>::cTAG_VIEW);
     Serialize(envelope.DataNode(), "BoardId", data.m_optionalBoardId);
     Serialize(envelope.DataNode(), "BoardIdCreatedBy", data.m_optionalBoardIdCreatedBy);
@@ -389,7 +639,22 @@ std::string Hermes::Serialize(const SendBoardInfoData& data)
     Serialize(envelope.DataNode(), "Weight", data.m_optionalWeightInGrams);
     Serialize(envelope.DataNode(), "WorkOrderId", data.m_optionalWorkOrderId);
     Serialize(envelope.DataNode(), "BatchId", data.m_optionalBatchId);
+    Serialize(envelope.DataNode(), "Route", data.m_optionalRoute);
+    Serialize(envelope.DataNode(), "Action", data.m_optionalAction);
+    if (includeSubBoards)
+    {
+        Serialize(envelope.DataNode(), "SubBoards", data.m_optionalSubBoards);
+    }
     return envelope.ToXmlString();
+}
+
+std::string Hermes::Serialize(const SendBoardInfoData& data)
+{
+    auto str{ Serialize_(data, true) };
+    if (str.size() <= cMAX_MESSAGE_SIZE)
+        return str;
+
+    return Serialize_(data, false);
 }
 
 std::string Hermes::Serialize(const SupervisoryServiceDescriptionData& data)
@@ -401,8 +666,9 @@ std::string Hermes::Serialize(const SupervisoryServiceDescriptionData& data)
     return envelope.ToXmlString();
 }
 
-std::string Hermes::Serialize(const BoardArrivedData& data)
+std::string Serialize_(const Hermes::BoardArrivedData& data, bool includeSubBoards)
 {
+    using namespace Hermes;
     SenderEnvelope envelope(Hermes::SerializationTraits<BoardArrivedData>::cTAG_VIEW);
     Serialize(envelope.DataNode(), "MachineId", data.m_machineId);
     Serialize(envelope.DataNode(), "UpstreamLaneId", data.m_upstreamLaneId);
@@ -426,11 +692,27 @@ std::string Hermes::Serialize(const BoardArrivedData& data)
     Serialize(envelope.DataNode(), "Weight", data.m_optionalWeightInGrams);
     Serialize(envelope.DataNode(), "WorkOrderId", data.m_optionalWorkOrderId);
     Serialize(envelope.DataNode(), "BatchId", data.m_optionalBatchId);
+    Serialize(envelope.DataNode(), "Route", data.m_optionalRoute);
+    Serialize(envelope.DataNode(), "Action", data.m_optionalAction);
+    if (includeSubBoards)
+    {
+        Serialize(envelope.DataNode(), "SubBoards", data.m_optionalSubBoards);
+    }
     return envelope.ToXmlString();
 }
 
-std::string Hermes::Serialize(const BoardDepartedData& data)
+std::string Hermes::Serialize(const BoardArrivedData& data)
 {
+    auto str{ Serialize_(data, true) };
+    if (str.size() <= cMAX_MESSAGE_SIZE)
+        return str;
+
+    return Serialize_(data, false);
+}
+
+std::string Serialize_(const Hermes::BoardDepartedData& data, bool includeSubBoards)
+{
+    using namespace Hermes;
     SenderEnvelope envelope(Hermes::SerializationTraits<BoardDepartedData>::cTAG_VIEW);
     Serialize(envelope.DataNode(), "MachineId", data.m_machineId);
     Serialize(envelope.DataNode(), "DownstreamLaneId", data.m_downstreamLaneId);
@@ -454,7 +736,22 @@ std::string Hermes::Serialize(const BoardDepartedData& data)
     Serialize(envelope.DataNode(), "Weight", data.m_optionalWeightInGrams);
     Serialize(envelope.DataNode(), "WorkOrderId", data.m_optionalWorkOrderId);
     Serialize(envelope.DataNode(), "BatchId", data.m_optionalBatchId);
+    Serialize(envelope.DataNode(), "Route", data.m_optionalRoute);
+    Serialize(envelope.DataNode(), "Action", data.m_optionalAction);
+    if (includeSubBoards)
+    {
+        Serialize(envelope.DataNode(), "SubBoards", data.m_optionalSubBoards);
+    }
     return envelope.ToXmlString();
+}
+
+std::string Hermes::Serialize(const BoardDepartedData& data)
+{
+    auto str{ Serialize_(data, true) };
+    if (str.size() <= cMAX_MESSAGE_SIZE)
+        return str;
+
+    return Serialize_(data, false);
 }
 
 std::string Hermes::Serialize(const QueryWorkOrderInfoData& data)
@@ -465,11 +762,14 @@ std::string Hermes::Serialize(const QueryWorkOrderInfoData& data)
     Serialize(envelope.DataNode(), "MagazineId", data.m_optionalMagazineId);
     Serialize(envelope.DataNode(), "SlotId", data.m_optionalSlotId);
     Serialize(envelope.DataNode(), "Barcode", data.m_optionalBarcode);
+    Serialize(envelope.DataNode(), "WorkOrderId", data.m_optionalWorkOrderId);
+    Serialize(envelope.DataNode(), "BatchId", data.m_optionalBatchId);
     return envelope.ToXmlString();
 }
 
-std::string Hermes::Serialize(const SendWorkOrderInfoData& data)
+std::string Serialize_(const Hermes::SendWorkOrderInfoData& data, bool includeSubBoards)
 {
+    using namespace Hermes;
     SenderEnvelope envelope(Hermes::SerializationTraits<SendWorkOrderInfoData>::cTAG_VIEW);
     Serialize(envelope.DataNode(), "QueryId", data.m_optionalQueryId);
     Serialize(envelope.DataNode(), "WorkOrderId", data.m_optionalWorkOrderId);
@@ -488,6 +788,52 @@ std::string Hermes::Serialize(const SendWorkOrderInfoData& data)
     Serialize(envelope.DataNode(), "TopClearanceHeight", data.m_optionalTopClearanceHeightInMM);
     Serialize(envelope.DataNode(), "BottomClearanceHeight", data.m_optionalBottomClearanceHeightInMM);
     Serialize(envelope.DataNode(), "Weight", data.m_optionalWeightInGrams);
+    Serialize(envelope.DataNode(), "Route", data.m_optionalRoute);
+    if (includeSubBoards)
+    {
+        Serialize(envelope.DataNode(), "SubBoards", data.m_optionalSubBoards);
+    }
+    return envelope.ToXmlString();
+}
+
+std::string Hermes::Serialize(const SendWorkOrderInfoData& data)
+{
+    auto str{ Serialize_(data, true) };
+    if (str.size() <= cMAX_MESSAGE_SIZE)
+        return str;
+
+    return Serialize_(data, false);
+}
+
+std::string Hermes::Serialize(const ReplyWorkOrderInfoData& data)
+{
+    SenderEnvelope envelope(Hermes::SerializationTraits<ReplyWorkOrderInfoData>::cTAG_VIEW);
+    Serialize(envelope.DataNode(), "WorkOrderId", data.m_workOrderId);
+    Serialize(envelope.DataNode(), "BatchId", data.m_optionalBatchId);
+    Serialize(envelope.DataNode(), "Status", data.m_status);
+    return envelope.ToXmlString();
+}
+
+std::string Hermes::Serialize(const QueryHermesCapabilitiesData&)
+{
+    SenderEnvelope envelope(Hermes::SerializationTraits<QueryHermesCapabilitiesData>::cTAG_VIEW);
+
+    return envelope.ToXmlString();
+}
+
+std::string Hermes::Serialize(const SendHermesCapabilitiesData& data)
+{
+    SenderEnvelope envelope(Hermes::SerializationTraits<SendHermesCapabilitiesData>::cTAG_VIEW);
+    Serialize(envelope.DataNode(), "OptionalMessages", data.m_optionalMessages);
+    Serialize(envelope.DataNode(), "Attributes", data.m_attributes);
+
+    return envelope.ToXmlString();
+}
+
+std::string Hermes::Serialize(const CommandData& data)
+{
+    SenderEnvelope envelope(Hermes::SerializationTraits<CommandData>::cTAG_VIEW);
+    Serialize(envelope.DataNode(), "Command", data.m_command);
     return envelope.ToXmlString();
 }
 
@@ -521,6 +867,9 @@ Hermes::Error Hermes::Deserialize(pugi::xml_node xmlNode, BoardAvailableData& da
     Deserialize(xmlNode, "Weight", error, data.m_optionalWeightInGrams);
     Deserialize(xmlNode, "WorkOrderId", error, data.m_optionalWorkOrderId);
     Deserialize(xmlNode, "BatchId", error, data.m_optionalBatchId);
+    Deserialize(xmlNode, "Route", error, data.m_optionalRoute);
+    Deserialize(xmlNode, "Action", error, data.m_optionalAction);
+    Deserialize(xmlNode, "SubBoards", error, data.m_optionalSubBoards);
     return error;
 }
 
@@ -676,6 +1025,9 @@ Hermes::Error Hermes::Deserialize(pugi::xml_node xmlNode, SendBoardInfoData& dat
     Deserialize(xmlNode, "Weight", error, data.m_optionalWeightInGrams);
     Deserialize(xmlNode, "WorkOrderId", error, data.m_optionalWorkOrderId);
     Deserialize(xmlNode, "BatchId", error, data.m_optionalBatchId);
+    Deserialize(xmlNode, "Route", error, data.m_optionalRoute);
+    Deserialize(xmlNode, "Action", error, data.m_optionalAction);
+    Deserialize(xmlNode, "SubBoards", error, data.m_optionalSubBoards);
     return error;
 }
 
@@ -713,6 +1065,9 @@ Hermes::Error Hermes::Deserialize(pugi::xml_node xmlNode, BoardArrivedData& data
     Deserialize(xmlNode, "Weight", error, data.m_optionalWeightInGrams);
     Deserialize(xmlNode, "WorkOrderId", error, data.m_optionalWorkOrderId);
     Deserialize(xmlNode, "BatchId", error, data.m_optionalBatchId);
+    Deserialize(xmlNode, "Route", error, data.m_optionalRoute);
+    Deserialize(xmlNode, "Action", error, data.m_optionalAction);
+    Deserialize(xmlNode, "SubBoards", error, data.m_optionalSubBoards);
     return error;
 }
 
@@ -741,6 +1096,9 @@ Hermes::Error Hermes::Deserialize(pugi::xml_node xmlNode, BoardDepartedData& dat
     Deserialize(xmlNode, "Weight", error, data.m_optionalWeightInGrams);
     Deserialize(xmlNode, "WorkOrderId", error, data.m_optionalWorkOrderId);
     Deserialize(xmlNode, "BatchId", error, data.m_optionalBatchId);
+    Deserialize(xmlNode, "Route", error, data.m_optionalRoute);
+    Deserialize(xmlNode, "Action", error, data.m_optionalAction);
+    Deserialize(xmlNode, "SubBoards", error, data.m_optionalSubBoards);
     return error;
 }
 
@@ -752,6 +1110,8 @@ Hermes::Error Hermes::Deserialize(pugi::xml_node xmlNode, QueryWorkOrderInfoData
     Deserialize(xmlNode, "MagazineId", error, data.m_optionalMagazineId);
     Deserialize(xmlNode, "SlotId", error, data.m_optionalSlotId);
     Deserialize(xmlNode, "Barcode", error, data.m_optionalBarcode);
+    Deserialize(xmlNode, "WorkOrderId", error, data.m_optionalWorkOrderId);
+    Deserialize(xmlNode, "BatchId", error, data.m_optionalBatchId);
     return error;
 }
 
@@ -775,6 +1135,36 @@ Hermes::Error Hermes::Deserialize(pugi::xml_node xmlNode, SendWorkOrderInfoData&
     Deserialize(xmlNode, "TopClearanceHeight", error, data.m_optionalTopClearanceHeightInMM);
     Deserialize(xmlNode, "BottomClearanceHeight", error, data.m_optionalBottomClearanceHeightInMM);
     Deserialize(xmlNode, "Weight", error, data.m_optionalWeightInGrams);
+    Deserialize(xmlNode, "Route", error, data.m_optionalRoute);
+    Deserialize(xmlNode, "SubBoards", error, data.m_optionalSubBoards);
     return error;
 }
 
+Hermes::Error Hermes::Deserialize(pugi::xml_node xmlNode, ReplyWorkOrderInfoData& data)
+{
+    Error error;
+    Deserialize(xmlNode, "WorkOrderId", error, data.m_workOrderId);
+    Deserialize(xmlNode, "BatchId", error, data.m_optionalBatchId);
+    Deserialize(xmlNode, "Status", error, data.m_status);
+    return error;
+}
+
+Hermes::Error Hermes::Deserialize(pugi::xml_node xmlNode, CommandData& data)
+{
+    Error error;
+    Deserialize(xmlNode, "Command", error, data.m_command);
+    return error;
+}
+
+Hermes::Error Hermes::Deserialize(pugi::xml_node /*xmlNode*/, QueryHermesCapabilitiesData& /*data*/)
+{
+    return { EErrorCode::eSUCCESS, "" };
+}
+
+Hermes::Error Hermes::Deserialize(pugi::xml_node xmlNode, SendHermesCapabilitiesData& data)
+{
+    Error error;
+    Deserialize(xmlNode, "OptionalMessages", error, data.m_optionalMessages);
+    Deserialize(xmlNode, "Attributes", error, data.m_attributes);
+    return error;
+}

@@ -131,6 +131,13 @@ BOOST_AUTO_TEST_CASE(UpstreamTest)
         upstream.Signal(upstreamSink.m_sessionId, upstreamNotification);
         WaitFor(downstreamSink, [&]() { return downstreamSink.m_notificationData == upstreamNotification; });
         WaitFor(upstreamSink, [&]() { return upstreamSink.m_notificationData == downstreamNotification; });
+
+        CommandData downstreamCommand(0);
+        CommandData upstreamCommand(1);
+        downstream.Signal(downstreamSink.m_sessionId, downstreamCommand);
+        upstream.Signal(upstreamSink.m_sessionId, upstreamCommand);
+        WaitFor(downstreamSink, [&]() { return downstreamSink.m_commandData == upstreamCommand; });
+        WaitFor(upstreamSink, [&]() { return upstreamSink.m_commandData == downstreamCommand; });
     }
 
     {

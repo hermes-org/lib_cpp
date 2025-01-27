@@ -277,6 +277,8 @@ namespace Hermes
                 spSocket->m_connectionInfo.m_hostName = itResolved->host_name();
             }
 
+            spSocket->m_service.Inform(spSocket->m_sessionId, "OnAccepted ", spSocket->m_connectionInfo);
+
             if (!configuration.m_hostName.empty())
             {
                 asio::ip::tcp::resolver::query query(asio::ip::tcp::v4(), configuration.m_hostName, "");

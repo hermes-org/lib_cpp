@@ -114,7 +114,7 @@ namespace Hermes
             m_socket.m_connectionInfo.m_port = endpoint.port();
             m_socket.m_connectionInfo.m_hostName = itEndpoint->host_name();
 
-            m_socket.m_service.Inform(m_socket.m_sessionId, "Connecting to ", m_socket.m_connectionInfo, " ...");
+            m_socket.m_service.Log(m_socket.m_sessionId, "Connecting to ", m_socket.m_connectionInfo, " ...");
             m_socket.m_socket.async_connect(endpoint, 
                 [spThis = shared_from_this()](const boost::system::error_code& ec)
             {
@@ -142,6 +142,7 @@ namespace Hermes
                 return;
             }
 
+            m_socket.m_service.Inform(m_socket.m_sessionId, "OnConnected ", m_socket.m_connectionInfo);
             m_socket.m_pCallback->OnConnected(m_socket.m_connectionInfo);
             m_socket.StartReceiving();
         }

@@ -41,6 +41,7 @@ namespace Hermes
                 m_dispatcher.Add<ServiceDescriptionData>([this](const auto& data) { m_pCallback->On(data); });
                 m_dispatcher.Add<CheckAliveData>([this](const auto& data) { m_pCallback->On(data); });
                 m_dispatcher.Add<NotificationData>([this](const auto& data) { m_pCallback->On(data); });
+                m_dispatcher.Add<CommandData>([this](const auto& data) { m_pCallback->On(data); });
                 m_dispatcher.Add<MachineReadyData>([this](const auto& data) { m_pCallback->On(data); });
                 m_dispatcher.Add<RevokeMachineReadyData>([this](const auto& data) { m_pCallback->On(data); });
                 m_dispatcher.Add<StartTransportData>([this](const auto& data) { m_pCallback->On(data); });

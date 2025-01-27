@@ -9,6 +9,8 @@
 # include "pugixml.hpp"
 #endif
 
+#include <iomanip>
+
 namespace Hermes
 {
     template<class T, class EnableT = void>
@@ -76,7 +78,10 @@ namespace Hermes
 
         static void WriteAttribute(pugi::xml_attribute attr, double value)
         {
-            attr.set_value(value);
+            // Standard states that we should have 3 trailing decimals
+            std::stringstream stream;
+            stream << std::fixed << std::setprecision(3) << value;
+            attr.set_value(stream.str().c_str());
         }
         static void ReadAttribute(pugi::xml_attribute attr, Error&, double& value)
         {
@@ -104,25 +109,6 @@ namespace Hermes
         }
     };
 
-    //void PugiSerialize(pugi::xml_attribute attribute, const std::string& value)
-    //{
-    //    attribute.set_value(value.c_str());
-    //}
-
-    //void PugiDeserialize(pugi::xml_attribute attribute, Error&, std::string& value)
-    //{
-    //    value = attribute.as_string();
-    //}
-
-    //void PugiSerialize(pugi::xml_attribute attribute, const int& value)
-    //{
-    //    attribute.set_value(value);
-    //}
-
-    //void PugiDeserialize(pugi::xml_attribute attribute, Error&, std::string& value)
-    //{
-    //    value = attribute.as_string();
-    //}
     
     void Serialize(pugi::xml_node parent, const char* name, const std::string& value)
     {
