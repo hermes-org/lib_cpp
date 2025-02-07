@@ -50,6 +50,7 @@ namespace Hermes
         void Signal(unsigned sessionId, const SendBoardInfoData&);
         void Signal(unsigned sessionId, const NotificationData&);
         void Signal(unsigned sessionId, const CheckAliveData&);
+        void Signal(unsigned sessionId, const CommandData&);
         void Reset(const NotificationData&);
 
         // raw XML for testing
@@ -74,6 +75,7 @@ namespace Hermes
         virtual void OnConnected(unsigned sessionId, EState, const ConnectionInfo&) = 0;
         virtual void On(unsigned sessionId, const NotificationData&) = 0;
         virtual void On(unsigned /*sessionId*/, const CheckAliveData&) {} // not necessarily interesting, hence not abstract
+        virtual void On(unsigned sessionId, const CommandData&) = 0;
         virtual void OnState(unsigned sessionId, EState) = 0;
         virtual void OnDisconnected(unsigned sessionId, EState, const Error&) = 0;
 
@@ -112,6 +114,7 @@ namespace Hermes
         void Signal(unsigned sessionId, const QueryBoardInfoData&);
         void Signal(unsigned sessionId, const NotificationData&);
         void Signal(unsigned sessionId, const CheckAliveData&);
+        void Signal(unsigned sessionId, const CommandData&);
         void Reset(const NotificationData&);
 
         // raw XML for testing
@@ -136,6 +139,7 @@ namespace Hermes
         virtual void OnConnected(unsigned sessionId, EState, const ConnectionInfo&) = 0;
         virtual void On(unsigned sessionId, const NotificationData&) = 0;
         virtual void On(unsigned /*sessionId*/, const CheckAliveData&) {} // not necessarily interesting, hence not abstract
+        virtual void On(unsigned sessionId, const CommandData&) = 0;
         virtual void OnState(unsigned sessionId, EState) = 0;
         virtual void OnDisconnected(unsigned sessionId, EState, const Error&) = 0;
 
@@ -234,9 +238,12 @@ namespace Hermes
         void Signal(unsigned sessionId, const BoardDepartedData&); // only to a specific client
         void Signal(const BoardDepartedData&); // to all clients that have specified FeatureBoardTracking
         void Signal(unsigned sessionId, const QueryWorkOrderInfoData&);
+        void Signal(unsigned sessionId, const ReplyWorkOrderInfoData&);
+        void Signal(unsigned sessionId, const SendHermesCapabilitiesData&);
         void Signal(unsigned sessionId, const CurrentConfigurationData&);
         void Signal(unsigned sessionId, const NotificationData&);
         void Signal(unsigned sessionId, const CheckAliveData&);
+        void Signal(unsigned sessionId, const CommandData&);
         void ResetSession(unsigned sessionId, const NotificationData&);
 
         void Disable(const NotificationData&);
@@ -260,6 +267,7 @@ namespace Hermes
         virtual void On(unsigned sessionId, const SetConfigurationData&, const ConnectionInfo&) = 0;
         virtual void On(unsigned /*sessionId*/, const SendWorkOrderInfoData&) {}; // not necessarily interesting, hence not abstract
         virtual void On(unsigned sessionId, const NotificationData&) = 0;
+        virtual void On(unsigned sessionId, const QueryHermesCapabilitiesData&) = 0;
         virtual void On(unsigned /*sessionId*/, const CheckAliveData&) {} // not necessarily interesting, hence not abstract
         virtual void OnDisconnected(unsigned sessionId, EVerticalState, const Error&) = 0;
 
@@ -286,6 +294,7 @@ namespace Hermes
         void Signal(unsigned sessionId, const SupervisoryServiceDescriptionData&);
         void Signal(unsigned sessionId, const GetConfigurationData&);
         void Signal(unsigned sessionId, const SetConfigurationData&);
+        void Signal(unsigned sessionId, const QueryHermesCapabilitiesData&);
         void Signal(unsigned sessionId, const SendWorkOrderInfoData&);
         void Signal(unsigned sessionId, const NotificationData&);
         void Signal(unsigned sessionId, const CheckAliveData&);
@@ -315,7 +324,9 @@ namespace Hermes
         virtual void On(unsigned /*sessionId*/, const BoardArrivedData&) {}; // not necessarily interesting, hence not abstract
         virtual void On(unsigned /*sessionId*/, const BoardDepartedData&) {} // not necessarily interesting, hence not abstract
         virtual void On(unsigned sessionId, const QueryWorkOrderInfoData&) = 0;
+        virtual void On(unsigned sessionId, const ReplyWorkOrderInfoData&) = 0;
         virtual void On(unsigned /*sessionId*/, const CurrentConfigurationData&) {} // not necessarily interesting, hence not abstract
+        virtual void On(unsigned /*sessionId*/, const SendHermesCapabilitiesData&) {} // not necessarily interesting, hence not abstract
         virtual void On(unsigned sessionId, const NotificationData&) = 0;
         virtual void On(unsigned /*sessionId*/, const CheckAliveData&) {} // not necessarily interesting, hence not abstract
         virtual void OnDisconnected(unsigned sessionId, EVerticalState, const Error&) = 0;
@@ -342,6 +353,7 @@ namespace Hermes
         virtual void OnUpstream(unsigned sessionId, EState, const ServiceDescriptionData&) = 0;
         virtual void OnUpstream(unsigned sessionId, const NotificationData& data) = 0;
         virtual void OnUpstream(unsigned sessionId, const CheckAliveData& data) = 0;
+        virtual void OnUpstream(unsigned sessionId, const CommandData& data) = 0;
         virtual void OnUpstreamState(unsigned sessionId, EState) = 0;
         virtual void OnUpstreamDisconnected(unsigned sessionId, EState, const Error&) = 0;
         virtual void OnUpstreamTrace(unsigned sessionId, ETraceType, StringView trace) = 0;
@@ -350,6 +362,7 @@ namespace Hermes
         void On(unsigned sessionId, EState state, const ServiceDescriptionData& data) override { OnUpstream(sessionId, state, data); }
         void On(unsigned sessionId, const NotificationData& data) override { OnUpstream(sessionId, data); }
         void On(unsigned sessionId, const CheckAliveData& data) override { OnUpstream(sessionId, data); }
+        void On(unsigned sessionId, const CommandData& data) override { OnUpstream(sessionId, data); }
         void OnState(unsigned sessionId, EState state) override { OnUpstreamState(sessionId, state); }
         void OnDisconnected(unsigned sessionId, EState state, const Error& data) override { OnUpstreamDisconnected(sessionId, state, data); }
         void OnTrace(unsigned sessionId, ETraceType type, StringView data) override { OnUpstreamTrace(sessionId, type, data); }
@@ -361,6 +374,7 @@ namespace Hermes
         virtual void OnDownstream(unsigned sessionId, EState, const ServiceDescriptionData&) = 0;
         virtual void OnDownstream(unsigned sessionId, const NotificationData& data) = 0;
         virtual void OnDownstream(unsigned sessionId, const CheckAliveData& data) = 0;
+        virtual void OnDownstream(unsigned sessionId, const CommandData& data) = 0;
         virtual void OnDownstreamState(unsigned sessionId, EState) = 0;
         virtual void OnDownstreamDisconnected(unsigned sessionId, EState, const Error&) = 0;
         virtual void OnDownstreamTrace(unsigned sessionId, ETraceType, StringView trace) = 0;
@@ -369,6 +383,7 @@ namespace Hermes
         void On(unsigned sessionId, EState state, const ServiceDescriptionData& data) override { OnDownstream(sessionId, state, data); }
         void On(unsigned sessionId, const NotificationData& data) override { OnDownstream(sessionId, data); }
         void On(unsigned sessionId, const CheckAliveData& data) override { OnDownstream(sessionId, data); }
+        void On(unsigned sessionId, const CommandData& data) override { OnDownstream(sessionId, data); }
         void OnState(unsigned sessionId, EState state) override { OnDownstreamState(sessionId, state); }
         void OnDisconnected(unsigned sessionId, EState state, const Error& data) override { OnDownstreamDisconnected(sessionId, state, data); }
         void OnTrace(unsigned sessionId, ETraceType type, StringView data) override { OnDownstreamTrace(sessionId, type, data); }
@@ -443,6 +458,13 @@ namespace Hermes
             static_cast<IDownstreamCallback*>(pCallback)->On(sessionId, ToCpp(*pData));
         };
 
+        callbacks.m_commandCallback.m_pData = &callback;
+        callbacks.m_commandCallback.m_pCall = [](void* pCallback, uint32_t sessionId,
+            const HermesCommandData* pData)
+        {
+            static_cast<IDownstreamCallback*>(pCallback)->On(sessionId, ToCpp(*pData));
+        };
+
         callbacks.m_stateCallback.m_pData = &callback;
         callbacks.m_stateCallback.m_pCall = [](void* pCallback, uint32_t sessionId, EHermesState state)
         {
@@ -485,62 +507,68 @@ namespace Hermes
 
     inline void Downstream::Enable(const DownstreamSettings& data)
     {
-        auto apiData = ToC(data);
-        ::EnableHermesDownstream(m_pImpl, &apiData);
+        const Converter2C<DownstreamSettings> converter(data);
+        ::EnableHermesDownstream(m_pImpl, converter.CPointer());
     }
 
     inline void Downstream::Signal(unsigned sessionId, const ServiceDescriptionData& data)
     {
-        auto apiData = ToC(data);
-        ::SignalHermesDownstreamServiceDescription(m_pImpl, sessionId, &apiData);
+        const Converter2C<ServiceDescriptionData> converter(data);
+        ::SignalHermesDownstreamServiceDescription(m_pImpl, sessionId, converter.CPointer());
     }
 
     inline void Downstream::Signal(unsigned sessionId, const BoardAvailableData& data)
     {
-        auto apiData = ToC(data);
-        ::SignalHermesBoardAvailable(m_pImpl, sessionId, &apiData);
+        const Converter2C<BoardAvailableData> converter(data);
+        ::SignalHermesBoardAvailable(m_pImpl, sessionId, converter.CPointer());
     }
 
     inline void Downstream::Signal(unsigned sessionId, const RevokeBoardAvailableData& data)
     {
-        auto apiData = ToC(data);
-        ::SignalHermesRevokeBoardAvailable(m_pImpl, sessionId, &apiData);
+        const Converter2C<RevokeBoardAvailableData> converter(data);
+        ::SignalHermesRevokeBoardAvailable(m_pImpl, sessionId, converter.CPointer());
     }
 
     inline void Downstream::Signal(unsigned sessionId, const TransportFinishedData& data)
     {
-        auto apiData = ToC(data);
-        ::SignalHermesTransportFinished(m_pImpl, sessionId, &apiData);
+        const Converter2C<TransportFinishedData> converter(data);
+        ::SignalHermesTransportFinished(m_pImpl, sessionId, converter.CPointer());
     }
 
     inline void Downstream::Signal(unsigned sessionId, const BoardForecastData& data)
     {
-        auto apiData = ToC(data);
-        ::SignalHermesBoardForecast(m_pImpl, sessionId, &apiData);
+        const Converter2C<BoardForecastData> converter(data);
+        ::SignalHermesBoardForecast(m_pImpl, sessionId, converter.CPointer());
     }
 
     inline void Downstream::Signal(unsigned sessionId, const SendBoardInfoData& data)
     {
-        auto apiData = ToC(data);
-        ::SignalHermesSendBoardInfo(m_pImpl, sessionId, &apiData);
+        const Converter2C<SendBoardInfoData> converter(data);
+        ::SignalHermesSendBoardInfo(m_pImpl, sessionId, converter.CPointer());
     }
 
     inline void Downstream::Signal(unsigned sessionId, const NotificationData& data)
     {
-        auto apiData = ToC(data);
-        ::SignalHermesDownstreamNotification(m_pImpl, sessionId, &apiData);
+        const Converter2C<NotificationData> converter(data);
+        ::SignalHermesDownstreamNotification(m_pImpl, sessionId, converter.CPointer());
     }
 
     inline void Downstream::Signal(unsigned sessionId, const CheckAliveData& data)
     {
-        auto apiData = ToC(data);
-        ::SignalHermesDownstreamCheckAlive(m_pImpl, sessionId, &apiData);
+        const Converter2C<CheckAliveData> converter(data);
+        ::SignalHermesDownstreamCheckAlive(m_pImpl, sessionId, converter.CPointer());
+    }
+
+    inline void Downstream::Signal(unsigned sessionId, const CommandData& data)
+    {
+        const Converter2C<CommandData> converter(data);
+        ::SignalHermesDownstreamCommand(m_pImpl, sessionId, converter.CPointer());
     }
 
     inline void Downstream::Reset(const NotificationData& data)
     {
-        auto apiData = ToC(data);
-        ::ResetHermesDownstream(m_pImpl, &apiData);
+        const Converter2C<NotificationData> converter(data);
+        ::ResetHermesDownstream(m_pImpl, converter.CPointer());
     }
 
     inline void Downstream::Signal(unsigned sessionId, StringView rawXml)
@@ -555,8 +583,8 @@ namespace Hermes
 
     inline void Downstream::Disable(const NotificationData& data)
     {
-        auto apiData = ToC(data);
-        ::DisableHermesDownstream(m_pImpl, &apiData);
+        const Converter2C<NotificationData> converter(data);
+        ::DisableHermesDownstream(m_pImpl, converter.CPointer());
     }
 
     inline void Downstream::Stop()
@@ -633,6 +661,13 @@ namespace Hermes
             static_cast<IUpstreamCallback*>(pCallback)->On(sessionId, ToCpp(*pData));
         };
 
+        callbacks.m_commandCallback.m_pData = &callback;
+        callbacks.m_commandCallback.m_pCall = [](void* pCallback, uint32_t sessionId,
+            const HermesCommandData* pData)
+        {
+            static_cast<IUpstreamCallback*>(pCallback)->On(sessionId, ToCpp(*pData));
+        };
+
         callbacks.m_stateCallback.m_pData = &callback;
         callbacks.m_stateCallback.m_pCall = [](void* pCallback, uint32_t sessionId, EHermesState state)
         {
@@ -663,8 +698,8 @@ namespace Hermes
 
     inline void Upstream::Enable(const UpstreamSettings& data)
     {
-        auto apiData = ToC(data);
-        ::EnableHermesUpstream(m_pImpl, &apiData);
+        const Converter2C<UpstreamSettings> converter(data);
+        ::EnableHermesUpstream(m_pImpl, converter.CPointer());
     }
 
     template<class F> void Upstream::Post(F&& f)
@@ -681,56 +716,62 @@ namespace Hermes
 
     inline void Upstream::Signal(unsigned sessionId, const ServiceDescriptionData& data)
     {
-        auto apiData = ToC(data);
-        ::SignalHermesUpstreamServiceDescription(m_pImpl, sessionId, &apiData);
+        const Converter2C<ServiceDescriptionData> converter(data);
+        ::SignalHermesUpstreamServiceDescription(m_pImpl, sessionId, converter.CPointer());
     }
 
     inline void Upstream::Signal(unsigned sessionId, const MachineReadyData& data)
     {
-        auto apiData = ToC(data);
-        ::SignalHermesMachineReady(m_pImpl, sessionId, &apiData);
+        const Converter2C<MachineReadyData> converter(data);
+        ::SignalHermesMachineReady(m_pImpl, sessionId, converter.CPointer());
     }
 
     inline void Upstream::Signal(unsigned sessionId, const RevokeMachineReadyData& data)
     {
-        auto apiData = ToC(data);
-        ::SignalHermesRevokeMachineReady(m_pImpl, sessionId, &apiData);
+        const Converter2C<RevokeMachineReadyData> converter(data);
+        ::SignalHermesRevokeMachineReady(m_pImpl, sessionId, converter.CPointer());
     }
 
     inline void Upstream::Signal(unsigned sessionId, const StartTransportData& data)
     {
-        auto apiData = ToC(data);
-        ::SignalHermesStartTransport(m_pImpl, sessionId, &apiData);
+        const Converter2C<StartTransportData> converter(data);
+        ::SignalHermesStartTransport(m_pImpl, sessionId, converter.CPointer());
     }
 
     inline void Upstream::Signal(unsigned sessionId, const StopTransportData& data)
     {
-        auto apiData = ToC(data);
-        ::SignalHermesStopTransport(m_pImpl, sessionId, &apiData);
+        const Converter2C<StopTransportData> converter(data);
+        ::SignalHermesStopTransport(m_pImpl, sessionId, converter.CPointer());
     }
 
     inline void Upstream::Signal(unsigned sessionId, const QueryBoardInfoData& data)
     {
-        auto apiData = ToC(data);
-        ::SignalHermesQueryBoardInfo(m_pImpl, sessionId, &apiData);
+        const Converter2C<QueryBoardInfoData> converter(data);
+        ::SignalHermesQueryBoardInfo(m_pImpl, sessionId, converter.CPointer());
     }
 
     inline void Upstream::Signal(unsigned sessionId, const NotificationData& data)
     {
-        auto apiData = ToC(data);
-        ::SignalHermesUpstreamNotification(m_pImpl, sessionId, &apiData);
+        const Converter2C<NotificationData> converter(data);
+        ::SignalHermesUpstreamNotification(m_pImpl, sessionId, converter.CPointer());
     }
 
     inline void Upstream::Reset(const NotificationData& data)
     {
-        auto apiData = ToC(data);
-        ::ResetHermesUpstream(m_pImpl, &apiData);
+        const Converter2C<NotificationData> converter(data);
+        ::ResetHermesUpstream(m_pImpl, converter.CPointer());
     }
 
     inline void Upstream::Signal(unsigned sessionId, const CheckAliveData& data)
     {
-        auto apiData = ToC(data);
-        ::SignalHermesUpstreamCheckAlive(m_pImpl, sessionId, &apiData);
+        const Converter2C<CheckAliveData> converter(data);
+        ::SignalHermesUpstreamCheckAlive(m_pImpl, sessionId, converter.CPointer());
+    }
+
+    inline void Upstream::Signal(unsigned sessionId, const CommandData& data)
+    {
+        const Converter2C<CommandData> converter(data);
+        ::SignalHermesUpstreamCommand(m_pImpl, sessionId, converter.CPointer());
     }
 
     inline void Upstream::Signal(unsigned sessionId, StringView rawXml)
@@ -745,8 +786,8 @@ namespace Hermes
 
     inline void Upstream::Disable(const NotificationData& data)
     {
-        auto apiData = ToC(data);
-        ::DisableHermesUpstream(m_pImpl, &apiData);
+        const Converter2C<NotificationData> converter(data);
+        ::DisableHermesUpstream(m_pImpl, converter.CPointer());
     }
 
     inline void Upstream::Stop()
@@ -771,8 +812,8 @@ namespace Hermes
         {
             auto pThis = static_cast<ConfigurationService*>(pVoid);
             auto configuration = pThis->m_callback.OnGetConfiguration(sessionId, ToCpp(*pConnectionInfo));
-            auto apiConfiguration = ToC(configuration);
-            ::SignalHermesCurrentConfiguration(pThis->m_pImpl, sessionId, &apiConfiguration);
+            const Converter2C<CurrentConfigurationData> converter(configuration);
+            ::SignalHermesCurrentConfiguration(pThis->m_pImpl, sessionId, converter.CPointer());
         };
 
         callbacks.m_setConfigurationCallback.m_pData = this;
@@ -785,8 +826,8 @@ namespace Hermes
                 return;
 
             NotificationData notification(ENotificationCode::eCONFIGURATION_ERROR, ESeverity::eERROR, error.m_text);
-            auto apiNotification = ToC(notification);
-            ::SignalHermesConfigurationNotification(pThis->m_pImpl, sessionId, &apiNotification);
+            const Converter2C<NotificationData> converter(notification);
+            ::SignalHermesConfigurationNotification(pThis->m_pImpl, sessionId, converter.CPointer());
         };
 
         callbacks.m_disconnectedCallback.m_pData = this;
@@ -824,14 +865,14 @@ namespace Hermes
 
     inline void ConfigurationService::Enable(const ConfigurationServiceSettings& data)
     {
-        auto apiData = ToC(data);
-        ::EnableHermesConfigurationService(m_pImpl, &apiData);
+        const Converter2C<ConfigurationServiceSettings> converter(data);
+        ::EnableHermesConfigurationService(m_pImpl, converter.CPointer());
     }
 
     inline void ConfigurationService::Disable(const NotificationData& data)
     {
-        auto apiData = ToC(data);
-        ::DisableHermesConfigurationService(m_pImpl, &apiData);
+        const Converter2C<NotificationData> converter(data);
+        ::DisableHermesConfigurationService(m_pImpl, converter.CPointer());
     }
 
     inline void ConfigurationService::Stop()
@@ -926,8 +967,8 @@ namespace Hermes
             *static_cast<CurrentConfigurationData*>(pData) = ToCpp(*pConfiguration);
         };
 
-        auto apiConfiguration = ToC(configuration);
-        ::SetHermesConfiguration(ToC(hostName), &apiConfiguration, timeoutInSeconds, &callbacks);
+        Converter2C<SetConfigurationData> converter(configuration);
+        ::SetHermesConfiguration(ToC(hostName), converter.CPointer(), timeoutInSeconds, &callbacks);
         return error;
     }
 
@@ -967,6 +1008,13 @@ namespace Hermes
         callbacks.m_sendWorkOrderInfoCallback.m_pData = &callback;
         callbacks.m_sendWorkOrderInfoCallback.m_pCall = [](void* pCallback, uint32_t sessionId,
             const HermesSendWorkOrderInfoData* pData)
+        {
+            static_cast<IVerticalServiceCallback*>(pCallback)->On(sessionId, ToCpp(*pData));
+        };
+
+        callbacks.m_queryHermesCapabilitiesCallback.m_pData = &callback;
+        callbacks.m_queryHermesCapabilitiesCallback.m_pCall = [](void* pCallback, uint32_t sessionId,
+            const HermesQueryHermesCapabilitiesData* pData)
         {
             static_cast<IVerticalServiceCallback*>(pCallback)->On(sessionId, ToCpp(*pData));
         };
@@ -1019,78 +1067,90 @@ namespace Hermes
         ::PostHermesVerticalService(m_pImpl, callback);
     }
 
-    inline void VerticalService::Enable(const VerticalServiceSettings& settings)
+    inline void VerticalService::Enable(const VerticalServiceSettings& data)
     {
-        auto apiSettings = ToC(settings);
-        ::EnableHermesVerticalService(m_pImpl, &apiSettings);
+        const Converter2C<VerticalServiceSettings> converter(data);
+        ::EnableHermesVerticalService(m_pImpl, converter.CPointer());
     }
 
     inline void VerticalService::Signal(unsigned sessionId, const SupervisoryServiceDescriptionData& data)
     {
-        auto apiData = ToC(data);
-        ::SignalHermesVerticalServiceDescription(m_pImpl, sessionId, &apiData);
+        const Converter2C<SupervisoryServiceDescriptionData> converter(data);
+        ::SignalHermesVerticalServiceDescription(m_pImpl, sessionId, converter.CPointer());
     }
 
     inline void VerticalService::Signal(unsigned sessionId, const BoardArrivedData& data)
     {
-        auto apiData = ToC(data);
-        ::SignalHermesBoardArrived(m_pImpl, sessionId, &apiData);
+        const Converter2C<BoardArrivedData> converter(data);
+        ::SignalHermesBoardArrived(m_pImpl, sessionId, converter.CPointer());
     }
 
     inline void VerticalService::Signal(const BoardArrivedData& data)
     {
-        auto apiData = ToC(data);
-        ::SignalHermesBoardArrived(m_pImpl, 0U, &apiData);
+        const Converter2C<BoardArrivedData> converter(data);
+        ::SignalHermesBoardArrived(m_pImpl, 0U, converter.CPointer());
     }
 
     inline void VerticalService::Signal(unsigned sessionId, const BoardDepartedData& data)
     {
-        auto apiData = ToC(data);
-        ::SignalHermesBoardDeparted(m_pImpl, sessionId, &apiData);
+        const Converter2C<BoardDepartedData> converter(data);
+        ::SignalHermesBoardDeparted(m_pImpl, sessionId, converter.CPointer());
     }
 
     inline void VerticalService::Signal(const BoardDepartedData& data)
     {
-        auto apiData = ToC(data);
-        ::SignalHermesBoardDeparted(m_pImpl, 0U, &apiData);
+        const Converter2C<BoardDepartedData> converter(data);
+        ::SignalHermesBoardDeparted(m_pImpl, 0U, converter.CPointer());
     }
 
     inline void VerticalService::Signal(unsigned sessionId, const QueryWorkOrderInfoData& data)
     {
-        auto apiData = ToC(data);
-        ::SignalHermesQueryWorkOrderInfo(m_pImpl, sessionId, &apiData);
+        const Converter2C<QueryWorkOrderInfoData> converter(data);
+        ::SignalHermesQueryWorkOrderInfo(m_pImpl, sessionId, converter.CPointer());
+    }
+
+    inline void VerticalService::Signal(unsigned sessionId, const ReplyWorkOrderInfoData& data)
+    {
+        const Converter2C<ReplyWorkOrderInfoData> converter(data);
+        ::SignalHermesReplyWorkOrderInfo(m_pImpl, sessionId, converter.CPointer());
+    }
+
+    inline void VerticalService::Signal(unsigned sessionId, const SendHermesCapabilitiesData& data)
+    {
+        const Converter2C<SendHermesCapabilitiesData> converter(data);
+        ::SignalHermesSendHermesCapabilities(m_pImpl, sessionId, converter.CPointer());
     }
 
     inline void VerticalService::Signal(unsigned sessionId, const CurrentConfigurationData& data)
     {
-        auto apiData = ToC(data);
-        ::SignalHermesVerticalCurrentConfiguration(m_pImpl, sessionId, &apiData);
+        const Converter2C<CurrentConfigurationData> converter(data);
+        ::SignalHermesVerticalCurrentConfiguration(m_pImpl, sessionId, converter.CPointer());
     }
 
 
     inline void VerticalService::Signal(unsigned sessionId, const NotificationData& data)
     {
-        auto apiData = ToC(data);
-        ::SignalHermesVerticalServiceNotification(m_pImpl, sessionId, &apiData);
+        const Converter2C<NotificationData> converter(data);
+        ::SignalHermesVerticalServiceNotification(m_pImpl, sessionId, converter.CPointer());
     }
 
     inline void VerticalService::Signal(unsigned sessionId, const CheckAliveData& data)
     {
-        auto apiData = ToC(data);
-        ::SignalHermesVerticalServiceCheckAlive(m_pImpl, sessionId, &apiData);
+        const Converter2C<CheckAliveData> converter(data);
+        ::SignalHermesVerticalServiceCheckAlive(m_pImpl, sessionId, converter.CPointer());
     }
 
     inline void VerticalService::ResetSession(unsigned sessionId, const NotificationData& data)
     {
-        auto apiData = ToC(data);
-        ::ResetHermesVerticalServiceSession(m_pImpl, sessionId, &apiData);
+        const Converter2C<NotificationData> converter(data);
+        ::ResetHermesVerticalServiceSession(m_pImpl, sessionId, converter.CPointer());
     }
 
 
     inline void VerticalService::Disable(const NotificationData& data)
     {
-        auto apiData = ToC(data);
-        ::DisableHermesVerticalService(m_pImpl, &apiData);
+        const Converter2C<NotificationData> converter(data);
+        ::DisableHermesVerticalService(m_pImpl, converter.CPointer());
     }
 
     inline void VerticalService::Stop()
@@ -1139,6 +1199,13 @@ namespace Hermes
             static_cast<IVerticalClientCallback*>(pCallback)->On(sessionId, ToCpp(*pData));
         };
 
+        callbacks.m_replyWorkOrderInfoCallback.m_pData = &callback;
+        callbacks.m_replyWorkOrderInfoCallback.m_pCall = [](void* pCallback, uint32_t sessionId,
+            const HermesReplyWorkOrderInfoData* pData)
+        {
+            static_cast<IVerticalClientCallback*>(pCallback)->On(sessionId, ToCpp(*pData));
+        };
+
         callbacks.m_currentConfigurationCallback.m_pData = &callback;
         callbacks.m_currentConfigurationCallback.m_pCall = [](void* pCallback, uint32_t sessionId,
             const HermesCurrentConfigurationData* pData)
@@ -1174,6 +1241,13 @@ namespace Hermes
             static_cast<IVerticalClientCallback*>(pCallback)->OnTrace(sessionId, ToCpp(type), ToCpp(trace));
         };
 
+        callbacks.m_sendHermesCapabilitiesCallback.m_pData = &callback;
+        callbacks.m_sendHermesCapabilitiesCallback.m_pCall = [](void* pCallback, uint32_t sessionId,
+            const HermesSendHermesCapabilitiesData* pData)
+        {
+            static_cast<IVerticalClientCallback*>(pCallback)->On(sessionId, ToCpp(*pData));
+        };
+
         m_pImpl = ::CreateHermesVerticalClient(&callbacks);
     }
 
@@ -1196,50 +1270,56 @@ namespace Hermes
 
     inline void VerticalClient::Enable(const VerticalClientSettings& data)
     {
-        auto apiData = ToC(data);
-        ::EnableHermesVerticalClient(m_pImpl, &apiData);
+        const Converter2C<VerticalClientSettings> converter(data);
+        ::EnableHermesVerticalClient(m_pImpl, converter.CPointer());
     }
 
     inline void VerticalClient::Signal(unsigned sessionId, const SupervisoryServiceDescriptionData& data)
     {
-        auto apiData = ToC(data);
-        ::SignalHermesVerticalClientDescription(m_pImpl, sessionId, &apiData);
+        const Converter2C<SupervisoryServiceDescriptionData> converter(data);
+        ::SignalHermesVerticalClientDescription(m_pImpl, sessionId, converter.CPointer());
     }
 
     inline void VerticalClient::Signal(unsigned sessionId, const SendWorkOrderInfoData& data)
     {
-        auto apiData = ToC(data);
-        ::SignalHermesSendWorkOrderInfo(m_pImpl, sessionId, &apiData);
+        const Converter2C<SendWorkOrderInfoData> converter(data);
+        ::SignalHermesSendWorkOrderInfo(m_pImpl, sessionId, converter.CPointer());
     }
 
     inline void VerticalClient::Signal(unsigned sessionId, const GetConfigurationData& data)
     {
-        auto apiData = ToC(data);
-        ::SignalHermesVerticalGetConfiguration(m_pImpl, sessionId, &apiData);
+        const Converter2C<GetConfigurationData> converter(data);
+        ::SignalHermesVerticalGetConfiguration(m_pImpl, sessionId, converter.CPointer());
     }
 
     inline void VerticalClient::Signal(unsigned sessionId, const SetConfigurationData& data)
     {
-        auto apiData = ToC(data);
-        ::SignalHermesVerticalSetConfiguration(m_pImpl, sessionId, &apiData);
+        const Converter2C<SetConfigurationData> converter(data);
+        ::SignalHermesVerticalSetConfiguration(m_pImpl, sessionId, converter.CPointer());
+    }
+
+    inline void VerticalClient::Signal(unsigned sessionId, const QueryHermesCapabilitiesData& data)
+    {
+        const Converter2C<QueryHermesCapabilitiesData> converter(data);
+        ::SignalHermesVerticalQueryHermesCapabilities(m_pImpl, sessionId, converter.CPointer());
     }
 
     inline void VerticalClient::Signal(unsigned sessionId, const NotificationData& data)
     {
-        auto apiData = ToC(data);
-        ::SignalHermesVerticalClientNotification(m_pImpl, sessionId, &apiData);
+        const Converter2C<NotificationData> converter(data);
+        ::SignalHermesVerticalClientNotification(m_pImpl, sessionId, converter.CPointer());
     }
 
     inline void VerticalClient::Signal(unsigned sessionId, const CheckAliveData& data)
     {
-        auto apiData = ToC(data);
-        ::SignalHermesVerticalClientCheckAlive(m_pImpl, sessionId, &apiData);
+        const Converter2C<CheckAliveData> converter(data);
+        ::SignalHermesVerticalClientCheckAlive(m_pImpl, sessionId, converter.CPointer());
     }
 
     inline void VerticalClient::Reset(const NotificationData& data)
     {
-        auto apiData = ToC(data);
-        ::ResetHermesVerticalClient(m_pImpl, &apiData);
+        const Converter2C<NotificationData> converter(data);
+        ::ResetHermesVerticalClient(m_pImpl, converter.CPointer());
     }
 
     inline void VerticalClient::Signal(unsigned sessionId, StringView rawXml)
@@ -1254,8 +1334,8 @@ namespace Hermes
 
     inline void VerticalClient::Disable(const NotificationData& data)
     {
-        auto apiData = ToC(data);
-        ::DisableHermesVerticalClient(m_pImpl, &apiData);
+        const Converter2C<NotificationData> converter(data);
+        ::DisableHermesVerticalClient(m_pImpl, converter.CPointer());
     }
 
     inline void VerticalClient::Stop()

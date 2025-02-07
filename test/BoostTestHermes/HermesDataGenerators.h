@@ -1,5 +1,5 @@
 /***********************************************************************
-Copyright ASM Assembly Systems GmbH & Co. KG
+Copyright ASMPT Assembly Systems GmbH & Co. KG
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -35,9 +35,9 @@ struct SimpleSampleGenerator;
 template<>
 struct SimpleSampleGenerator<std::string>
 {
-    static std::vector<std::string> Generate(const std::string& default)
+    static std::vector<std::string> Generate(const std::string& defaultValue)
     {
-        if (default == std::string{"00000000-0000-0000-0000-000000000000"})
+        if (defaultValue == std::string{"00000000-0000-0000-0000-000000000000"})
             return
         {
             std::string{"00000000-0000-0000-0000-000000000000"},
@@ -137,18 +137,18 @@ struct SimpleSampleGenerator<I, std::enable_if_t<std::is_signed<I>::value && std
 template<class U>
 struct SimpleSampleGenerator<U, std::enable_if_t<std::is_unsigned<U>::value && std::is_integral<U>::value>>
 {
-    static std::vector<U> Generate(U default)
+    static std::vector<U> Generate(U defaultValue)
     {
-        return{default, default + 1U, std::numeric_limits<U>::max()};
+        return{ defaultValue, defaultValue + 1U, std::numeric_limits<U>::max()};
     }
 };
 
 template<>
 struct SimpleSampleGenerator<unsigned>
 {
-    static std::vector<unsigned> Generate(unsigned default)
+    static std::vector<unsigned> Generate(unsigned defaultValue)
     {
-        return{default, default + 1, static_cast<unsigned>(std::numeric_limits<int>::max())};
+        return{ defaultValue, defaultValue + 1, static_cast<unsigned>(std::numeric_limits<int>::max())};
     }
 };
 
@@ -157,7 +157,7 @@ struct SimpleSampleGenerator<double>
 {
     static std::vector<double> Generate(double)
     {
-        return{0.0, 0.125, 1.0, 10000.0};
+        return{0.0, 0.375, 1.0, 10000.125};
     };
 };
 
@@ -194,36 +194,7 @@ struct MemberTraits<MemberT ClassT::*>
     using Member = MemberT;
 };
 
-//inline std::vector<Hermes::ServiceDescriptionData> GenerateNonDefaultServiceDescriptionData()
-//{
-//    std::vector<Hermes::ServiceDescriptionData> result;
-//    AddNonDefaultSamples<Hermes::ServiceDescriptionData, std::string, &Hermes::ServiceDescriptionData::m_machineId>(result);
-//        
-//    return result;
-//}
-//
-//inline std::vector<Hermes::MachineReadyData> GenerateNonDefaultMachineReadyData()
-//{
-//    std::vector<Hermes::MachineReadyData> result;
-//    AddNonDefaultSamples<Hermes::MachineReadyData, Hermes::EBoardQuality, &Hermes::MachineReadyData::m_boardQuality>(result);
-//    return result;
-//}
 
-//#define HERMES_TEST_ADD_NON_DEFAULT_SAMPLES(samples, member) \
-//AddNonDefaultSamples<MemberTraits<decltype(member)>::Class, MemberTraits<decltype(member)>::Member, member>(samples)
-//
-//void AddAllNonDefaultSamples(std::vector<Hermes::MachineReadyData>& samples)
-//{
-//    HERMES_TEST_ADD_NON_DEFAULT_SAMPLES(samples, &Hermes::MachineReadyData::m_boardQuality);
-//}
-//
-//void AddAllNonDefaultSamples(std::vector<Hermes::ServiceDescriptionData>& samples)
-//{
-//    HERMES_TEST_ADD_NON_DEFAULT_SAMPLES(samples, &Hermes::ServiceDescriptionData::m_laneId);
-//    HERMES_TEST_ADD_NON_DEFAULT_SAMPLES(samples, &Hermes::ServiceDescriptionData::m_machineId);
-//}
-
-//HERMES_ADD_SAMPLES(Hermes::MachineReadyData, (m_boardQuality))
 template<class T>
 std::vector<T> GenerateNonDefaultSamples()
 {

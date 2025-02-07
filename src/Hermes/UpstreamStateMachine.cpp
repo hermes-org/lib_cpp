@@ -234,6 +234,20 @@ namespace Hermes
                 }
             }
 
+            void Signal(const CommandData&, StringView rawXml) override
+            {
+                switch (m_state)
+                {
+                case EState::eNOT_CONNECTED:
+                case EState::eDISCONNECTED:
+                    return;
+
+                default:
+                    m_forward.Signal(rawXml);
+                    return;
+                }
+            }
+
             void Signal(const CheckAliveData&, StringView rawXml) override
             {
                 switch (m_state)
@@ -408,7 +422,6 @@ namespace Hermes
 
                 default:
                     m_pCallback->On(m_state, data);
-                    return;
                 }
             }
 
@@ -422,7 +435,19 @@ namespace Hermes
 
                 default:
                     m_pCallback->On(m_state, data);
+                }
+            }
+
+            void On(const CommandData& data) override
+            {
+                switch (m_state)
+                {
+                case EState::eNOT_CONNECTED:
+                case EState::eDISCONNECTED:
                     return;
+
+                default:
+                    m_pCallback->On(m_state, data);
                 }
             }
 
@@ -436,7 +461,6 @@ namespace Hermes
 
                 default:
                     m_pCallback->On(m_state, data);
-                    return;
                 }
             }
 

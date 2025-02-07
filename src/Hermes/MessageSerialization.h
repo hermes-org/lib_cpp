@@ -3,10 +3,11 @@
 #include <HermesData.hpp>
 
 #ifdef _WINDOWS
-# include <pugixml/pugixml.hpp>
+#include "pugixml/pugixml.hpp"
 #else
-# include <pugixml.hpp>
+#include "pugixml.hpp"
 #endif
+
 #include <string>
 
 
@@ -141,7 +142,7 @@ namespace Hermes
         static constexpr const char cTAG[] = "SendBoardInfo";
         static constexpr StringView cTAG_VIEW = StringView{cTAG, sizeof(cTAG) - 1U};
     };
-    
+
     template<> struct SerializationTraits<SupervisoryServiceDescriptionData>
     {
         using Data = CurrentConfigurationData;
@@ -181,6 +182,38 @@ namespace Hermes
         static constexpr const char cTAG[] = "SendWorkOrderInfo";
         static constexpr StringView cTAG_VIEW = StringView{cTAG, sizeof(cTAG) - 1U};
     };
+
+    template<> struct SerializationTraits<ReplyWorkOrderInfoData>
+    {
+        using Data = CurrentConfigurationData;
+
+        static constexpr const char cTAG[] = "ReplyWorkOrderInfo";
+        static constexpr StringView cTAG_VIEW = StringView{ cTAG, sizeof(cTAG) - 1U };
+    };
+
+    template<> struct SerializationTraits<QueryHermesCapabilitiesData>
+    {
+        using Data = CurrentConfigurationData;
+
+        static constexpr const char cTAG[] = "QueryHermesCapabilities";
+        static constexpr StringView cTAG_VIEW = StringView{ cTAG, sizeof(cTAG) - 1U };
+    };
+
+    template<> struct SerializationTraits<SendHermesCapabilitiesData>
+    {
+        using Data = CurrentConfigurationData;
+
+        static constexpr const char cTAG[] = "SendHermesCapabilities";
+        static constexpr StringView cTAG_VIEW = StringView{ cTAG, sizeof(cTAG) - 1U };
+    };
+
+    template<> struct SerializationTraits<CommandData>
+    {
+        using Data = CurrentConfigurationData;
+
+        static constexpr const char cTAG[] = "Command";
+        static constexpr StringView cTAG_VIEW = StringView{ cTAG, sizeof(cTAG) - 1U };
+    };
     
     std::string Serialize(const ServiceDescriptionData&);
     std::string Serialize(const BoardAvailableData&);
@@ -203,6 +236,10 @@ namespace Hermes
     std::string Serialize(const BoardDepartedData&);
     std::string Serialize(const QueryWorkOrderInfoData&);
     std::string Serialize(const SendWorkOrderInfoData&);
+    std::string Serialize(const ReplyWorkOrderInfoData&);
+    std::string Serialize(const QueryHermesCapabilitiesData&);
+    std::string Serialize(const SendHermesCapabilitiesData&);
+    std::string Serialize(const CommandData&);
 
     Error Deserialize(pugi::xml_node, ServiceDescriptionData&);
     Error Deserialize(pugi::xml_node, BoardAvailableData&);
@@ -225,5 +262,9 @@ namespace Hermes
     Error Deserialize(pugi::xml_node, BoardDepartedData&);
     Error Deserialize(pugi::xml_node, QueryWorkOrderInfoData&);
     Error Deserialize(pugi::xml_node, SendWorkOrderInfoData&);
+    Error Deserialize(pugi::xml_node, ReplyWorkOrderInfoData&);
+    Error Deserialize(pugi::xml_node, QueryHermesCapabilitiesData&);
+    Error Deserialize(pugi::xml_node, SendHermesCapabilitiesData&);
+    Error Deserialize(pugi::xml_node, CommandData&);
 
 }

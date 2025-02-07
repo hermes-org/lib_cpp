@@ -45,6 +45,8 @@ namespace Hermes
                 m_dispatcher.Add<BoardArrivedData>([this](const auto& data) { m_pCallback->On(data); });
                 m_dispatcher.Add<BoardDepartedData>([this](const auto& data) { m_pCallback->On(data); });
                 m_dispatcher.Add<QueryWorkOrderInfoData>([this](const auto& data) { m_pCallback->On(data); });
+                m_dispatcher.Add<ReplyWorkOrderInfoData>([this](const auto& data) { m_pCallback->On(data); });
+                m_dispatcher.Add<SendHermesCapabilitiesData>([this](const auto& data) { m_pCallback->On(data); });
             }
 
             // ISocketCallback

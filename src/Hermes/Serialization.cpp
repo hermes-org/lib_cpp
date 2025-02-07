@@ -109,8 +109,22 @@ void HermesSerializeSendWorkOrderInfo(const HermesSendWorkOrderInfoData* pData, 
 {
     callback.m_pCall(callback.m_pData, Hermes::ToC(Hermes::Serialize(Hermes::ToCpp(*pData))));
 }
-
-
+void HermesSerializeReplyWorkOrderInfo(const HermesReplyWorkOrderInfoData* pData, HermesSerializationCallback callback)
+{
+    callback.m_pCall(callback.m_pData, Hermes::ToC(Hermes::Serialize(Hermes::ToCpp(*pData))));
+}
+void HermesSerializeCommand(const HermesCommandData* pData, HermesSerializationCallback callback)
+{
+    callback.m_pCall(callback.m_pData, Hermes::ToC(Hermes::Serialize(Hermes::ToCpp(*pData))));
+}
+void HermesSerializeQueryHermesCapabilities(const HermesQueryHermesCapabilitiesData* pData, HermesSerializationCallback callback)
+{
+    callback.m_pCall(callback.m_pData, Hermes::ToC(Hermes::Serialize(Hermes::ToCpp(*pData))));
+}
+void HermesSerializeSendHermesCapabilities(const HermesSendHermesCapabilitiesData* pData, HermesSerializationCallback callback)
+{
+    callback.m_pCall(callback.m_pData, Hermes::ToC(Hermes::Serialize(Hermes::ToCpp(*pData))));
+}
 namespace
 {
     template<class T, class CallbackT>
@@ -121,8 +135,8 @@ namespace
 
         dispatcher.Add<T>([callback](const auto& data)
         {
-            auto cData{Hermes::ToC(data)};
-            callback.m_pCall(callback.m_pData, &cData);
+            Hermes::Converter2C<T> converter(data);
+            callback.m_pCall(callback.m_pData, converter.CPointer());
         });
     }
 }
@@ -154,6 +168,10 @@ void HermesDeserialize(HermesStringView stringView, const HermesDeserializationC
     Add_<Hermes::BoardDepartedData>(dispatcher, pCallbacks->m_boardDepartedCallback);
     Add_<Hermes::QueryWorkOrderInfoData>(dispatcher, pCallbacks->m_queryWorkOrderInfoCallback);
     Add_<Hermes::SendWorkOrderInfoData>(dispatcher, pCallbacks->m_sendWorkOrderInfoCallback);
+    Add_<Hermes::ReplyWorkOrderInfoData>(dispatcher, pCallbacks->m_replyWorkOrderInfoCallback);
+    Add_<Hermes::CommandData>(dispatcher, pCallbacks->m_commandCallback);
+    Add_<Hermes::QueryHermesCapabilitiesData>(dispatcher, pCallbacks->m_queryHermesCapabilitiesCallback);
+    Add_<Hermes::SendHermesCapabilitiesData>(dispatcher, pCallbacks->m_sendHermesCapabilitiesCallback);
 
     std::string xmlParseString{Hermes::ToCpp(stringView)};
     auto error = dispatcher.Dispatch(xmlParseString);
@@ -163,8 +181,9 @@ void HermesDeserialize(HermesStringView stringView, const HermesDeserializationC
     if (!pCallbacks->m_deserializationErrorCallback.m_pCall)
         return;
 
-    auto cError = Hermes::ToC(error);
-    pCallbacks->m_deserializationErrorCallback.m_pCall(pCallbacks->m_deserializationErrorCallback.m_pData, &cError);
+    const Hermes::Converter2C<Hermes::Error> converter(error);
+    pCallbacks->m_deserializationErrorCallback.m_pCall(pCallbacks->m_deserializationErrorCallback.m_pData, 
+        converter.CPointer());
 }
 
 

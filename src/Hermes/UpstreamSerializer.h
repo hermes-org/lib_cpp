@@ -47,6 +47,7 @@ namespace Hermes
             virtual void On(const BoardForecastData&) = 0;
             virtual void On(const SendBoardInfoData&) = 0;
             virtual void On(const NotificationData&) = 0;
+            virtual void On(const CommandData&) = 0;
             virtual void On(const CheckAliveData&) = 0;
             virtual void OnDisconnected(const Error&) = 0;
 

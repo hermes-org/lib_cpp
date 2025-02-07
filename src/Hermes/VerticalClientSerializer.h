@@ -47,8 +47,10 @@ namespace Hermes
             virtual void On(const BoardDepartedData&) = 0;
             virtual void On(const CurrentConfigurationData&) = 0;
             virtual void On(const QueryWorkOrderInfoData&) = 0;
+            virtual void On(const ReplyWorkOrderInfoData&) = 0;
             virtual void On(const NotificationData&) = 0;
             virtual void On(const CheckAliveData&) = 0;
+            virtual void On(const SendHermesCapabilitiesData&) = 0;
             virtual void OnDisconnected(const Error&) = 0;
 
         protected:

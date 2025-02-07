@@ -1,19 +1,3 @@
-/***********************************************************************
-Copyright ASM Assembly Systems GmbH & Co. KG
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-************************************************************************/
-
 #pragma once
 
 #include <Hermes.hpp>
@@ -67,6 +51,7 @@ namespace Hermes
         StopTransportData m_stopTransportData;
         QueryBoardInfoData m_queryBoardInfoData;
         NotificationData m_notificationData;
+        CommandData m_commandData;
         CheckAliveData m_checkAliveData;
 
         void OnConnected(unsigned sessionId, EState state, const Hermes::ConnectionInfo& connectionInfo) override
@@ -92,6 +77,13 @@ namespace Hermes
             m_sessionId = sessionId;
         }
 
+        void On(unsigned sessionId, const Hermes::CommandData& data) override
+        {
+            ChangeLock lock(this);
+            m_commandData = data;
+            m_sessionId = sessionId;
+        }
+
         void On(unsigned sessionId, const Hermes::CheckAliveData& data) override
         {
             ChangeLock lock(this);
@@ -112,7 +104,6 @@ namespace Hermes
             m_state = state;
             m_sessionId = sessionId;
         }
-
 
         void On(unsigned sessionId, EState state, const Hermes::MachineReadyData& data) override
         {
@@ -173,6 +164,7 @@ namespace Hermes
         BoardForecastData m_boardForecastData;
         SendBoardInfoData m_sendBoardInfoData;
         NotificationData m_notificationData;
+        CommandData m_commandData;
         CheckAliveData m_checkAliveData;
 
         void OnConnected(unsigned sessionId, EState state, const Hermes::ConnectionInfo& connectionInfo) override
@@ -196,6 +188,13 @@ namespace Hermes
             ChangeLock lock(this);
             m_sessionId = sessionId;
             m_notificationData = data;
+        }
+
+        void On(unsigned sessionId, const Hermes::CommandData& data) override
+        {
+            ChangeLock lock(this);
+            m_sessionId = sessionId;
+            m_commandData = data;
         }
 
         void On(unsigned sessionId, const Hermes::CheckAliveData& data) override
@@ -282,6 +281,7 @@ namespace Hermes
             Hermes::Optional<SendWorkOrderInfoData> m_sendWorkOrderInfoData;
             Hermes::Optional<NotificationData> m_notificationData;
             Hermes::Optional<CheckAliveData> m_checkAliveData;
+            Hermes::Optional<QueryHermesCapabilitiesData> m_queryHermesCapabilitiesData;
         };
         std::map<unsigned int, Session> m_sessionMap;
 
@@ -332,6 +332,12 @@ namespace Hermes
             m_sessionMap[sessionId].m_checkAliveData = data;
         }
 
+        void On(unsigned sessionId, const Hermes::QueryHermesCapabilitiesData& data) override
+        {
+            ChangeLock lock(this);
+            m_sessionMap[sessionId].m_queryHermesCapabilitiesData = data;
+        }
+
         void OnDisconnected(unsigned sessionId, EVerticalState state, const Hermes::Error&) override
         {
             ChangeLock lock(this);
@@ -359,8 +365,10 @@ namespace Hermes
         Hermes::Optional<BoardArrivedData> m_boardArrivedData;
         Hermes::Optional<BoardDepartedData> m_boardDepartedData;
         Hermes::Optional<QueryWorkOrderInfoData> m_queryWorkOrderInfoData;
+        Hermes::Optional<ReplyWorkOrderInfoData> m_replyWorkOrderInfoData;
         Hermes::Optional<NotificationData> m_notificationData;
         Hermes::Optional<CheckAliveData> m_checkAliveData;
+        Hermes::Optional<SendHermesCapabilitiesData> m_sendHermesCapabilitiesData;
 
         void OnConnected(unsigned sessionId, EVerticalState state, const Hermes::ConnectionInfo& connectionInfo) override
         {
@@ -404,6 +412,20 @@ namespace Hermes
             ChangeLock lock(this);
             m_sessionId = sessionId;
             m_queryWorkOrderInfoData = data;
+        }
+
+        void On(unsigned sessionId, const Hermes::ReplyWorkOrderInfoData& data) override
+        {
+            ChangeLock lock(this);
+            m_sessionId = sessionId;
+            m_replyWorkOrderInfoData = data;
+        }
+
+        void On(unsigned sessionId, const Hermes::SendHermesCapabilitiesData& data) override
+        {
+            ChangeLock lock(this);
+            m_sessionId = sessionId;
+            m_sendHermesCapabilitiesData = data;
         }
 
         void On(unsigned sessionId, const Hermes::NotificationData& data) override

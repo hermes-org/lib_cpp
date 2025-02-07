@@ -18,15 +18,18 @@ limitations under the License.
 
 #include <Hermes.h>
 #ifdef _WINDOWS
-# include <Windows.h>
+#include <Windows.h>
 #else
-# include <pthread.h>
+ #include <pthread.h>
 #endif
 
 #include <cassert>
 #include <iostream>
 #include <string>
 #include <vector>
+#include <boost/uuid/uuid_generators.hpp> // generators
+#include <boost/uuid/uuid_io.hpp>         // streaming operators etc.
+
 
 // some infrastructure to aid testing:
 namespace
@@ -130,8 +133,8 @@ public:
         m_laneId(laneId),
         m_pHermes(0),
         m_threadHandle(0), 
-        m_state(eHERMES_STATE_NOT_CONNECTED), 
         m_sessionId(0U),
+        m_state(eHERMES_STATE_NOT_CONNECTED),
         m_bottomBarcode("ABCDEF"),
         m_width(210.0),
         m_configuration()
@@ -146,6 +149,7 @@ public:
             {&DownstreamProxy::OnStopTransport_, this},
             {0, 0}, // OnSendBoardInfo
             {0, 0}, // OnNotification
+            {0, 0}, // OnCommand
             {0, 0}, // OnState
             {0, 0}, // OnCheckAlive
             {0, 0}, // OnDisconnected
@@ -301,12 +305,9 @@ private:
 
         pThis->m_state = state;
 
-        GUID guid;
-        ::UuidCreateSequential(&guid);
-        RPC_CSTR guidString;
-        ::UuidToStringA(&guid, &guidString);
-        pThis->m_boardId = reinterpret_cast<const char*>(guidString);
-        ::RpcStringFreeA(&guidString);
+        std::stringstream guid;
+        guid << boost::uuids::random_generator()();
+        pThis->m_boardId = guid.str();
 
         HermesBoardAvailableData boardAvailableData =
         {
@@ -390,6 +391,7 @@ public:
             {0, 0}, // OnBoardForecast
             {0, 0}, // OnSendBoardInfo
             {0, 0}, // OnNotification
+            {0, 0}, // OnCommand
             {0, 0}, // OnState
             {0, 0}, // OnCheckAlive
             {0, 0}, // OnDisconnected
@@ -481,6 +483,7 @@ private:
     std::string m_serverAddress; // this is the actual storage behind m_configuration.m_hostAddress!
 #ifdef _WINDOWS
     HANDLE m_threadHandle;
+
 #else
     pthread_t m_threadHandle;
 #endif
@@ -587,7 +590,6 @@ public:
         };
 
         m_pHermes = ::CreateHermesConfigurationService(&callbacks);
-
 #ifdef _WINDOWS
         m_threadHandle = ::CreateThread(0, 0, &ConfigurationProxy::Run_, this, 0, 0);
 #else

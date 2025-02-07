@@ -3,9 +3,9 @@
 #include <HermesStringView.hpp>
 
 #ifdef _WINDOWS
-# include <pugixml/pugixml.hpp>
+#include "pugixml/pugixml.hpp"
 #else
-# include <pugixml.hpp>
+#include "pugixml.hpp"
 #endif
 
 namespace Hermes

@@ -1,10 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="Resource Files">
-      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
-      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
-    </Filter>
     <Filter Include="PrecompiledHeaders">
       <UniqueIdentifier>{1206491f-c7dc-4ff7-9428-24ec0363de3a}</UniqueIdentifier>
     </Filter>
@@ -27,14 +23,20 @@
     <Filter Include="Serialization">
       <UniqueIdentifier>{a1b6f957-3633-4457-8869-555143b5cdba}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Serialization\pugixml">
-      <UniqueIdentifier>{2bb8285b-5879-4db8-bea3-899d4ff1438c}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Upstream">
       <UniqueIdentifier>{217b355f-4db9-4366-8f3e-2fc173b41223}</UniqueIdentifier>
     </Filter>
     <Filter Include="Configuration">
       <UniqueIdentifier>{4035d6a8-f053-4d09-92f9-856f89ef72d0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="VerticalService">
+      <UniqueIdentifier>{b1011605-5304-4521-bc19-57db95f24442}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="VerticalClient">
+      <UniqueIdentifier>{3a3fc53b-b1ec-4d42-9082-17db5afd9423}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Pugixml">
+      <UniqueIdentifier>{2c66b745-fc16-4ca7-937b-d360d6105e07}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -62,9 +64,6 @@
     <ClInclude Include="DownstreamStateMachine.h">
       <Filter>Downstream</Filter>
     </ClInclude>
-    <ClInclude Include="UpstreamConnection.h">
-      <Filter>Upstream</Filter>
-    </ClInclude>
     <ClInclude Include="UpstreamSerializer.h">
       <Filter>Upstream</Filter>
     </ClInclude>
@@ -73,12 +72,6 @@
     </ClInclude>
     <ClInclude Include="UpstreamSession.h">
       <Filter>Upstream</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\References\pugixml\pugiconfig.hpp">
-      <Filter>Serialization\pugixml</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\References\pugixml\pugixml.hpp">
-      <Filter>Serialization\pugixml</Filter>
     </ClInclude>
     <ClInclude Include="ConfigurationServiceSerializer.h">
       <Filter>Configuration</Filter>
@@ -140,16 +133,19 @@
     <ClInclude Include="MessageDispatcher.h">
       <Filter>Serialization</Filter>
     </ClInclude>
-    <ClInclude Include="VerticalClientSerializer.h">
-      <Filter>Service</Filter>
-    </ClInclude>
-    <ClInclude Include="VerticalClientSession.h">
-      <Filter>Service</Filter>
-    </ClInclude>
     <ClInclude Include="VerticalServiceSerializer.h">
-      <Filter>Service</Filter>
+      <Filter>VerticalService</Filter>
     </ClInclude>
     <ClInclude Include="VerticalServiceSession.h">
+      <Filter>VerticalService</Filter>
+    </ClInclude>
+    <ClInclude Include="VerticalClientSerializer.h">
+      <Filter>VerticalClient</Filter>
+    </ClInclude>
+    <ClInclude Include="VerticalClientSession.h">
+      <Filter>VerticalClient</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\version\resource.h">
       <Filter>Service</Filter>
     </ClInclude>
   </ItemGroup>
@@ -187,9 +183,6 @@
     <ClCompile Include="UpstreamSession.cpp">
       <Filter>Upstream</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\References\pugixml\pugixml.cpp">
-      <Filter>Serialization\pugixml</Filter>
-    </ClCompile>
     <ClCompile Include="ConfigurationService.cpp">
       <Filter>Configuration</Filter>
     </ClCompile>
@@ -217,16 +210,26 @@
     <ClCompile Include="MessageDispatcher.cpp">
       <Filter>Serialization</Filter>
     </ClCompile>
-    <ClCompile Include="VerticalClient.cpp" />
-    <ClCompile Include="VerticalClientSerializer.cpp" />
-    <ClCompile Include="VerticalClientSession.cpp" />
-    <ClCompile Include="VerticalService.cpp" />
-    <ClCompile Include="VerticalServiceSerializer.cpp" />
-    <ClCompile Include="VerticalServiceSession.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ResourceCompile Include="..\..\version\Version.rc">
-      <Filter>Resource Files</Filter>
-    </ResourceCompile>
+    <ClCompile Include="VerticalServiceSerializer.cpp">
+      <Filter>VerticalService</Filter>
+    </ClCompile>
+    <ClCompile Include="VerticalServiceSession.cpp">
+      <Filter>VerticalService</Filter>
+    </ClCompile>
+    <ClCompile Include="VerticalService.cpp">
+      <Filter>VerticalService</Filter>
+    </ClCompile>
+    <ClCompile Include="VerticalClientSerializer.cpp">
+      <Filter>VerticalClient</Filter>
+    </ClCompile>
+    <ClCompile Include="VerticalClientSession.cpp">
+      <Filter>VerticalClient</Filter>
+    </ClCompile>
+    <ClCompile Include="VerticalClient.cpp">
+      <Filter>VerticalClient</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\References\pugixml\pugixml.cpp">
+      <Filter>Pugixml</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

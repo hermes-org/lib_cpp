@@ -81,7 +81,6 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(TestEmptyHermesDataTypes, DataT, EmptyHermesDataTy
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(TestNonEmptyHermesDataTypes, DataT, NonEmptyHermesDataTypes)
 {
-    //auto counter = 0U;
     auto samples = GenerateSamples<DataT>();
     for (const auto& data : samples)
     {
@@ -97,6 +96,63 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(TestNonEmptyHermesDataTypes, DataT, NonEmptyHermes
     }
 }
 
+template<class T>
+void TestSubBoardsCutoff_(T& data, const uint16_t maxSubBoards)
+{
+    auto& subBoards = data.m_optionalSubBoards;
 
+    data.m_optionalSubBoards.reserve(maxSubBoards + 1);
+    for (uint16_t i{ 0 }; i < maxSubBoards; ++i)
+    {
+        subBoards.emplace_back();
+        subBoards.back().m_pos = i + 1;
+        subBoards.back().m_optionalBc = std::to_string(i);
+    }
 
+    // maxCount and contents were carefully tweaked to yield slightly less or equal to max message size:
+    auto xml = ToXml(data);
+    BOOST_CHECK(xml.size() <= cHERMES_MAX_MESSAGE_SIZE);
+    auto optionalData = Hermes::FromXml<T>(xml);
+    BOOST_CHECK(optionalData == data);
 
+    subBoards.emplace_back();
+    subBoards.back().m_optionalBc = "AVeryLongBarcodeStringThatWillSurelyExceedTheMaximumHermesMessageSizeOf65536Bytes";
+    xml = ToXml(data);
+    BOOST_CHECK(xml.size() < cHERMES_MAX_MESSAGE_SIZE/2); // size should have become a lot smaller
+    optionalData = Hermes::FromXml<T>(xml);
+    BOOST_CHECK(optionalData != data);
+
+    subBoards.clear();
+    BOOST_CHECK(optionalData == data);
+}
+
+BOOST_AUTO_TEST_CASE(TestBoardAvailableSubBoardInfoSerializationCutOff)
+{
+    Hermes::BoardAvailableData data{ "0e4c18f9-5f69-4dbe-9b1c-e705bf7d680f", "123456", Hermes::EBoardQuality::eGOOD,
+        Hermes::EFlippedBoard::eTOP_SIDE_IS_UP };
+
+    TestSubBoardsCutoff_(data, 1777);
+}
+
+BOOST_AUTO_TEST_CASE(TestBoardArrivedSubBoardInfoSerializationCutOff)
+{
+    Hermes::BoardArrivedData data{ "M", 1, Hermes::EBoardArrivedTransfer::eINSERTED,
+        "0e4c18f9-4dbe-9b1c-e705bf7d680f", "Cr", Hermes::EBoardQuality::eGOOD, Hermes::EFlippedBoard::eTOP_SIDE_IS_UP };
+
+    TestSubBoardsCutoff_(data, 1776);
+}
+
+BOOST_AUTO_TEST_CASE(TestBoardDepartedSubBoardInfoSerializationCutOff)
+{
+    Hermes::BoardDepartedData data{ "M", 1, Hermes::EBoardDepartedTransfer::eREMOVED,
+        "0e4c18f9-9b1c-e705bf7d680f", "Cr", Hermes::EBoardQuality::eGOOD, Hermes::EFlippedBoard::eTOP_SIDE_IS_UP };
+
+    TestSubBoardsCutoff_(data, 1776);
+}
+
+BOOST_AUTO_TEST_CASE(TestSendWorkOrderInfoSubBoardInfoSerializationCutOff)
+{
+    Hermes::SendWorkOrderInfoData data{std::string{"MyVeryLongQueryId"}};
+
+    TestSubBoardsCutoff_(data, 1778);
+}

@@ -48,6 +48,7 @@ namespace Hermes
             virtual void On(const SendWorkOrderInfoData&) = 0;
             virtual void On(const NotificationData&) = 0;
             virtual void On(const CheckAliveData&) = 0;
+            virtual void On(const QueryHermesCapabilitiesData&) = 0;
             virtual void OnDisconnected(const Error&) = 0;
 
         protected:

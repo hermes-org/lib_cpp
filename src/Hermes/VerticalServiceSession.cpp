@@ -149,6 +149,7 @@ namespace Hermes
             void On(const SendWorkOrderInfoData& data) override  { On_(data, "SendWorkOrderInfo"); }
             void On(const NotificationData& data) override { On_(data, "Notification"); }
             void On(const CheckAliveData& data) override { On_(data, "CheckAlive"); }
+            void On(const QueryHermesCapabilitiesData& data) override { On_(data, "QueryHermesCapabilities"); }
 
             void Signal_(StringView rawXml)
             {
@@ -228,9 +229,11 @@ namespace Hermes
         void Session::Signal(const BoardArrivedData& data) { m_spImpl->Signal_(Serialize(data)); }
         void Session::Signal(const BoardDepartedData& data) { m_spImpl->Signal_(Serialize(data)); }
         void Session::Signal(const QueryWorkOrderInfoData& data) { m_spImpl->Signal_(Serialize(data)); }
+        void Session::Signal(const ReplyWorkOrderInfoData& data) { m_spImpl->Signal_(Serialize(data)); }
         void Session::Signal(const CurrentConfigurationData& data) { m_spImpl->Signal_(Serialize(data)); }
         void Session::Signal(const NotificationData& data) { m_spImpl->Signal_(Serialize(data)); }
         void Session::Signal(const CheckAliveData& data) { m_spImpl->Signal_(Serialize(data)); }
+        void Session::Signal(const SendHermesCapabilitiesData& data) { m_spImpl->Signal_(Serialize(data)); }
 
         void Session::Disconnect()
         {

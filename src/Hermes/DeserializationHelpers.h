@@ -2,10 +2,11 @@
 
 #include "IService.h"
 #include "StringSpan.h"
+
 #ifdef _WINDOWS
-# include <pugixml/pugixml.hpp>
+#include "pugixml/pugixml.hpp"
 #else
-# include <pugixml.hpp>
+#include "pugixml.hpp"
 #endif
 
 #include <boost/variant.hpp>
