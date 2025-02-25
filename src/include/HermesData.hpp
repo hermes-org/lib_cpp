@@ -495,7 +495,7 @@ struct ServiceDescriptionData
     std::string m_machineId;
     unsigned m_laneId{0};
     Optional<std::string> m_optionalInterfaceId;
-    std::string m_version{"1.5"};
+    std::string m_version{HERMES_VERSION};
     SupportedFeatures m_supportedFeatures;
 
     ServiceDescriptionData() = default;
@@ -1318,7 +1318,7 @@ struct SupervisoryFeatures
 struct SupervisoryServiceDescriptionData
 {
     std::string m_systemId;
-    std::string m_version{"1.5"};
+    std::string m_version{HERMES_VERSION};
     SupervisoryFeatures m_supportedFeatures;
 
     SupervisoryServiceDescriptionData() = default;

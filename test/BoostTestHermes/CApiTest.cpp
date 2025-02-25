@@ -93,7 +93,7 @@ namespace
     };
 
 
-    std::string sHermesVersion = "1.0";
+    std::string sHermesVersion = HERMES_VERSION;
     std::string sLocalHost = "localhost";
     Mutex sTraceMutex;
     const unsigned cCHECK_ALIVE_PERIOD = 60U;
